@@ -1,1 +1,10 @@
 *.MBO
+*.layout
+*.user
+*.ncb
+*.suo
+*.filters
+*.pro.user*
+
+	
+
