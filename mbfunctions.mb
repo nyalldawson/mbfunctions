@@ -1,0 +1,3090 @@
+'**************************************************************************
+'**************************************************************************
+'
+' mbfunctions.mb - contains useful, generic functions for use throughout
+'				   MapBasic.
+'
+'**************************************************************************
+'**************************************************************************
+
+Include "mapbasic.def"
+Include "menu.def"
+Include "mbfunctions.def"
+
+Declare Sub ChooseMultipleColumnsVerify
+Dim iChooseMultipleColumnsValueChoices() As Integer
+
+Sub SortPartStringArray( sArray() As String, ByVal iStartPos As Integer, ByVal iEndPos As Integer )
+	Dim iMaxLength As Integer
+	Dim i As Integer
+	'Calculate maximum string length in array
+	For i = iStartPos To iEndPos
+		If Len( sArray(i) ) > iMaxLength Then
+			iMaxLength = Len( sArray(i) )
+		End If
+	Next
+	'Now make sure all positions in array are of sufficient capacity for longest string in array
+	For i = iStartPos To iEndPos
+		If Len( sArray(i) ) < iMaxLength Then
+			'Pad string out to max required length
+			sArray(i) = sArray(i) + Space$( iMaxLength - Len( sArray(i) ) )
+		End If
+	Next
+	'Call DLL sort routine
+	Dim iResult As Integer
+	iResult = DLLSortStringArray( sArray, iStartPos, iEndPos )
+End Sub
+
+Sub SortStringArray( sArray() As String )
+	'Sort whole array
+	Call SortPartStringArray( sArray(), 1, UBound( sArray ) )
+End Sub
+
+Function InputBox( ByVal sPrompt As String, ByVal sTitle As String, ByVal sDefault As String ) As String
+	If Not sTitle Then
+		sTitle = "Enter a value"
+	End If
+	
+	Dim sValue As String
+	Dialog
+		Title sTitle
+		Control StaticText
+			Title sPrompt
+			Position 5, 5
+		Control EditText
+			Value sDefault
+			Into sValue
+			Position 5, 20
+		Control OKButton
+		Control CancelButton
+			
+	If Not CommandInfo( CMD_INFO_DLG_OK ) Then
+		'Cancel pressed
+		InputBox = - 999
+	Else
+		InputBox = sValue
+	End If
+	
+End Function
+
+Function Replace$( ByVal sFullString As String, ByVal sRemoveString As String, ByVal sReplaceString As String ) As String
+	Dim iReplaceStringPos As Integer
+	Dim sStartString, sEndString As String
+	
+	Dim iCurrentPos As Integer
+	iCurrentPos = 1
+	
+	OnError Goto ErrorOccured
+	Search_For_Replace:
+	iReplaceStringPos = InStr( iCurrentPos, LCase$( sFullString ), LCase$( sRemoveString ))
+	If ( iReplaceStringPos > 0 ) Then
+		If ( iReplaceStringPos = 1 ) Then
+			' Search string is at beginning of full string
+			sFullString = sReplaceString +
+					Mid$( sFullString, Len( sRemoveString ) + 1, Len( sFullString ) -
+					Len( sRemoveString ))
+			iCurrentPos = iReplaceStringPos + Len( sReplaceString )
+			Goto Search_For_Replace
+		ElseIf (( iReplaceStringPos + Len( sRemoveString ) - 1 ) = Len( sFullString )) Then
+			' Search string is at end of full string
+			sFullString = Left$( sFullString, iReplaceStringPos - 1 ) + sReplaceString
+		Else
+			' Search string in middle of full string
+			sStartString = Left$( sFullString, iReplaceStringPos - 1 )
+			sEndString = Mid$( sFullString, iReplaceStringPos + Len( sRemoveString ),
+					Len( sFullString ) - ( iReplaceStringPos + Len( sRemoveString ) - 1 ))
+			sFullString = sStartString + sReplaceString + sEndString
+			iCurrentPos = Len( sStartString ) + Len( sReplaceString )
+			Goto Search_For_Replace
+		End If
+	End If
+	Replace$ = sFullString
+	Exit Function
+	ErrorOccured:
+	Replace$ = ""
+End Function
+
+Function StripLeft$( ByVal sFullString As String, ByVal sRemoveChars As String ) As String
+	Dim sTemp As String
+	
+	sTemp = sFullString
+	
+	Do Until Left$( sTemp, 1 ) <> sRemoveChars
+		sTemp = Mid$( sTemp, 2, 1000 )
+		
+	Loop
+	StripLeft$ = sTemp
+	
+End Function
+
+Function StripRight$( ByVal sFullString As String, ByVal sRemoveChars As String ) As String
+	Dim sTemp As String
+	
+	sTemp = sFullString
+	
+	Do Until Right$( sTemp, 1 ) <> sRemoveChars
+		sTemp = Left$( sTemp, Len( sTemp ) - 1 )
+		
+	Loop
+	StripRight$ = sTemp
+	
+End Function
+
+Function GetLayerNumber( ByVal sTableName As String ) As Integer
+	Dim i, iNumberLayers As Integer
+	iNumberLayers = MapperInfo( FrontWindow(), MAPPER_INFO_LAYERS )
+	For i = 1 to iNumberLayers
+		If LayerInfo( FrontWindow(), i, LAYER_INFO_NAME ) = sTableName Then
+			GetLayerNumber = i
+			Exit Function
+		End If
+	Next
+End Function
+
+Function IsNum( ByVal sTest As String ) As Logical
+	OnError Goto test_failed
+	If sTest = "0" Then
+		isNum = TRUE
+		Exit Function
+	End If
+	
+	'Instant fails
+	If sTest = "." Then
+		isNum = FALSE
+		Exit Function
+	End If
+	
+	If InStr( InStr( 1, sTest, "." ) + 1, sTest, "." ) Then
+		'More than one . so fail
+		isNum = FALSE
+		Exit Function
+	End If
+	
+	sTest = StripLeft$( sTest, "0" )
+	If Left$( sTest, 1 ) = "." Then
+		sTest = "0" + sTest
+	End If
+	
+	sTest = StripRight$( sTest, "0" )
+	If Right$( sTest, 1 ) = "." Then
+		sTest = Left$( sTest, Len( sTest ) - 1 )
+	End If
+	
+	If InStr( 1, sTest, "." ) Then
+		'Split string at . and check each part, to avoid rounding issues
+		Dim sSplit() As String
+		Call Explode( sTest, ".", sSplit )
+		IsNum = IsNum( sSplit(1) ) And IsNum( sSplit(2) )
+		Exit Function
+	End If
+	
+	If Str$( Val( sTest )) = sTest Then
+		isNum = TRUE
+	Else
+		isNum = FALSE
+	End If
+	
+	Exit Function
+	
+	test_failed:
+	isNum = FALSE
+	OnError Goto 0
+	
+End Function
+
+Function Trim$( ByVal sTrim As String ) As String
+	Trim$ = LTrim$( RTrim$( sTrim ))
+End Function
+
+Function CountOccurances( ByVal sString As String, ByVal sCount As String ) As Integer
+	Dim iCount As Integer
+	Dim sTmp As String
+	
+	sTmp = sString
+	iCount = 0
+	Do While InStr( 1, sTmp, sCount ) > 0
+		iCount = iCount + 1
+		sTmp = Right$( sTmp, Len( sTmp ) - InStr( 1, sTmp, sCount ))
+	Loop
+	
+	CountOccurances = iCount
+End Function
+
+Function InStrRev( ByVal sString As String, ByVal sSearch As String ) As Integer
+	Dim sTmp As String
+	Dim iPos As Integer
+	sTmp = sString
+	iPos = 1
+	Do While InStr( iPos, sTmp, sSearch ) > 0
+		iPos = InStr( iPos, sTmp, sSearch ) + 1
+	Loop
+	
+	InStrRev = iPos - 1
+End Function
+
+Function AlterLineStyle( ByVal oLine As Object, ByVal pNew As Pen ) As Object
+	Alter Object oLine Info OBJ_INFO_PEN, pNew
+	AlterLineStyle = oLine
+End Function
+
+Function AlterSymbolStyle( ByVal oSymbol As Object, ByVal sNew As Symbol ) As Object
+	Alter Object oSymbol Info OBJ_INFO_SYMBOL, sNew
+	AlterSymbolStyle = oSymbol
+End Function
+
+Function AlterRegionStyle( ByVal oRegion As Object, ByVal bNew As Brush, ByVal pNew As Pen ) As Object
+	Alter Object oRegion Info OBJ_INFO_BRUSH, bNew
+	Alter Object oRegion Info OBJ_INFO_PEN, pNew
+	AlterRegionStyle = oRegion
+End Function
+
+Function AlterFontStyle( ByVal oText As Object, ByVal fNew As Font ) As Object
+	Alter Object oText Info OBJ_INFO_TEXTFONT, fNew
+	AlterFontStyle = oText
+End Function
+
+Function ChooseTable( ByVal sDialogTitle As String, ByVal sPrompt As String ) As String
+	ChooseTable = ChooseTableAdvanced( sDialogTitle, sPrompt, "", "", 0 )
+End Function
+
+Function ChooseTableAdvanced( ByVal sDialogTitle As String, ByVal sPrompt As String, ByVal sSubstringDefault As String, ByVal sSubstringIgnore As String, ByVal iChooseTableOptions As Integer ) As String
+	
+	Dim i, iTableChoice As Integer
+	Dim sTableList() As String
+	Dim iTableDefault As Integer
+	Dim sDefaultTable As String
+	
+	If SelectionInfo( SEL_INFO_NROWS ) > 0 Then
+		'If there's a current selection, add a "Selection" item to top of list
+		Call PushStringArray( sTableList, "Selection" )
+	End If
+	
+	' Check read only
+	Dim iFlags As Integer
+	iFlags = 0
+	If BitwiseTest( iChooseTableOptions, CHOOSETABLE_HIDEREADONLY ) Then
+		iFlags = iFlags + TABLELIST_HIDEREADONLY
+	End If
+	If BitwiseTest( iChooseTableOptions, CHOOSETABLE_VECTORONLY ) Then
+		iFlags = iFlags + TABLELIST_VECTORONLY
+	End If
+	
+	Call GetTableList( sTableList, sSubstringIgnore, iFlags )
+	
+	If UBound( sTableList ) = 0 Then
+		ChooseTableAdvanced = "__no_good_tables!__"
+		Exit Function
+	End If
+	
+	'Sort list of tables
+	If SelectionInfo( SEL_INFO_NROWS ) > 0 Then
+		'If there's a selection item, make sure it's always on top
+		Call SortPartStringArray( sTableList, 2, UBound( sTableList ) )
+	Else
+		Call SortStringArray( sTableList )
+	End If
+	
+	'Find default table selection
+	
+	If sSubstringDefault <> "" Then
+		For i = 1 to UBound( sTableList )
+			If InStr( 1, UCase$( sTableList(i)), UCase$( sSubstringDefault ) ) Then
+				iTableDefault = i
+				Exit For
+			End If
+		Next
+	End If
+	
+	' No default table specified, or we didn't find it, so try and guess a sensible one
+	If iTableDefault = 0 Then
+		' Try to guess a sensible default table
+		Dim iWindow As Integer
+		iWindow = FrontWindow()
+		If iWindow <> 0 Then
+			If WindowInfo( iWindow, WIN_INFO_TYPE ) = WIN_BROWSER Then
+				' Is front window a browser? If so, default to table being browsed
+				sDefaultTable = WindowInfo( iWindow, WIN_INFO_TABLE )
+			ElseIf SelectionInfo( SEL_INFO_NROWS ) > 0 Then
+				' If there's a selection, then the default table is the selection
+				sDefaultTable = "Selection"
+			ElseIf WindowInfo( iWindow, WIN_INFO_TYPE ) = WIN_MAPPER Then
+				' Is front window a mapper? If so, default to topmost visible layer
+				sDefaultTable = GetTopVisibleLayer( iWindow )
+			End If
+		End If
+		For i = 1 to UBound( sTableList )
+			If sTableList(i) = sDefaultTable Then
+				iTableDefault = i
+				Exit For
+			End If
+		Next
+	End If
+	
+	If iTableDefault = 0 Then
+		'Still haven't found a default table, so default to first table
+		iTableDefault = 1
+	End If
+	
+	DIALOG_DBL_CLICKED = FALSE
+	
+	Dialog
+		Title sDialogTitle
+		Width 200 Height 113
+		Control StaticText
+			Title sPrompt
+			Position 5, 7
+		Control ListBox
+			Title From Variable sTableList
+			Value iTableDefault
+			ID 1
+			Into iTableChoice
+			Width 182
+			Position 10, 22
+			Calling ListBoxDoubleClickHandler
+		Control OKButton
+			Position 55, 95
+			ID 1
+		Control CancelButton
+			Position 115, 95
+			ID 2
+			
+	If Not CommandInfo( CMD_INFO_DLG_OK ) And Not DIALOG_DBL_CLICKED Then
+		ChooseTableAdvanced = ""
+		Exit Function
+	End If
+	
+	If DIALOG_DBL_CLICKED Then
+		iTableChoice = DIALOG_DBL_CLICKED_RETURN_VAL
+	End If
+	If sTableList( iTableChoice ) = "Selection" Then
+		ChooseTableAdvanced = SelectionInfo( SEL_INFO_SELNAME )
+	Else
+		ChooseTableAdvanced = sTableList( iTableChoice )
+	End If
+	
+End Function
+
+Function ChooseStringArray( ByVal sDialogTitle As String, ByVal sPrompt As String, sArray() As String, ByVal sDefault As String ) As String
+	ChooseStringArray = ChooseStringArrayAdvanced( sDialogTitle, sPrompt, sArray, sArray, sDefault )
+End Function
+
+Function ChooseStringArrayAdvanced( ByVal sDialogTitle As String, ByVal sPrompt As String, sArray() As String, sReturnValues() As String, ByVal sDefault As String ) As String
+	Dim i, iRowChoice As Integer
+	Dim iDefault As Integer
+	
+	If UBound( sArray ) = 0 Or UBound( sReturnValues ) = 0 Or UBound( sArray ) <> UBound( sReturnValues ) Then
+		ChooseStringArrayAdvanced = ""
+		Exit Function
+	End If
+	
+	'Find default table selection
+	If sDefault <> "" Then
+		For i = 1 to UBound( sArray )
+			If sReturnValues(i) = sDefault Then
+				iDefault = i
+				Exit For
+			End If
+		Next
+	End If
+	
+	' No default value specified, or we didn't find it, so default to first
+	If iDefault = 0 Then
+		iDefault = 1
+	End If
+	
+	DIALOG_DBL_CLICKED = FALSE
+	
+	Dialog
+		Title sDialogTitle
+		Width 200 Height 113
+		Control StaticText
+			Title sPrompt
+			Position 5, 7
+		Control ListBox
+			Title From Variable sArray
+			Value iDefault
+			ID 1
+			Into iRowChoice
+			Width 182
+			Position 10, 22
+			Calling ListBoxDoubleClickHandler
+		Control OKButton
+			Position 55, 95
+			ID 1
+		Control CancelButton
+			Position 115, 95
+			ID 2
+			
+	If Not CommandInfo( CMD_INFO_DLG_OK ) And Not DIALOG_DBL_CLICKED Then
+		ChooseStringArrayAdvanced = ""
+		Exit Function
+	End If
+	
+	If DIALOG_DBL_CLICKED Then
+		iRowChoice = DIALOG_DBL_CLICKED_RETURN_VAL
+	End If
+	
+	ChooseStringArrayAdvanced = sReturnValues( iRowChoice )
+	
+End Function
+
+Function ChooseMapWindow( ByVal sDialogTitle As String, ByVal sPrompt As String ) As String
+	ChooseMapWindow = ChooseWindow( sDialogTitle, sPrompt, WIN_MAPPER )
+End Function
+
+Function ChooseWindow( ByVal sDialogTitle As String, ByVal sPrompt As String, ByVal iWindowType As Integer ) As String
+	ChooseWindow = ChooseWindowAdvanced( sDialogTitle, sPrompt, iWindowType, 0 )
+End Function
+
+Function ChooseWindowAdvanced( ByVal sDialogTitle As String, ByVal sPrompt As String, ByVal iWindowType As Integer, ByVal iIgnoreWindowId As Integer ) As String
+	Dim i, iWindowChoice, iWindowID() As Integer
+	Dim sWindowList() As String
+	
+	For i = 1 to NumWindows()
+		If WindowInfo( i, WIN_INFO_WINDOWID ) <> iIgnoreWindowId And
+				( iWindowType = 0 Or WindowInfo( i, WIN_INFO_TYPE ) = iWindowType Or ( iWindowType = WIN_LEGEND And WindowInfo( i, WIN_INFO_TYPE ) = WIN_CART_LEGEND ) ) Then
+			Call PushStringArray( sWindowList, WindowInfo( i, WIN_INFO_NAME ) )
+			Call PushIntegerArray( iWindowID, WindowInfo( i, WIN_INFO_WINDOWID ) )
+		End If
+	Next
+	
+	If UBound( sWindowList ) = 0 Then
+		ChooseWindowAdvanced = 0
+		Exit Function
+	End If
+	
+	' Sort....
+	Call SortStringArray( sWindowList )
+	
+	' Now rebuild window id array in order
+	Dim j As Integer
+	ReDim iWindowID(0)
+	For i = 1 To UBound( sWindowList )
+		For j = 1 To NumWindows()
+			If WindowInfo( j, WIN_INFO_WINDOWID ) <> iIgnoreWindowId And
+					( iWindowType = 0 Or WindowInfo( j, WIN_INFO_TYPE ) = iWindowType Or ( iWindowType = WIN_LEGEND And WindowInfo( j, WIN_INFO_TYPE ) = WIN_CART_LEGEND ) )
+					And WindowInfo( j, WIN_INFO_NAME ) = sWindowList(i)
+					Then
+				Call PushIntegerArray( iWindowID, WindowInfo( j, WIN_INFO_WINDOWID ) )
+			End If
+		Next
+	Next
+	
+	DIALOG_DBL_CLICKED = FALSE
+	
+	Dialog
+		Title sDialogTitle
+		Width 200 Height 113
+		Control StaticText
+			Title sPrompt
+			Position 5, 7
+		Control ListBox
+			Title From Variable sWindowList
+			Value 1
+			ID 1
+			Into iWindowChoice
+			Width 182
+			Position 10, 22
+			Calling ListBoxDoubleClickHandler
+		Control OKButton
+			Position 55, 95
+			ID 1
+		Control CancelButton
+			Position 115, 95
+			ID 2
+			
+	If Not CommandInfo( CMD_INFO_DLG_OK ) And Not DIALOG_DBL_CLICKED Then
+		ChooseWindowAdvanced = 0
+		Exit Function
+	End If
+	
+	If DIALOG_DBL_CLICKED Then
+		iWindowChoice = DIALOG_DBL_CLICKED_RETURN_VAL
+	End If
+	
+	ChooseWindowAdvanced = iWindowID( iWindowChoice )
+	
+End Function
+
+Function ChooseLegendWindow( ByVal sDialogTitle As String, ByVal sPrompt As String ) As Integer
+	ChooseLegendWindow = ChooseWindowAdvanced( sDialogTitle, sPrompt, WIN_LEGEND, 0 )
+End Function
+
+Function ChooseLayer( ByVal sChooseLayerTitle As String, ByVal sPrompt As String, iLayerNumber As Integer ) As String
+	ChooseLayer = ChooseLayerAdvanced( sChooseLayerTitle, sPrompt, iLayerNumber, "", "", 0 )
+End Function
+
+Function ChooseLayerAdvanced( ByVal sChooseLayerTitle As String, ByVal sPrompt As String, iLayerNo As Integer, ByVal sIgnoreLayer As String, ByVal sDefaultLayer As String, ByVal iChooseLayerOptions As Integer ) As String
+	Dim i, iLayerChoice, iDefault As Integer
+	Dim iNumLayers As Integer
+	Dim sValidLayers(), sLayerName As String
+	Dim iLayerMap() As Integer
+	
+	If FrontWindow() = 0 Then
+		ChooseLayerAdvanced = "__no_good_layers"
+		iLayerNo = 0
+		Exit Function
+	End If
+	If WindowInfo( FrontWindow(), WIN_INFO_TYPE ) <> WIN_MAPPER Then
+		ChooseLayerAdvanced = "__no_good_layers"
+		iLayerNo = 0
+		Exit Function
+	End If
+	
+	iNumLayers = MapperInfo( FrontWindow(), MAPPER_INFO_LAYERS )
+	For i = 1 To iNumLayers
+		If LayerInfo( FrontWindow(), i, LAYER_INFO_TYPE ) = LAYER_INFO_TYPE_NORMAL
+				And LayerInfo( FrontWindow(), i, LAYER_INFO_NAME ) <> sIgnoreLayer
+				And LayerInfo( FrontWindow(), i, LAYER_INFO_DISPLAY ) <> LAYER_INFO_DISPLAY_OFF
+				And ( Not BitwiseTest( iChooseLayerOptions, CHOOSELAYER_WITHOVERRIDES ) Or LayerInfo( FrontWindow(), i, LAYER_INFO_DISPLAY ) = LAYER_INFO_DISPLAY_GLOBAL ) Then
+			Call PushStringArray( sValidLayers, LayerInfo( FrontWindow(), i, LAYER_INFO_NAME ) )
+			Call PushIntegerArray( iLayerMap, i )
+		End If
+	Next
+	
+	If UBound( sValidLayers ) = 0 Then
+		ChooseLayerAdvanced = "__no_good_layers"
+		iLayerNo = 0
+		Exit Function
+	End If
+	
+	'Find default layer selection
+	If sDefaultLayer <> "" Then
+		For i = 1 to UBound( sValidLayers )
+			If sValidLayers(i) = sDefaultLayer Then
+				iDefault = i
+				Exit For
+			End If
+		Next
+	End If
+	If iDefault = 0 Then
+		iDefault = 1
+	End If
+	
+	DIALOG_DBL_CLICKED = FALSE
+	
+	Dialog
+		Title sChooseLayerTitle
+		Width 200 Height 113
+		Control StaticText
+			Title sPrompt
+			Position 5, 7
+			Width 200
+		Control ListBox
+			Title From Variable sValidLayers
+			Value iDefault
+			ID 1
+			Into iLayerChoice
+			Width 182
+			Position 10, 22
+			Calling ListBoxDoubleClickHandler
+		Control OKButton
+			Position 55, 95
+			ID 2
+		Control CancelButton
+			Position 115, 95
+			ID 3
+			
+	If Not CommandInfo( CMD_INFO_DLG_OK ) And Not DIALOG_DBL_CLICKED Then
+		iLayerNo = 0
+		Exit Function
+	End If
+	
+	If DIALOG_DBL_CLICKED Then
+		iLayerChoice = DIALOG_DBL_CLICKED_RETURN_VAL
+	End If
+	
+	sLayerName = sValidLayers( iLayerChoice )
+	
+	'Also return layer number
+	iLayerNo = iLayerMap( iLayerChoice )
+	
+	ChooseLayerAdvanced = sLayerName
+End Function
+
+Function ChooseColumn( ByVal sTable As String, ByVal sTitle As String, ByVal sPrompt As String ) As String
+	ChooseColumn = ChooseColumnAdvanced( sTable, sTitle, sPrompt, "", "", "" )
+End Function
+
+Function ChooseMultipleColumns( ByVal sTable As String, ByVal sTitle As String, ByVal sPrompt As String, sChosenColumns() As String ) As Logical
+	
+	Dim i, iNoCols, iColumnChoice As Integer
+	Dim sColumnList() As String
+	
+	ReDim sChosenColumns(0)
+	
+	If Not TableExists( sTable ) Then
+		ChooseMultipleColumns = FALSE
+		Exit Function
+	End If
+	
+	' Build up array of column names
+	iNoCols = TableInfo( sTable, TAB_INFO_NCOLS )
+	For i = 1 to iNoCols
+		Call PushStringArray( sColumnList, ColumnInfo( sTable, "COL" + i, COL_INFO_NAME ) )
+	Next
+	
+	If UBound( sColumnList ) = 0 Then
+		Exit Function
+	End If
+	
+	'Sort column list
+	Call SortStringArray( sColumnList )
+	
+	DIALOG_DBL_CLICKED = FALSE
+	Dialog
+		Title sTitle
+		Width 200 Height 113
+		Control StaticText
+			Title sPrompt
+			Position 5, 7
+		Control MultiListBox
+			Title From Variable sColumnList
+			ID 3
+			Width 182
+			Position 10, 22
+			Calling ListBoxDoubleClickHandler
+		Control OKButton
+			Position 55, 95
+			ID 1
+			Calling ChooseMultipleColumnsVerify
+		Control CancelButton
+			Position 115, 95
+			ID 2
+			
+	If Not CommandInfo( CMD_INFO_DLG_OK ) And Not DIALOG_DBL_CLICKED Then
+		ChooseMultipleColumns = FALSE
+		Exit Function
+	End If
+	
+	If DIALOG_DBL_CLICKED Then
+		iColumnChoice = DIALOG_DBL_CLICKED_RETURN_VAL
+		ReDim sChosenColumns(1)
+		sChosenColumns(1) = sColumnList( iColumnChoice )
+		ChooseMultipleColumns = TRUE
+		Exit Function
+	End If
+	
+	'Copy chosen column names to array
+	ReDim sChosenColumns( UBound( iChooseMultipleColumnsValueChoices ) )
+	For i = 1 To UBound( iChooseMultipleColumnsValueChoices )
+		sChosenColumns(i) = sColumnList( iChooseMultipleColumnsValueChoices(i) )
+	Next
+	
+	ChooseMultipleColumns = TRUE
+End Function
+
+Sub ChooseMultipleColumnsVerify
+	'Read chosen columns
+	Dim iNumberValuesChosen, iChosen As Integer
+	
+	iNumberValuesChosen = 0
+	iChosen = ReadControlValue(3)
+	Do While iChosen > 0
+		iNumberValuesChosen = iNumberValuesChosen + 1
+		ReDim iChooseMultipleColumnsValueChoices( iNumberValuesChosen )
+		iChooseMultipleColumnsValueChoices( iNumberValuesChosen ) = iChosen
+		iChosen = ReadControlValue(3)
+	Loop
+	
+	If iNumberValuesChosen = 0 Then
+		Call MessageBox( "Please select some columns from the list", "Choose Columns", vbInformation )
+		Dialog Preserve
+	End If
+End Sub
+
+
+'**************************************************************************
+' Presents a dialog asking user to choose a column from a given table, with more options
+'**************************************************************************
+
+Function ChooseColumnAdvanced( ByVal sTable As String, ByVal sTitle As String, ByVal sPrompt As String, ByVal sDefault As String, ByVal sSubstringIgnore As String, ByVal sDataType As String ) As String
+	
+	Dim i, iNoCols, iCurrentColumn, iColumnChoice, iDefault As Integer
+	Dim sColumnList() As String
+	
+	If Not TableExists( sTable ) Then
+		Exit Function
+	End If
+	
+	iNoCols = TableInfo( sTable, TAB_INFO_NCOLS )
+	
+	For i = 1 to iNoCols
+		If ( sDataType = "char" And ColumnInfo( sTable, "COL" + i, COL_INFO_TYPE ) = COL_TYPE_CHAR )
+				Or ( sDataType = "numeric" And (
+				ColumnInfo( sTable, "COL" + i, COL_INFO_TYPE ) = COL_TYPE_DECIMAL
+				Or ColumnInfo( sTable, "COL" + i, COL_INFO_TYPE ) = COL_TYPE_FLOAT
+				Or ColumnInfo( sTable, "COL" + i, COL_INFO_TYPE ) = COL_TYPE_INTEGER
+				Or ColumnInfo( sTable, "COL" + i, COL_INFO_TYPE ) = COL_TYPE_SMALLINT
+				))
+				Or ( sDataType = "date" And (
+				ColumnInfo( sTable, "COL" + i, COL_INFO_TYPE ) = COL_TYPE_DATETIME
+				Or ColumnInfo( sTable, "COL" + i, COL_INFO_TYPE ) = COL_TYPE_DATE
+				))
+				Or ( sDataType = "dateonly" And (
+				ColumnInfo( sTable, "COL" + i, COL_INFO_TYPE ) = COL_TYPE_DATE
+				))
+				Or sDataType = "" Then
+			
+			If ( sSubstringIgnore = "" Or ( sSubstringIgnore <> "" And Not InStr( 1, ColumnInfo( sTable, "COL" + i, COL_INFO_NAME ), sSubStringIgnore ))) Then
+				Call PushStringArray( sColumnList, ColumnInfo( sTable, "COL" + i, COL_INFO_NAME ) )
+			End If
+		End If
+	Next
+	
+	If UBound( sColumnList ) = 0 Then
+		If sDataType = "char" Then
+			Call MessageBox( "Table " + sTable + " contains no valid character fields!", sTitle, vbExclamation )
+		ElseIf sDataType = "numeric" Then
+			Call MessageBox( "Table " + sTable + " contains no valid numeric fields!", sTitle, vbExclamation )
+		ElseIf sDataType = "date" Then
+			Call MessageBox( "Table " + sTable + " contains no valid date or datetime fields!", sTitle, vbExclamation )
+		ElseIf sDataType = "dateonly" Then
+			Call MessageBox( "Table " + sTable + " contains no valid date fields!", sTitle, vbExclamation )
+		End If
+		Exit Function
+	End If
+	
+	'Sort column list
+	Call SortStringArray( sColumnList )
+	
+	'Default column selection
+	If sDefault <> "" Then
+		For i = 1 To UBound( sColumnList )
+			' Is column the default value?
+			If sColumnList(i) = sDefault Then
+				iDefault = i
+				Exit For
+			End If
+		Next
+	End If
+	If iDefault = 0 Then
+		iDefault = 1
+	End If
+	
+	DIALOG_DBL_CLICKED = FALSE
+	Dialog
+		Title sTitle
+		Width 200 Height 113
+		Control StaticText
+			Title sPrompt
+			Position 5, 7
+		Control ListBox
+			Title From Variable sColumnList
+			Value iDefault
+			ID 1
+			Into iColumnChoice
+			Width 182
+			Position 10, 22
+			Calling ListBoxDoubleClickHandler
+		Control OKButton
+			Position 55, 95
+			ID 1
+		Control CancelButton
+			Position 115, 95
+			ID 2
+			
+	If Not CommandInfo( CMD_INFO_DLG_OK ) And Not DIALOG_DBL_CLICKED Then
+		ChooseColumnAdvanced = ""
+		Exit Function
+	End If
+	
+	If DIALOG_DBL_CLICKED Then
+		iColumnChoice = DIALOG_DBL_CLICKED_RETURN_VAL
+	End If
+	
+	ChooseColumnAdvanced = sColumnList( iColumnChoice )
+	
+End Function
+
+Function TableExists( ByVal sTable As String ) As Logical
+	Dim i, iNoTables As Integer
+	
+	iNoTables = NumTables()
+	
+	If iNoTables = 0 Then
+		TableExists = FALSE
+		Exit Function
+	End If
+	
+	For i = 1 To iNoTables
+		If TableInfo( i, TAB_INFO_NAME ) = sTable Then
+			' Matching table
+			TableExists = TRUE
+			Exit Function
+		End If
+	Next
+	
+	TableExists = FALSE
+End Function
+
+Function TabFileOpen( ByVal sFilename As String ) As Logical
+	Dim i, iNoTables As Integer
+	
+	iNoTables = NumTables()
+	
+	If iNoTables = 0 Or sFilename = "" Then
+		TabFileOpen = FALSE
+		Exit Function
+	End If
+	
+	For i = 1 To iNoTables
+		If TableInfo( i, TAB_INFO_TABFILE ) = sFilename Then
+			' Matching table
+			TabFileOpen = TRUE
+			Exit Function
+		End If
+	Next
+	
+	TabFileOpen = FALSE
+End Function
+
+Sub SafeClose( ByVal sTableName As String )
+	'Safe approach first
+	If TableExists( sTableName ) Then
+		Close Table sTableName
+		Exit Sub
+	End If
+	
+	' Slightly messier approach
+	OnError Goto Err
+	Close Table sTableName
+	err:
+	OnError Goto 0
+	
+End Sub
+
+Function SafeOpen( ByVal sTabFilename As String, ByVal sTabName As String ) As Integer
+	If sTabFilename = "" Then
+		SafeOpen = OPEN_NOFILE
+		Exit Function
+	End If
+	
+	If TabFileOpen( sTabFilename ) Then
+		SafeOpen = OPEN_ALREADYOPEN
+		Exit Function
+	End If
+	
+	If Not FileExists( sTabFilename ) Then
+		SafeOpen = OPEN_MISSINGFILE
+		Exit Function
+	End If
+	
+	OnError Goto SafeOpenError
+	If sTabName <> "" Then
+		Open Table sTabFilename As sTabName
+	Else
+		Open Table sTabFilename
+	End If
+	
+	SafeOpen = OPEN_SUCCESSFUL
+	Exit Function
+	
+	SafeOpenError:
+	SafeOpen = OPEN_OTHERERROR
+	OnError Goto 0
+	
+End Function
+
+Function SafeOpenWorkspace( ByVal sWorFilename As String ) As Integer
+	If sWorFilename = "" Then
+		SafeOpenWorkspace = OPENWOR_NOFILE
+		Exit Function
+	End If
+	
+	If Not Right$( sWorFilename, 4 ) = ".wor" Then
+		SafeOpenWorkspace = OPENWOR_NOTWORKSPACE
+		Exit Function
+	End If
+	
+	If Not FileExists( sWorFilename ) Then
+		SafeOpenWorkspace = OPENWOR_MISSINGFILE
+		Exit Function
+	End If
+	
+	OnError Goto SafeOpenWorError
+	
+	Run Application sWorFilename
+	
+	SafeOpenWorkspace = OPENWOR_SUCCESSFUL
+	Exit Function
+	
+	SafeOpenWorError:
+	SafeOpenWorkspace = OPENWOR_OTHERERROR
+	OnError Goto 0
+	
+End Function
+
+Function LayerExists( ByVal sLayer As String ) As Integer
+	Dim i, iNoLayers As Integer
+	
+	' Do some checks first
+	If NumWindows() > 0 Then
+		If FrontWindow() = 0 Then
+			' Front window is probably a panel
+			' Loop through all windows to find likely basemap
+			
+			Dim lFoundMap As Logical
+			i = 1
+			Do Until lFoundMap
+				If WindowID(i) <> 0 Then
+					If WindowInfo( WindowID(i), WIN_INFO_TYPE ) = WIN_MAPPER Then
+						' Found a mapper, let's move it to the front
+						Set Window WindowID(i) Front
+						lFoundMap = TRUE
+					End If
+				End If
+				i = i + 1
+			Loop
+			
+		End If
+		
+		' Still some random crashes where the focus moves to a hidden window?
+		OnError Goto window_error
+		
+		If FrontWindow() <> 0 And WindowInfo( FrontWindow(), WIN_INFO_TYPE ) = WIN_MAPPER Then
+			LayerExists = LayerExistsInWindow( sLayer, FrontWindow())
+		End If
+	End If
+	
+	Exit Function
+	
+	window_error:
+	' Handle other random crashes by saying layer doesn't exist
+	LayerExists = 0
+	OnError Goto 0
+	
+End Function
+
+Function LayerExistsInWindow( ByVal sLayer As String, ByVal iWindowID As Integer ) As Integer
+	Dim i, iNoLayers As Integer
+	
+	iNoLayers = MapperInfo( iWindowID, MAPPER_INFO_LAYERS )
+	If iNoLayers = 0 Then
+		LayerExistsInWindow = FALSE
+		Exit Function
+	End If
+	
+	For i = 1 To iNoLayers
+		If LayerInfo( iWindowID, i, LAYER_INFO_NAME ) = sLayer Then
+			' Found matching layer, break immediately
+			LayerExistsInWindow = i
+			Exit Function
+		End If
+	Next
+	
+	LayerExistsInWindow = 0
+	
+End Function
+
+Function LayerVisible( ByVal sLayerCheck As String ) As Logical
+	Dim i, iNoLayers As Integer
+	
+	LayerVisible = 0
+	
+	iNoLayers = MapperInfo( FrontWindow(), MAPPER_INFO_LAYERS )
+	If iNoLayers = 0 Then
+		Exit Function
+	End If
+	
+	For i = 1 To iNoLayers
+		If LayerInfo( FrontWindow(), i, LAYER_INFO_NAME ) = sLayerCheck And LayerInfo( FrontWindow(), i, LAYER_INFO_DISPLAY ) Then
+			LayerVisible = 1
+			Exit Function
+		End If
+	Next
+End Function
+
+Function LayerElsewhere( ByVal sLayerName As String ) As Logical
+	Dim i, j, iNoLayers, iNoWindows, iWindowId As Integer
+	
+	iNoWindows = NumWindows()
+	For i = 1 To iNoWindows
+		iWindowId = WindowID(i)
+		If iWindowId <> FrontWindow() Then
+			If WindowInfo( iWindowId, WIN_INFO_TYPE ) = WIN_MAPPER Then
+				iNoLayers = MapperInfo( iWindowId, MAPPER_INFO_LAYERS )
+				For j = 1 To iNoLayers
+					If LayerInfo( iWindowId, j, LAYER_INFO_NAME ) = sLayerName Then
+						LayerElsewhere = TRUE
+						Exit Function
+					End If
+				Next
+			ElseIf WindowInfo( iWindowId, WIN_INFO_TYPE ) = WIN_BROWSER Then
+				If WindowInfo( iWindowId, WIN_INFO_TABLE ) = sLayerName Then
+					LayerElsewhere = TRUE
+					Exit Function
+				End If
+			End If
+		End If
+	Next
+	
+	LayerElsewhere = FALSE
+	
+End Function
+
+Function ColumnExists( ByVal table_check As String, ByVal column_check As String ) As Integer
+	If Not TableExists( table_check ) Then
+		ColumnExists = 0
+		Exit Function
+	End If
+	
+	Dim i, iNoCols As Integer
+	
+	iNoCols = TableInfo( table_check, TAB_INFO_NCOLS )
+	
+	For i = 1 To iNoCols
+		If ColumnInfo( table_check, "COL" + i, COL_INFO_NAME ) = column_check Then
+			ColumnExists = i
+			Exit Function
+		End If
+	Next
+	
+	ColumnExists = 0
+	
+End Function
+
+Function MakeFilenameSafe$( ByVal sInputString As String ) As String
+	Dim sTempString, sTempString2 As String
+	
+	'Truncate to 30 characters
+	sInputString = Left$( sInputString, 30 )
+	
+	' Replace bad characters in name
+	Dim sReplaced As String
+	sReplaced = Space$( Len( sInputString ))
+	Dim lResult As Logical
+	lResult = RegExReplace( sInputString, "[^a-zA-Z0-9_]", "_", sReplaced )
+	sTempString = sReplaced
+	
+	If RegExTest( sTempString, "^\d+" ) Then
+		'String starts in digit
+		sTempString = "file" + sTempString
+	End If
+	
+	' Make sure filename is unique
+	If TableExists( sTempString ) Then
+		' Remove any _1, _2 etc from name
+		lResult = RegExReplace( sInputString, "_[0-9]*$", "", sReplaced )
+		' Make room for _# bit
+		sTempString = Left$( sReplaced, 28 )
+		
+		'Loop till we find a good free filename
+		Dim i As Integer
+		Do
+			i = i + 1
+			sTempString2 = sTempString + "_" + i
+		Loop While TableExists( sTempString2 )
+		
+		sTempString = sTempString2
+	End If
+	
+	MakeFilenameSafe$ = sTempString
+End Function
+
+Function MakeRandomFilename$( ByVal sPath As String, ByVal sExt As String ) As String
+	Dim i As Integer
+	Dim sTemp As String
+	Dim sFilename As String
+	
+	If Right$( sPath, 1 ) <> "\" Then
+		sPath = sPath + "\"
+	End If
+	If Left$( sExt, 1 ) <> "." Then
+		sExt = "." + sExt
+	End If
+	
+	' Create a 25 character random filename
+	Do
+		For i = 1 to 25
+			sTemp = sTemp + Chr$( Fix( Rnd(1) * 26 ) + 97 )
+		Next
+		sFilename = sPath + sTemp + sExt
+	Loop Until Not FileExists( sFilename )
+	
+	MakeRandomFilename$ = sFilename
+End Function
+
+Function SquareBuffer( ByVal oInput As Object, ByVal fDist As Float ) As Object
+	Dim fX1, fY1, fX2, fY2, fXRange, fYRange, fAngle, fDeltaX, fDeltaY As Float
+	Dim iQuadrant As Integer
+	Dim fBuffer(8) As Float
+	Dim oTemp As Object
+	
+	' Get line start and end points
+	fX1 = ObjectGeography( oInput, OBJ_GEO_LINEBEGX )
+	fY1 = ObjectGeography( oInput, OBJ_GEO_LINEBEGY )
+	fX2 = ObjectGeography( oInput, OBJ_GEO_LINEENDX )
+	fY2 = ObjectGeography( oInput, OBJ_GEO_LINEENDY )
+	
+	' Calculate range
+	fXRange = Abs( fX1 - fX2 )
+	fYRange = Abs( fY1 - fY2 )
+	
+	' Calculate angle of line
+	If ( fYRange = 0 ) Then
+		fAngle = 90
+	Else
+		fAngle = Atn( fXRange / fYRange ) * RAD_2_DEG
+	End If
+	
+	fDeltaX = Cos( fAngle * DEG_2_RAD ) * fDist
+	fDeltaY = Sin( fAngle * DEG_2_RAD ) * fDist
+	
+	' Determine quadrant
+	If ( fX2 - fX1 ) > 0 Then
+		If ( fY2 - fY1 ) > 0 Then
+			iQuadrant = 1
+		Else
+			iQuadrant = 2
+		End If
+	ElseIf ( fY1 - fY2 ) > 0 Then
+		iQuadrant = 3
+	Else
+		iQuadrant = 4
+	End If
+	
+	' Calculate buffer extents based on quadrant
+	Do Case iQuadrant
+		Case 1
+			fBuffer(1) = fX1 - fDeltaX
+			fBuffer(2) = fY1 + fDeltaY
+			fBuffer(3) = fX1 + fDeltaX
+			fBuffer(4) = fY1 - fDeltaY
+			fBuffer(5) = fX2 + fDeltaX
+			fBuffer(6) = fY2 - fDeltaY
+			fBuffer(7) = fX2 - fDeltaX
+			fBuffer(8) = fY2 + fDeltaY
+		Case 2
+			fBuffer(1) = fX1 + fDeltaX
+			fBuffer(2) = fY1 + fDeltaY
+			fBuffer(3) = fX1 - fDeltaX
+			fBuffer(4) = fY1 - fDeltaY
+			fBuffer(5) = fX2 - fDeltaX
+			fBuffer(6) = fY2 - fDeltaY
+			fBuffer(7) = fX2 + fDeltaX
+			fBuffer(8) = fY2 + fDeltaY
+		Case 3
+			fBuffer(1) = fX1 + fDeltaX
+			fBuffer(2) = fY1 - fDeltaY
+			fBuffer(3) = fX1 - fDeltaX
+			fBuffer(4) = fY1 + fDeltaY
+			fBuffer(5) = fX2 - fDeltaX
+			fBuffer(6) = fY2 + fDeltaY
+			fBuffer(7) = fX2 + fDeltaX
+			fBuffer(8) = fY2 - fDeltaY
+		Case 4
+			fBuffer(1) = fX1 - fDeltaX
+			fBuffer(2) = fY1 - fDeltaY
+			fBuffer(3) = fX1 + fDeltaX
+			fBuffer(4) = fY1 + fDeltaY
+			fBuffer(5) = fX2 + fDeltaX
+			fBuffer(6) = fY2 + fDeltaY
+			fBuffer(7) = fX2 - fDeltaX
+			fBuffer(8) = fY2 - fDeltaY
+	End Case
+	
+	' Make a new region object matching the extents
+	Create Region Into Variable oTemp 1
+			5 ( fBuffer(1), fBuffer(2))( fBuffer(3), fBuffer(4))( fBuffer(5), fBuffer(6))( fBuffer(7), fBuffer(8))( fBuffer(1), fBuffer(2))
+	
+	SquareBuffer = oTemp
+	
+End Function
+
+Function ShrinkLine( ByVal oLine As Object, ByVal fDistance As Float ) As Object
+	Dim fXStart, fYStart, fXEnd, fYEnd As Float
+	Dim fXStartShrunk, fYStartShrunk, fXEndShrunk, fYEndShrunk As Float
+	Dim fAngle As Float
+	
+	' Find the start and end coordinates of the line
+	fXStart = ObjectGeography( oLine, OBJ_GEO_MINX )
+	fYStart = ObjectGeography( oLine, OBJ_GEO_MINY )
+	fXEnd = ObjectGeography( oLine, OBJ_GEO_MAXX )
+	fYEnd = ObjectGeography( oLine, OBJ_GEO_MAXY )
+	
+	' Work out which quadrant the line is in, calculate angle, and shrink
+	If fXEnd > fXStart Then
+		If fYEnd > fYStart Then
+			fAngle = Atn( ( fYEnd - fYStart ) / ( fXEnd - fXStart ) )
+			fXStartShrunk = fXStart + fDistance * Cos( fAngle )
+			fYStartShrunk = fYStart + fDistance * Sin( fAngle )
+			fXEndShrunk = fXEnd - fDistance * Cos( fAngle )
+			fYEndShrunk = fYEnd - fDistance * Sin( fAngle )
+		Else
+			fAngle = Atn( ( fYStart - fYEnd ) / ( fXEnd - fXStart ) )
+			fXStartShrunk = fXStart + fDistance * Cos( fAngle )
+			fYStartShrunk = fYStart - fDistance * Sin( fAngle )
+			fXEndShrunk = fXEnd - fDistance * Cos( fAngle )
+			fYEndShrunk = fYEnd + fDistance * Sin( fAngle )
+		End If
+	Else
+		If fYEnd > fYStart Then
+			fAngle = Atn( ( fYEnd - fYStart ) / ( fXStart - fXEnd ) )
+			fXStartShrunk = fXStart - fDistance * Cos( fAngle )
+			fYStartShrunk = fYStart + fDistance * Sin( fAngle )
+			fXEndShrunk = fXEnd + fDistance * Cos( fAngle )
+			fYEndShrunk = fYEnd - fDistance * Sin( fAngle )
+		Else
+			fAngle = Atn( ( fYStart - fYEnd ) / ( fXStart - fXEnd ) )
+			fXStartShrunk = fXStart - fDistance * Cos( fAngle )
+			fYStartShrunk = fYStart - fDistance * Sin( fAngle )
+			fXEndShrunk = fXEnd + fDistance * Cos( fAngle )
+			fYEndShrunk = fYEnd + fDistance * Sin( fAngle )
+		End If
+	End If
+	
+	ShrinkLine = CreateLine( fXStartShrunk, fYStartShrunk, fXEndShrunk, fYEndShrunk )
+End Function
+
+Function IIf( ByVal lTest As Logical, ByVal sValTrue As String, ByVal sValFalse As String ) As String
+	If lTest = TRUE Then
+		IIf = sValTrue
+	Else
+		IIf = sValFalse
+	End If
+End Function
+
+Function IIfVal( ByVal lTest As Logical, ByVal fValTrue As Float, ByVal fValFalse As Float ) As Float
+	If lTest = TRUE Then
+		IIfVal = fValTrue
+	Else
+		IIfVal = fValFalse
+	End If
+End Function
+
+Function Repeat$( ByVal sString As String, ByVal iMultiples As Integer ) As String
+	Dim i As Integer
+	Dim sTmp As String
+	
+	sTmp = ""
+	For i = 1 to iMultiples
+		sTmp = sTmp + sString
+	Next
+	
+	Repeat$ = sTmp
+End Function
+
+Sub LaunchFileOrURL( ByVal sFile As String )
+	Dim iReturnCode, iHwnd As Integer
+	Dim sOp, sDir As String
+	
+	OnError Goto URLerror
+	iHwnd = WindowInfo( WIN_MAPINFO, WIN_INFO_WND )
+	sOp = "open"
+	sDir = ""
+	
+	iReturnCode = ShellExecute( iHwnd, sOp, sFile, 0, sDir, 0 )
+	If iReturnCode <= 32 Then
+		Call MessageBox( "Unable to launch " + iReturnCode, "GAS3", vbExclamation )
+	End If
+	Exit Sub
+	
+	Urlerror:
+	OnError Goto 0
+	Exit Sub
+	
+End Sub
+
+Function MsgBox( ByVal sTxt As String, ByVal sCaption As String, ByVal iType As Integer ) As Integer
+	MsgBox = MsgBoxA( WindowInfo( WIN_MAPINFO, WIN_INFO_WND ), sTxt, sCaption, iType )
+End Function
+
+Sub MessageBox( ByVal sTxt As String, ByVal sCaption As String, ByVal iType As Integer )
+	Dim i As Integer
+	i = MsgBoxA( WindowInfo( WIN_MAPINFO, WIN_INFO_WND ), sTxt, sCaption, iType )
+End Sub
+
+Sub PrepareArray( sArray() As String, ByVal iBufferLength As Integer )
+	Dim i As Integer
+	For i = 1 to UBound( sArray )
+		sArray(i) = Space$( iBufferLength )
+	Next
+End Sub
+
+Function MonthNumToShortName( ByVal iMonthNo As Integer ) As String
+	Do Case iMonthNo
+		Case 1
+			MonthNumToShortName = "Jan"
+		Case 2
+			MonthNumToShortName = "Feb"
+		Case 3
+			MonthNumToShortName = "Mar"
+		Case 4
+			MonthNumToShortName = "Apr"
+		Case 5
+			MonthNumToShortName = "May"
+		Case 6
+			MonthNumToShortName = "Jun"
+		Case 7
+			MonthNumToShortName = "Jul"
+		Case 8
+			MonthNumToShortName = "Aug"
+		Case 9
+			MonthNumToShortName = "Sep"
+		Case 10
+			MonthNumToShortName = "Oct"
+		Case 11
+			MonthNumToShortName = "Nov"
+		Case 12
+			MonthNumToShortName = "Dec"
+	End Case
+	
+End Function
+
+Function FormatVicPolDate$( ByVal dDate As Date ) As String
+	If dDate = "" Then
+		Exit Function
+	End If
+	
+	Dim sTemp As String
+	sTemp = Right$( "0" + Day( dDate ), 2 ) + "-"
+	sTemp = sTemp + UCase$( MonthNumToShortName( Month( dDate ))) + "-"
+	sTemp = sTemp + Year( dDate )
+	
+	FormatVicPolDate$ = sTemp
+End Function
+
+
+Function GetTopVisibleLayer( ByVal iWindowId As Integer ) As String
+	Dim i As Integer
+	Dim iNumLayers As Integer
+	
+	' Loop through layers, looking for the first visible, normal layer
+	iNumLayers = MapperInfo( iWindowId, MAPPER_INFO_LAYERS )
+	For i = 1 To iNumLayers
+		If LayerInfo( iWindowId, i, LAYER_INFO_TYPE ) = LAYER_INFO_TYPE_NORMAL And
+				LayerInfo( iWindowId, i, LAYER_INFO_DISPLAY ) <> LAYER_INFO_DISPLAY_OFF Then
+			' Found a normal, visible layer
+			GetTopVisibleLayer = LayerInfo( iWindowId, i, LAYER_INFO_NAME )
+			Exit Function
+		End If
+	Next
+	
+End Function
+
+Sub Explode( ByVal sString As String, ByVal sSeperator As String, sArray() As String )
+	Dim iNoElements As Integer
+	Dim sRemaining As String
+	
+	'Clear array
+	ReDim sArray(0)
+	
+	sRemaining = sString + sSeperator
+	Do Until Not InStr( 1, sRemaining, sSeperator )
+		Call PushStringArray( sArray, Left$( sRemaining, InStr( 1, sRemaining, sSeperator ) - 1 ) )
+		sRemaining = Mid$( sRemaining, InStr( 1, sRemaining, sSeperator ) + Len( sSeperator ), Len( sRemaining ))
+	Loop
+	
+End Sub
+
+Function Join( sArray() As String, ByVal sJoiner As String ) As String
+	Dim iPos As Integer
+	Dim sTemp As String
+	
+	If UBound( sArray ) = 0 Then
+		Join = ""
+		Exit Function
+	End If
+	
+	For iPos = 1 To UBound( sArray )
+		If sTemp <> "" Then
+			sTemp = sTemp + sJoiner
+		End If
+		sTemp = sTemp + sArray( iPos )
+	Next
+	
+	Join = sTemp
+	
+End Function
+
+Function FilePathToUrl( ByVal sFilePath As String ) As String
+	Dim sFileUnix As String
+	sFileUnix = Replace$( sFilePath, "\", "/" )
+	sFileUnix = "file://" + sFileUnix
+	FilePathToUrl = sFileUnix
+End Function
+
+Function EventLength( ByVal sEventS As String, ByVal sEventE As String, ByVal dEventStart As Date, ByVal dEventEnd As Date ) As Integer
+	If sEventS = "" Or sEventE = "" Or dEventStart = "" Or dEventEnd = "" Then
+		EventLength = 0
+		Exit Function
+	End If
+	
+	Dim dtEventStart, dtEventEnd As DateTime
+	dtEventStart = dEventStart + StringToTime( sEventS )
+	dtEventEnd = dEventEnd + StringToTime( sEventE )
+	
+	EventLength = ( dtEventEnd - dtEventStart ) * 24 * 60
+End Function
+
+Function RealWeekDay( ByVal dDate As Date ) As Integer
+	If dDate = "" Then
+		RealWeekDay = 0
+		Exit Function
+	End If
+	
+	Dim iWeekStartOnSunday, iWeekStartOnMonday As Integer
+	iWeekStartOnSunday = Weekday( dDate )
+	iWeekStartOnMonday = iWeekStartOnSunday - 1
+	If iWeekStartOnMonday = 0 Then
+		iWeekStartOnMonday = 7
+	End If
+	
+	RealWeekDay = iWeekStartOnMonday
+End Function
+
+Function DayNumToLetter( ByVal iDayNumber As Integer ) As String
+	Do Case iDayNumber
+		Case 1
+			DayNumToLetter = "M"
+		Case 2
+			DayNumToLetter = "T"
+		Case 3
+			DayNumToLetter = "W"
+		Case 4
+			DayNumToLetter = "T"
+		Case 5
+			DayNumToLetter = "F"
+		Case 6
+			DayNumToLetter = "S"
+		Case 7
+			DayNumToLetter = "S"
+	End Case
+End Function
+
+Sub PushStringArray( sArray() As String, ByVal sVal As String )
+	Dim iNoElements As Integer
+	iNoElements = UBound( sArray )
+	
+	' Play it safe, and check for initial size of array
+	If iNoElements = 0 Then
+		ReDim sArray(1)
+		sArray(1) = sVal
+	ElseIf iNoElements = 1 And sArray(1) = "" Then
+		' Effectively an empty array, store over first position
+		sArray(1) = sVal
+	Else
+		ReDim sArray( iNoElements + 1 )
+		sArray( iNoElements + 1 ) = sVal
+	End If
+End Sub
+
+Sub InsertStringArray( sArray() As String, ByVal sVal As String, ByVal iNewPosition As Integer )
+	Dim iNoElements As Integer
+	iNoElements = UBound( sArray )
+	
+	ReDim sArray( iNoElements + 1 )
+	
+	Dim i As Integer
+	For i = iNoElements + 1 To iNewPosition + 1 Step - 1
+		' Shove values forward one
+		sArray(i) = sArray( i - 1 )
+	Next
+	
+	sArray( iNewPosition ) = sVal
+	
+End Sub
+
+Sub PushIntegerArray( iArray() As Integer, ByVal iVal As Integer )
+	Dim iNoElements As Integer
+	iNoElements = UBound( iArray )
+	
+	' Play it safe, and check for initial size of array
+	If iNoElements = 0 Then
+		ReDim iArray(1)
+		iArray(1) = iVal
+	Else
+		ReDim iArray( iNoElements + 1 )
+		iArray( iNoElements + 1 ) = iVal
+	End If
+End Sub
+
+Sub PushFloatArray( fArray() As Float, ByVal fVal As Float )
+	Dim iNoElements As Integer
+	iNoElements = UBound( fArray )
+	
+	' Play it safe, and check for initial size of array
+	If iNoElements = 0 Then
+		ReDim fArray(1)
+		fArray(1) = fVal
+	Else
+		ReDim fArray( iNoElements + 1 )
+		fArray( iNoElements + 1 ) = fVal
+	End If
+End Sub
+
+Function PopStringFromArray( sArray() As String ) As String
+	Dim iNoElements As Integer
+	iNoElements = UBound( sArray )
+	
+	' Play it safe, and check for initial size of array
+	If iNoElements = 0 Then
+		PopStringFromArray = ""
+		Exit Function
+	Else
+		'Get last element in array
+		PopStringFromArray = sArray( iNoElements )
+		'Remove value from array
+		ReDim sArray( iNoElements - 1 )
+	End If
+End Function
+
+Sub RemoveStringFromArray( sArray() As String, ByVal sVal As String )
+	
+	' Create a new, temporary array
+	Dim sNewArray() As String
+	ReDim sNewArray( UBound( sArray ))
+	
+	' Loop through input array
+	Dim i As Integer
+	Dim iCurrentPos As Integer
+	iCurrentPos = 0
+	
+	For i = 1 To UBound( sArray )
+		If sArray(i) <> sVal Then
+			' If element does not match the value we are removing, then copy it across
+			iCurrentPos = iCurrentPos + 1
+			sNewArray( iCurrentPos ) = sArray(i)
+		End If
+	Next
+	
+	' Now, copy values back across to input array
+	ReDim sArray( iCurrentPos )
+	For i = 1 To iCurrentPos
+		sArray(i) = sNewArray(i)
+	Next
+	
+End Sub
+
+Sub InitializeStringArray( sArray() As String, ByVal sVal As String )
+	ReDim sArray(1)
+	sArray(1) = sVal
+End Sub
+
+Function ArrayContains( sArray() As String, ByVal sVal As String ) As Integer
+	Dim i As Integer
+	
+	For i = 1 to UBound( sArray )
+		If sArray(i) = sVal Then
+			ArrayContains = i
+			Exit Function
+		End If
+	Next
+	ArrayContains = 0
+End Function
+
+Function GetEndOfLine( ByVal oLine As Object ) As Object
+	Dim fLineEndX, fLineEndY As Float
+	Dim iNoNodes As Integer
+	
+	If ObjectInfo( oLine, OBJ_INFO_TYPE ) = OBJ_TYPE_LINE Then
+		fLineEndX = ObjectGeography( oLine, OBJ_GEO_LINEENDX )
+		fLineEndY = ObjectGeography( oLine, OBJ_GEO_LINEENDY )
+	Else
+		iNoNodes = ObjectInfo( oLine, OBJ_INFO_NPNTS )
+		fLineEndX = ObjectNodeX( oLine, 1, iNoNodes )
+		fLineEndY = ObjectNodeY( oLine, 1, iNoNodes )
+	End If
+	
+	GetEndOfLine = CreatePoint( fLineEndX, fLineEndY )
+End Function
+
+Function GetStartOfLine( ByVal oLine As Object ) As Object
+	Dim fLineStartX, fLineStartY As Float
+	
+	If ObjectInfo( oLine, OBJ_INFO_TYPE ) = OBJ_TYPE_LINE Then
+		fLineStartX = ObjectGeography( oLine, OBJ_GEO_LINEBEGX )
+		fLineStartY = ObjectGeography( oLine, OBJ_GEO_LINEBEGY )
+	Else
+		fLineStartX = ObjectNodeX( oLine, 1, 1 )
+		fLineStartY = ObjectNodeY( oLine, 1, 1 )
+	End If
+	
+	GetStartOfLine = CreatePoint( fLineStartX, fLineStartY )
+End Function
+
+Function GetBearing( ByVal oStart As Object, ByVal oEnd As Object ) As Float
+	Dim fX1, fX2, fY1, fY2 As Float
+	Dim fDx, fDy As Float
+	
+	fX1 = CentroidX( oStart )
+	fY1 = CentroidY( oStart )
+	fX2 = CentroidX( oEnd )
+	fY2 = CentroidY( oEnd )
+	
+	fDx = fX2 - fX1
+	fDy = fY2 - fY1
+	
+	If fDx > 0 Then
+		GetBearing = 90 - Atn( fDy / fDx ) * RAD_2_DEG
+	ElseIf fDx < 0 Then
+		GetBearing = 270 - Atn( fDy / fDx ) * RAD_2_DEG
+	Else
+		If fDy > 0 Then
+			GetBearing = 0
+		ElseIf fDy < 0 Then
+			GetBearing = 180
+		Else
+			' effectively null - no bearing
+			GetBearing = 0
+		End If
+	End If
+End Function
+
+Function ProjectPoint( ByVal oStart As Object, ByVal fBearing As Float, ByVal fDistance As Float ) As Object
+	Dim fAngle, fAngleRad, fDx, fDy As Float
+	
+	If fBearing < 0 Then
+		fBearing = fBearing + 360
+	End If
+	
+	' Determine quadrant
+	If fBearing < 90 Then
+		fAngle = 90 - fBearing
+		fAngleRad = fAngle * DEG_2_RAD
+		fDx = Cos( fAngleRad ) * fDistance
+		fDy = Sin( fAngleRad ) * fDistance
+	ElseIf fBearing < 180 Then
+		fAngle = fBearing - 90
+		fAngleRad = fAngle * DEG_2_RAD
+		fDx = Cos( fAngleRad ) * fDistance
+		fDy = Sin( fAngleRad ) * fDistance * - 1
+	ElseIf fBearing < 270 Then
+		fAngle = 270 - fBearing
+		fAngleRad = fAngle * DEG_2_RAD
+		fDx = Cos( fAngleRad ) * fDistance * - 1
+		fDy = Sin( fAngleRad ) * fDistance * - 1
+	Else
+		fAngle = fBearing - 270
+		fAngleRad = fAngle * DEG_2_RAD
+		fDx = Cos( fAngleRad ) * fDistance * - 1
+		fDy = Sin( fAngleRad ) * fDistance
+	End If
+	
+	Dim fEndX, fEndY As Float
+	fEndX = CentroidX( oStart ) + fDx
+	fEndY = CentroidY( oStart ) + fDy
+	
+	ProjectPoint = CreatePoint( fEndX, fEndY )
+End Function
+
+Sub QueryToTable( ByVal sQuery As String, ByVal sTable As String, ByVal sFile As String )
+	If Not TableExists( sQuery ) Then
+		Exit Sub
+	End If
+	If sFile = "" Then
+		Exit Sub
+	End If
+	
+	If sTable = "" Then
+		sTable = sQuery
+	End If
+	
+	Commit Table sQuery As sFile
+	Close Table sQuery
+	Open Table sFile As sTable
+End Sub
+
+Function GetUserID( sUserID As String ) As Logical
+	
+	Dim sBuffer As String
+	Dim iBufferLen As Integer
+	
+	OnError Goto Err_Handler
+	
+	iBufferLen = 100
+	sBuffer = Space$( iBufferLen )
+	
+	If GetUserName( sBuffer, iBufferLen ) Then
+		sUserID = Left$( sBuffer, iBufferLen - 1 )
+		GetUserId = TRUE
+	End If
+	
+	Exit Function
+	
+	Err_handler:
+	GetUserId = FALSE
+	OnError Goto 0
+	
+End Function
+
+Function GetWorkstationName() As String
+	
+	Dim sBuffer As String
+	Dim iBufferLen As Integer
+	
+	OnError Goto Err_Handler
+	
+	iBufferLen = 100
+	sBuffer = Space$( iBufferLen )
+	
+	If GetComputerName( sBuffer, iBufferLen ) Then
+		GetWorkstationName = Left$( sBuffer, iBufferLen )
+	End If
+	
+	Exit Function
+	
+	Err_handler:
+	GetWorkstationName = ""
+	OnError Goto 0
+	
+End Function
+
+Function RandomPointInPolygon( ByVal oBoundary As Object, ByVal iMaxIterations As Integer ) As Object
+	' Get bounding box of object
+	Dim fXmin, fXmax, fYmin, fYmax, fDX, fDY As Float
+	fXmin = ObjectGeography( oBoundary, OBJ_GEO_MINX )
+	fXmax = ObjectGeography( oBoundary, OBJ_GEO_MAXX )
+	fYmin = ObjectGeography( oBoundary, OBJ_GEO_MINY )
+	fYmax = ObjectGeography( oBoundary, OBJ_GEO_MAXY )
+	
+	fDX = fXMax - fXmin
+	fDY = fYmax - fYmin
+	
+	If Not iMaxIterations Then
+		iMaxIterations = 1000
+	End If
+	
+	Dim i As Integer
+	Dim fX, fY As Float
+	Dim oRandomPoint As Object
+	
+	For i = 1 to iMaxIterations
+		fX = fXMin + fDX * BetterRnd()
+		fY = fYMin + fDY * BetterRnd()
+		oRandomPoint = CreatePoint( fX, fY )
+		If oRandomPoint Within oBoundary Then
+			RandomPointInPolygon = oRandomPoint
+			Exit Function
+		End If
+	Next
+	
+End Function
+
+Function Ceil( ByVal fNumber As Float ) As Integer
+	Dim iTemp As Integer
+	
+	If fNumber >= 0 Then
+		iTemp = Fix( fNumber )
+		
+		If iTemp <> fNumber Then
+			iTemp = iTemp + 1
+		End If
+	Else
+		iTemp = Fix( fNumber )
+	End If
+	
+	Ceil = iTemp
+End Function
+
+Function RandomiseCoord( ByVal fCoord As Float, ByVal fDistance As Float ) As Float
+	Dim fNewCoord, fDirection As Float
+	
+	' Randomise direction
+	fDirection = BetterRnd()
+	
+	If fDirection < 0.5 Then
+		fNewCoord = fCoord + ( fDistance * BetterRnd() )
+	Else
+		fNewCoord = fCoord - ( fDistance * BetterRnd() )
+	End If
+	
+	RandomiseCoord = fNewCoord
+End Function
+
+Function ShiftPointByRandomDist( ByVal oPoint As Object, ByVal fMaxDistance As Float ) As Object
+	Dim fOldX, fNewX, fOldY, fNewY As Float
+	
+	fOldX = CentroidX( oPoint )
+	fNewX = RandomiseCoord( fOldX, fMaxDistance )
+	fOldY = CentroidY( oPoint )
+	fNewY = RandomiseCoord( fOldY, fMaxDistance )
+	
+	ShiftPointByRandomDist = CreatePoint( fNewX, fNewY )
+End Function
+
+Sub DrawInCosmetic( ByVal oObject As Object, ByVal iWindowID As Integer )
+	Dim sTable As String
+	sTable = WindowInfo( iWindowId, WIN_INFO_TABLE )
+	
+	Insert Into sTable ( Obj ) Values ( oObject )
+End Sub
+
+Function TemporalOverlap( ByVal dtStart1 As DateTime, ByVal dtEnd1 As DateTime, ByVal dtStart2 As DateTime, ByVal dtEnd2 As DateTime ) As Logical
+	If dtStart1 <= dtStart2 And dtStart2 <= dtEnd1 Then
+		TemporalOverlap = TRUE
+	ElseIf dtStart2 <= dtStart1 And dtStart1 <= dtEnd2 Then
+		TemporalOverlap = TRUE
+	Else
+		TemporalOverlap = FALSE
+	End If
+End Function
+
+Function TemporalOverlap1Interval( ByVal dtStart1 As DateTime, ByVal dtEnd1 As DateTime, ByVal dtTime2 As DateTime ) As Logical
+	If dtStart1 <= dtTime2 And dtTime2 <= dtEnd1 Then
+		TemporalOverlap1Interval = TRUE
+	Else
+		TemporalOverlap1Interval = FALSE
+	End If
+End Function
+
+Function BufferTime( ByVal dtTime As DateTime, ByVal fInterval As Float, ByVal sIntervalType As String ) As DateTime
+	Do Case sIntervalType
+		Case "d"
+			' Days
+			BufferTime = dtTime + fInterval
+		Case "h"
+			' Hours
+			BufferTime = dtTime + ( fInterval / 24 )
+		Case "m"
+			' Minutes
+			BufferTime = dtTime + ( fInterval / ( 24 * 60 ) )
+		Case "s"
+			' Seconds
+			BufferTime = dtTime + ( fInterval / ( 24 * 60 * 60 ) )
+	End Case
+End Function
+
+Function DateTimeCentroid( ByVal dt1 As DateTime, ByVal dt2 As DateTime ) As DateTime
+	DateTimeCentroid = dt1 + ( dt2 - dt1 ) / 2
+End Function
+
+' Handles double clicks for list box dialogs
+Sub ListBoxDoubleClickHandler
+	If CommandInfo( CMD_INFO_DLG_DBL ) Then
+		DIALOG_DBL_CLICKED = TRUE
+		DIALOG_DBL_CLICKED_RETURN_VAL = ReadControlValue( TriggerControl() )
+		Dialog Remove
+	End If
+End Sub
+
+Function GetWriteableTables( sTableArray() As String, ByVal sFindTable As String ) As Integer
+	Dim i, iReturnValue As Integer
+	
+	'Clear array to begin
+	ReDim sTableArray(0)
+	
+	Call GetTableList( sTableArray, "", TABLELIST_BASETABLESONLY + TABLELIST_HIDEREADONLY + TABLELIST_SORT )
+	
+	' Find position of matched table
+	For i = 1 to UBound( sTableArray )
+		If sTableArray(i) = sFindTable Then
+			GetWriteableTables = i
+			Exit Function
+		End If
+	Next
+	
+	' Couldn't find sFindTable
+	GetWriteableTables = 0
+	
+End Function
+
+Function RecursiveSearchFiles( ByVal sParentFolder As String, ByVal sFilePattern As String, sMatchingFiles() As String ) As Logical
+	Dim sFoldersToSearch() As String
+	
+	Dim iHFindFile, iNStatus As Integer
+	Dim f As WIN32_FIND_DATA
+	Dim i, j As Integer
+	Dim sDirPath As String
+	
+	'Clear matching files
+	ReDim sMatchingFiles(0)
+	
+	sDirPath = sParentFolder
+	If Right$( sDirPath, 1 ) <> "\" Then
+		sDirPath = sDirPath + "\"
+	End If
+	Call PushStringArray( sFoldersToSearch, sDirPath )
+	Dim sCurrentPath As String
+	Do
+		' Pop first folder from search list
+		sCurrentPath = PopStringFromArray( sFoldersToSearch )
+		
+		' First find all folders in this path
+		iHFindFile = FindFirstFile( sCurrentPath + "*.*", f )
+		Do
+			If f.dwFileAttributes = 16 And ( f.cFilename <> "." And f.cFilename <> ".." ) Then
+				'Push to folders to search list
+				Call PushStringArray( sFoldersToSearch, sCurrentPath + f.cFilename + "\" )
+			End If
+			iNStatus = FindNextFile( iHFindFile, f )
+		Loop While iNStatus = 1
+		iNStatus = FindClose( iHFindFile )
+		
+		' Next find all matching files in the current path
+		iHFindFile = FindFirstFile( sCurrentPath + sFilePattern, f )
+		Do
+			If iHFindFile <> INVALID_HANDLE_VALUE And f.dwFileAttributes <> 16 Then
+				'Push to matching files array
+				Call PushStringArray( sMatchingFiles, sCurrentPath + f.cFilename )
+			End If
+			iNStatus = FindNextFile( iHFindFile, f )
+		Loop While iNStatus = 1
+		iNStatus = FindClose( iHFindFile )
+		
+	Loop Until UBound( sFoldersToSearch ) = 0
+	
+	RecursiveSearchFiles = TRUE
+	
+End Function
+
+Sub PrintArray( sArray() As String )
+	Dim i As Integer
+	For i = 1 To UBound( sArray )
+		Print sArray(i)
+	Next
+End Sub
+
+Sub PrintIntegerArray( iArray() As Integer )
+	Dim i As Integer
+	For i = 1 To UBound( iArray )
+		Print iArray(i)
+	Next
+End Sub
+
+Sub PrintFloatArray( fArray() As Float )
+	Dim i As Integer
+	For i = 1 To UBound( fArray )
+		Print fArray(i)
+	Next
+End Sub
+
+Sub FindFiles( ByVal sPath As String, ByVal sFilespec As String, sList() As String )
+	Dim iHFindFile, iNStatus As Integer
+	Dim f As WIN32_FIND_DATA
+	Dim i As Integer
+	
+	'Clear array
+	ReDim sList(0)
+	
+	If Right$( sPath, 1 ) <> "\" Then
+		sPath = sPath + "\"
+	End If
+	
+	iHFindFile = FindFirstFile( sPath + sFilespec, f )
+	If iHFindFile <> INVALID_HANDLE_VALUE Then
+		Do
+			If f.dwFileAttributes <> 16 Then
+				'Push to matching files array
+				Call PushStringArray( sList, sPath + f.cFilename )
+			End If
+			iNStatus = FindNextFile( iHFindFile, f )
+		Loop While iNStatus = 1
+	Else
+		ReDim sList(0)
+	End If
+	
+	iNStatus = FindClose( iHFindFile )
+End Sub
+
+Sub GetTableList( sTables() As String, ByVal sSubstringIgnore As String, ByVal iTableListOptions As Integer )
+	
+	Dim i As Integer
+	
+	Dim iIncludeTableTypes As Integer
+	If BitwiseTest( iTableListOptions, TABLELIST_BASETABLESONLY ) Then
+		iIncludeTableTypes = BASE_TABLES_ONLY
+	ElseIf BitwiseTest( iTableListOptions, TABLELIST_TABLES_AND_QUERIES ) Then
+		iIncludeTableTypes = TABLES_AND_QUERIES
+	Else
+		iIncludeTableTypes = ALL_TABLES
+	End If
+	
+	Dim lIncludeReadOnly As Logical
+	If BitwiseTest( iTableListOptions, TABLELIST_HIDEREADONLY ) Then
+		lIncludeReadOnly = FALSE
+	Else
+		lIncludeReadOnly = TRUE
+	End If
+	
+	Dim lMappableOnly As Logical
+	If BitwiseTest( iTableListOptions, TABLELIST_HIDENONMAPPABLE ) Then
+		lMappableOnly = TRUE
+	Else
+		lMappableOnly = FALSE
+	End If
+	
+	Dim lVectorOnly As Logical
+	If BitwiseTest( iTableListOptions, TABLELIST_VECTORONLY ) Then
+		lVectorOnly = TRUE
+	Else
+		lVectorOnly = FALSE
+	End If
+	
+	For i = 1 to NumTables()
+		' Ignore tables with matching substring
+		If TableInfo( i, TAB_INFO_TYPE ) <> 0 And
+				( iIncludeTableTypes = ALL_TABLES Or ( iIncludeTableTypes = BASE_TABLES_ONLY And TableInfo( i, TAB_INFO_TYPE ) = TAB_TYPE_BASE And Not TableInfo( i, TAB_INFO_SEAMLESS ) )
+				Or ( iIncludeTableTypes = TABLES_AND_QUERIES And ( TableInfo( i, TAB_INFO_TYPE ) = TAB_TYPE_BASE Or TableInfo( i, TAB_INFO_TYPE ) = TAB_TYPE_RESULT ) And Not TableInfo( i, TAB_INFO_SEAMLESS ) ))
+				And ( sSubstringIgnore = "" Or ( sSubstringIgnore <> "" And Not InStr( 1, TableInfo( i, TAB_INFO_NAME ), sSubStringIgnore )))
+				And ( lIncludeReadOnly Or Not TableInfo( i, TAB_INFO_READONLY ) )
+				And ( Not lMappableOnly Or TableInfo( i, TAB_INFO_MAPPABLE ) )
+				And ( Not lVectorOnly Or TableIsVector( TableInfo( i, TAB_INFO_NAME )) )
+				Then
+			Call PushStringArray( sTables, TableInfo( i, TAB_INFO_NAME ) )
+		End If
+	Next
+	
+	If BitwiseTest( iTableListOptions, TABLELIST_SORT ) Then
+		Call SortStringArray( sTables )
+	End If
+End Sub
+
+Function GetColumnList( ByVal sTable As String, sColumns() As String ) As Logical
+	ReDim sColumns(0)
+	
+	If Not TableExists( sTable ) Then
+		Exit Function
+	End If
+	
+	'Only proceed if table is vector type
+	If Not TableIsVector( sTable ) Then
+		Exit Function
+	End If
+	
+	Dim i As Integer
+	For i = 1 To TableInfo( sTable, TAB_INFO_NCOLS )
+		Call PushStringArray( sColumns, ColumnInfo( sTable, "COL" + i, COL_INFO_NAME ) )
+	Next
+	
+	GetColumnList = TRUE
+	
+End Function
+
+Function TableIsVector( ByVal sTable As String ) As Logical
+	
+	If Not TableExists( sTable ) Then
+		TableIsVector = FALSE
+		Exit Function
+	End If
+	
+	If TableInfo( sTable, TAB_INFO_SEAMLESS ) Then
+		' Assume all seamless tables are rasters
+		TableIsVector = FALSE
+	ElseIf TableInfo( sTable, TAB_INFO_TYPE ) = Any( TAB_TYPE_BASE, TAB_TYPE_RESULT, TAB_TYPE_LINKED, TAB_TYPE_WFS ) Then
+		TableIsVector = TRUE
+	Else
+		TableIsVector = FALSE
+	End If
+	
+End Function
+
+Function CreateLineBetweenPoints( ByVal oPoint1 As Object, ByVal oPoint2 As Object ) As Object
+	CreateLineBetweenPoints = CreateLine( CentroidX( oPoint1 ), CentroidY( oPoint1 ), CentroidX( oPoint2 ), CentroidY( oPoint2 ))
+End Function
+
+Function PortionOfLine( ByVal oLine As Object, ByVal fPercent As Float ) As Object
+	Dim fStartX, fStartY As Float
+	Dim fEndX, fEndY As Float
+	Dim fNewX, fNewY As Float
+	Dim fDh, fDw As Float
+	
+	fStartX = CentroidX( GetStartOfLine( oLine ))
+	fStartY = CentroidY( GetStartOfLine( oLine ))
+	fEndX = CentroidX( GetEndOfLine( oLine ))
+	fEndY = CentroidY( GetEndOfLine( oLine ))
+	
+	fDh = fEndY - fStartY
+	fDw = fEndX - fStartX
+	
+	fNewY = fStartY + fDh * fPercent
+	fNewX = fStartX + fDw * fPercent
+	
+	PortionOfLine = CreateLineBetweenPoints( GetStartOfLine( oLine ), CreatePoint( fNewX, fNewY ) )
+End Function
+
+Function LinearReference( ByVal oLine As Object, ByVal fDistance As Float, ByVal fOffset As Float, ByVal sUnit As String, oPoint As Object, fAngle As Float ) As Logical
+	Dim fSegmentLength As Float
+	fSegmentLength = SphericalObjectLen( oLine, sUnit )
+	
+	If fSegmentLength < fDistance Then
+		'No, too short!
+		LinearReference = FALSE
+		Exit Function
+	End If
+	
+	Dim fPercent As Float
+	
+	' Simple case ... a line object!
+	If Str$( oLine ) = "Line" Then
+		fPercent = fDistance / fSegmentLength
+		oPoint = GetEndOfLine( PortionOfLine( oLine, fPercent ) )
+		LinearReference = TRUE
+		Exit Function
+	End If
+	
+	' Complex case... a polyline
+	
+	' Chomp along line.... yum yum
+	Dim iNoNodes As Integer
+	iNoNodes = ObjectInfo( oLine, OBJ_INFO_NPOLYGONS + 1 )
+	
+	Dim fConsumed As Float
+	Dim i As Integer
+	Dim oPoint1, oPoint2 As Object
+	For i = 1 To iNoNodes - 1
+		oPoint1 = NodePoint( oLine, 1, i )
+		oPoint2 = NodePoint( oLine, 1, i + 1 )
+		fSegmentLength = SphericalObjectDistance( oPoint1, oPoint2, sUnit )
+		If fConsumed + fSegmentLength >= fDistance Then
+			' Desired point lies somewhere in this segment:
+			fPercent = ( fDistance - fConsumed ) / fSegmentLength
+			oPoint = GetEndOfLine( PortionOfLine( CreateLineBetweenPoints( oPoint1, oPoint2 ), fPercent ) )
+			
+			fAngle = 360 - GetBearing( oPoint1, oPoint2 )
+			
+			If fOffset <> 0 Then
+				If sUnit = "km" Then
+					oPoint = ProjectPoint( oPoint, 360 - fAngle - 90, fOffset * 1000 )
+				Else
+					oPoint = ProjectPoint( oPoint, 360 - fAngle - 90, fOffset )
+				End If
+			End If
+			
+			' Used up available length, so return:
+			Exit For
+		Else
+			' Still hunting along line:
+			fConsumed = fConsumed + fSegmentLength
+		End If
+	Next
+	
+	LinearReference = TRUE
+	
+End Function
+
+Function RotatePointSymbol( oPoint As Object, ByVal fAngle As Float ) As Logical
+	
+	' Check if object is a point
+	If ObjectInfo( oPoint, OBJ_INFO_TYPE ) <> OBJ_TYPE_POINT Then
+		RotatePointSymbol = FALSE
+		Exit Function
+	End If
+	
+	' Get symbol style
+	Dim symSymbol As Symbol
+	symSymbol = ObjectInfo( oPoint, OBJ_INFO_SYMBOL )
+	
+	' Check symbol style - must be truetype font symbol to be rotatable
+	If StyleAttr( symSymbol, SYMBOL_KIND ) <> 2 Then
+		' Not a rotatable symbol
+		RotatePointSymbol = FALSE
+		Exit Function
+	End If
+	
+	' Grab all symbol properties
+	Dim iSymbol, iColor, iSize, iStyle As Integer
+	Dim sFont As String
+	iSymbol = StyleAttr( symSymbol, SYMBOL_CODE )
+	iColor = StyleAttr( symSymbol, SYMBOL_COLOR )
+	iSize = StyleAttr( symSymbol, SYMBOL_POINTSIZE )
+	sFont = StyleAttr( symSymbol, SYMBOL_FONT_NAME )
+	iStyle = StyleAttr( symSymbol, SYMBOL_FONT_STYLE )
+	
+	Create Point Into Variable oPoint ( CentroidX( oPoint ), CentroidY( oPoint ) )
+			Symbol MakeFontSymbol( iSymbol, iColor, iSize, sFont, iStyle, fAngle )
+	
+	RotatePointSymbol = TRUE
+End Function
+
+Function NodePoint( ByVal oObject As Object, ByVal iPolyNo As Integer, ByVal iNodeNo As Integer ) As Object
+	NodePoint = CreatePoint( ObjectNodeX( oObject, iPolyNo, iNodeNo ), ObjectNodeY( oObject, iPolyNo, iNodeNo ))
+End Function
+
+Function IsSubFolder( ByVal sSubFolder As String, ByVal sFolder As String ) As Logical
+	If sSubFolder = "" Or sFolder = "" Then
+		Exit Function
+	End If
+	
+	If Right$( sSubFolder, 1 ) <> "\" Then
+		sSubFolder = sSubFolder + "\"
+	End If
+	If Right$( sFolder, 1 ) <> "\" Then
+		sFolder = sFolder + "\"
+	End If
+	
+	If UCase$( sSubFolder ) Like UCase$( sFolder ) + "%" Then
+		IsSubFolder = TRUE
+	Else
+		IsSubFolder = FALSE
+	End If
+	
+End Function
+
+Function IsDate( ByVal sDate As String ) As Logical
+	sDate = Trim$( sDate )
+	If sDate = "" Then
+		IsDate = FALSE
+		Exit Function
+	End If
+	
+	OnError Goto bad_date
+	
+	Dim dDate As Date
+	dDate = StringToDate( sDate )
+	
+	OnError Goto 0
+	IsDate = TRUE
+	Exit Function
+	
+	bad_date:
+	OnError Goto 0
+	IsDate = FALSE
+	
+End Function
+
+Dim sMultiChooseColumnsAvailableColumns() As String
+Dim sMultiChooseColumnsSelectedColumns() As String
+Dim lMultiChooseColumnsForceSelection As Logical
+Dim lMultiChooseColumnOkEnabled As Logical
+
+Function MultiChooseColumns( ByVal sTable As String, sChosenColumns() As String, ByVal lForceSelection As Logical ) As Logical
+	MultiChooseColumns = MultiChooseColumnsAdvanced( sTable, sChosenColumns, lForceSelection, "Choose Columns", "Select columns from table:", FALSE )
+End Function
+
+Function MultiChooseColumnsAdvanced( ByVal sTable As String, sChosenColumns() As String, ByVal lForceSelection As Logical, ByVal sTitle As String, ByVal sPrompt As String, ByVal lHideAddRemoveAll As Logical ) As Logical
+	Dim i, iNoCols As Integer
+	
+	If Not TableExists( sTable ) Then
+		Exit Function
+	End If
+	lMultiChooseColumnsForceSelection = lForceSelection
+	
+	' Populate column lists
+	iNoCols = TableInfo( sTable, TAB_INFO_NCOLS )
+	ReDim sMultiChooseColumnsAvailableColumns(0)
+	ReDim sMultiChooseColumnsSelectedColumns(0)
+	Dim sCurrentCol As String
+	For i = 1 to iNoCols
+		sCurrentCol = ColumnInfo( sTable, "COL" + i, COL_INFO_NAME )
+		
+		' Check if this column is in prechosen columns
+		If ArrayContains( sChosenColumns, sCurrentCol ) Then
+			Call PushStringArray( sMultiChooseColumnsSelectedColumns, sCurrentCol )
+		Else
+			Call PushStringArray( sMultiChooseColumnsAvailableColumns, sCurrentCol )
+		End If
+	Next
+	
+	If lMultiChooseColumnsForceSelection And UBound( sMultiChooseColumnsSelectedColumns ) = 0 Then
+		lMultiChooseColumnOkEnabled = FALSE
+	Else
+		lMultiChooseColumnOkEnabled = TRUE
+	End If
+	
+	If Not lHideAddRemoveAll Then
+		Dialog
+			Title sTitle
+			Calling MultiChooseOkHandler
+			Control StaticText
+				Title sPrompt
+				Position 10, 7
+				
+			Control StaticText
+				Title "Available columns"
+				Position 10, 20
+			Control MultiListBox
+				Title From Variable sMultiChooseColumnsAvailableColumns
+				Position 10, 30
+				ID 1
+				Width 100
+				Height 120
+				Calling MultiChooseColumnsDoubleClickHandler
+			Control Button
+				Title "Add all >>"
+				Position 115, 30
+				Width 60
+				ID 2
+				Calling MultiChooseColumnsChangeHandler
+			Control Button
+				Title "Add >"
+				Position 115, 50
+				Width 60
+				ID 3
+				Calling MultiChooseColumnsChangeHandler
+			Control Button
+				Title "< Remove"
+				Position 115, 70
+				Width 60
+				ID 4
+				Calling MultiChooseColumnsChangeHandler
+			Control Button
+				Title "<< Remove all"
+				Position 115, 90
+				Width 60
+				ID 5
+				Calling MultiChooseColumnsChangeHandler
+			Control StaticText
+				Title "Selected columns"
+				Position 180, 20
+			Control MultiListBox
+				Position 180, 30
+				ID 6
+				Width 100
+				Height 120
+				Title From Variable sMultiChooseColumnsSelectedColumns
+				Calling MultiChooseColumnsDoubleClickHandler
+			Control OKButton
+				Position 180, 160
+				Width 45
+				ID 7
+			Control CancelButton
+				Position 235, 160
+				Width 45
+	Else
+		'Hide all / remove all
+		Dialog
+			Title sTitle
+			Calling MultiChooseOkHandler
+			Control StaticText
+				Title sPrompt
+				Position 10, 7
+				
+			Control StaticText
+				Title "Available columns"
+				Position 10, 20
+			Control MultiListBox
+				Title From Variable sMultiChooseColumnsAvailableColumns
+				Position 10, 30
+				ID 1
+				Width 100
+				Height 120
+				Calling MultiChooseColumnsDoubleClickHandler
+			Control Button
+				Title "Add >"
+				Position 115, 30
+				Width 60
+				ID 3
+				Calling MultiChooseColumnsChangeHandler
+			Control Button
+				Title "< Remove"
+				Position 115, 50
+				Width 60
+				ID 4
+				Calling MultiChooseColumnsChangeHandler
+			Control StaticText
+				Title "Selected columns"
+				Position 180, 20
+			Control MultiListBox
+				Position 180, 30
+				ID 6
+				Width 100
+				Height 120
+				Title From Variable sMultiChooseColumnsSelectedColumns
+				Calling MultiChooseColumnsDoubleClickHandler
+			Control OKButton
+				Position 180, 160
+				Width 45
+				ID 7
+			Control CancelButton
+				Position 235, 160
+				Width 45
+				
+	End If
+	
+	If Not CommandInfo( CMD_INFO_DLG_OK ) Then
+		'Cancel pressed
+		MultiChooseColumnsAdvanced = FALSE
+		Exit Function
+	End If
+	
+	' Update sChosenColumns with selected columns
+	ReDim sChosenColumns(0)
+	For i = 1 To UBound( sMultiChooseColumnsSelectedColumns )
+		Call PushStringArray( sChosenColumns, sMultiChooseColumnsSelectedColumns(i) )
+	Next
+	
+	MultiChooseColumnsAdvanced = TRUE
+	
+End Function
+
+Sub MultiChooseColumnsDoubleClickHandler
+	Dim iOriginalSelection As Integer
+	Dim sItem As String
+	
+	'Handle double clicks in lists
+	If Not CommandInfo( CMD_INFO_DLG_DBL ) Then
+		Exit Sub
+	End If
+	
+	Dim iItem As Integer
+	iItem = ReadControlValue( TriggerControl() )
+	Do Case TriggerControl()
+		Case 1
+			' Add selected
+			iOriginalSelection = iItem
+			sItem = sMultiChooseColumnsAvailableColumns( iItem )
+			Call PushStringArray( sMultiChooseColumnsSelectedColumns, sItem )
+			Call RemoveStringFromArray( sMultiChooseColumnsAvailableColumns, sItem )
+		Case 6
+			' Remove selected
+			iOriginalSelection = iItem
+			sItem = sMultiChooseColumnsSelectedColumns( iItem )
+			Call PushStringArray( sMultiChooseColumnsAvailableColumns, sItem )
+			Call RemoveStringFromArray( sMultiChooseColumnsSelectedColumns, sItem )
+	End Case
+	
+	Alter Control 1 Title From Variable sMultiChooseColumnsAvailableColumns
+	Alter Control 6 Title From Variable sMultiChooseColumnsSelectedColumns
+	
+	'Update active control and value
+	Do Case TriggerControl()
+		Case 1
+			'Add
+			If iOriginalSelection > 0 Then
+				If UBound( sMultiChooseColumnsAvailableColumns ) > 0 Then
+					If iOriginalSelection = 1 Then
+						Alter Control 1 Value 1
+					ElseIf iOriginalSelection > UBound( sMultiChooseColumnsAvailableColumns ) Then
+						Alter Control 1 Value UBound( sMultiChooseColumnsAvailableColumns )
+					Else
+						Alter Control 1 Value iOriginalSelection
+					End If
+					Alter Control 1 Active
+				End If
+			End If
+		Case 6
+			'Remove
+			If iOriginalSelection > 0 Then
+				If UBound( sMultiChooseColumnsSelectedColumns ) > 0 Then
+					If iOriginalSelection = 1 Then
+						Alter Control 6 Value 1
+					ElseIf iOriginalSelection > UBound( sMultiChooseColumnsSelectedColumns ) Then
+						Alter Control 6 Value UBound( sMultiChooseColumnsSelectedColumns )
+					Else
+						Alter Control 6 Value iOriginalSelection
+					End If
+					Alter Control 6 Active
+				End If
+			End If
+	End Case
+	
+	' Update status of ok button
+	If lMultiChooseColumnsForceSelection And UBound( sMultiChooseColumnsSelectedColumns ) = 0 Then
+		Alter Control 7 Disable
+	Else
+		Alter Control 7 Enable
+	End If
+	
+End Sub
+
+Sub MultiChooseOkHandler
+	If Not lMultiChooseColumnOkEnabled Then
+		Alter Control 7 Disable
+	End If
+End Sub
+
+Sub MultiChooseColumnsChangeHandler
+	Dim iOriginalSelection, iItem As Integer
+	Dim sItem As String
+	Dim iItemsRemoved As Integer
+	
+	Do Case TriggerControl()
+			
+		Case 2
+			' Add all
+			For iItem = 1 To UBound( sMultiChooseColumnsAvailableColumns )
+				sItem = sMultiChooseColumnsAvailableColumns( iItem - iItemsRemoved )
+				Call PushStringArray( sMultiChooseColumnsSelectedColumns, sItem )
+				Call RemoveStringFromArray( sMultiChooseColumnsAvailableColumns, sItem )
+				iItemsRemoved = iItemsRemoved + 1
+			Next
+			
+		Case 3
+			' Add selected
+			iItem = ReadControlValue(1)
+			iOriginalSelection = iItem
+			Do
+				If iItem <> 0 Then
+					sItem = sMultiChooseColumnsAvailableColumns( iItem - iItemsRemoved )
+					Call PushStringArray( sMultiChooseColumnsSelectedColumns, sItem )
+					Call RemoveStringFromArray( sMultiChooseColumnsAvailableColumns, sItem )
+					iItemsRemoved = iItemsRemoved + 1
+				End If
+				iItem = ReadControlValue(1)
+			Loop Until iItem = 0
+			
+		Case 4
+			' Remove selected
+			iItem = ReadControlValue(6)
+			iOriginalSelection = iItem
+			Do
+				If iItem <> 0 Then
+					sItem = sMultiChooseColumnsSelectedColumns( iItem - iItemsRemoved )
+					Call PushStringArray( sMultiChooseColumnsAvailableColumns, sItem )
+					Call RemoveStringFromArray( sMultiChooseColumnsSelectedColumns, sItem )
+					iItemsRemoved = iItemsRemoved + 1
+				End If
+				iItem = ReadControlValue(6)
+			Loop Until iItem = 0
+			
+		Case 5
+			' Remove all
+			For iItem = 1 To UBound( sMultiChooseColumnsSelectedColumns )
+				sItem = sMultiChooseColumnsSelectedColumns( iItem - iItemsRemoved )
+				Call PushStringArray( sMultiChooseColumnsAvailableColumns, sItem )
+				Call RemoveStringFromArray( sMultiChooseColumnsSelectedColumns, sItem )
+				iItemsRemoved = iItemsRemoved + 1
+			Next
+			
+	End Case
+	
+	Alter Control 1 Title From Variable sMultiChooseColumnsAvailableColumns
+	Alter Control 6 Title From Variable sMultiChooseColumnsSelectedColumns
+	
+	'Update active control and value
+	Do Case TriggerControl()
+		Case 3
+			'Add
+			If iOriginalSelection > 0 Then
+				If UBound( sMultiChooseColumnsAvailableColumns ) > 0 Then
+					If iOriginalSelection = 1 Then
+						Alter Control 1 Value 1
+					ElseIf iOriginalSelection > UBound( sMultiChooseColumnsAvailableColumns ) Then
+						Alter Control 1 Value UBound( sMultiChooseColumnsAvailableColumns )
+					Else
+						Alter Control 1 Value iOriginalSelection
+					End If
+					Alter Control 1 Active
+				End If
+			End If
+		Case 4
+			'Remove
+			If iOriginalSelection > 0 Then
+				If UBound( sMultiChooseColumnsSelectedColumns ) > 0 Then
+					If iOriginalSelection = 1 Then
+						Alter Control 6 Value 1
+					ElseIf iOriginalSelection > UBound( sMultiChooseColumnsSelectedColumns ) Then
+						Alter Control 6 Value UBound( sMultiChooseColumnsSelectedColumns )
+					Else
+						Alter Control 6 Value iOriginalSelection
+					End If
+					Alter Control 6 Active
+				End If
+			End If
+	End Case
+	
+	' Update status of ok button
+	If lMultiChooseColumnsForceSelection And UBound( sMultiChooseColumnsSelectedColumns ) = 0 Then
+		Alter Control 7 Disable
+	Else
+		Alter Control 7 Enable
+	End If
+	
+End Sub
+
+Function BitwiseTest( ByVal iTest As Integer, ByVal iBit As Integer ) As Logical
+	If iTest = 0 Or iBit = 0 Then
+		BitWiseTest = FALSE
+		Exit Function
+	End If
+	
+	BitwiseTest = iTest \ iBit Mod 2
+End Function
+
+Function ObjectIsPolygon( ByVal oObj As Object ) As Logical
+	If ObjectInfo( oObj, OBJ_INFO_TYPE ) = Any( OBJ_TYPE_REGION, OBJ_TYPE_RECT, OBJ_TYPE_ROUNDRECT, OBJ_TYPE_ELLIPSE, OBJ_TYPE_FRAME ) Then
+		ObjectIsPolygon = TRUE
+	Else
+		ObjectIsPolygon = FALSE
+	End If
+End Function
+
+Function SelectionIsPolygons( ByVal iFlags As Integer ) As Logical
+	Dim lSingleOnly As Logical
+	If BitWiseTest( iFlags, ALLOW_SINGLE_ONLY ) Then
+		lSingleOnly = TRUE
+	End If
+	
+	If SelectionInfo( SEL_INFO_NROWS ) = 0 Then
+		SelectionIsPolygons = FALSE
+		Exit Function
+	End If
+	
+	Dim sSelectionQuery As String
+	sSelectionQuery = SelectionInfo( SEL_INFO_SELNAME )
+	
+	If lSingleOnly And TableInfo( sSelectionQuery, TAB_INFO_NROWS ) > 1 Then
+		SelectionIsPolygons = FALSE
+	ElseIf Not TableInfo( sSelectionQuery, TAB_INFO_MAPPABLE ) Then
+		SelectionIsPolygons = FALSE
+	Else
+		Select * From sSelectionQuery Where Obj Into __regions NoSelect
+		If TableInfo( "__regions", TAB_INFO_NROWS ) = TableInfo( sSelectionQuery, TAB_INFO_NROWS ) Then
+			' All selected rows have objects
+			Select * From __regions Where Not ObjectIsPolygon( Obj ) Into not_region NoSelect
+			If TableInfo( "not_region", TAB_INFO_NROWS ) > 0 Then
+				SelectionIsPolygons = FALSE
+			Else
+				SelectionIsPolygons = TRUE
+			End If
+			Call SafeClose( "__regions" )
+		Else
+			' Some non-object rows selected
+			SelectionIsPolygons = FALSE
+		End If
+	End If
+	
+	Call SafeClose( "not_region" )
+	Call SafeClose( sSelectionQuery )
+	
+End Function
+
+Function SelectionIsLines( ByVal iFlags As Integer ) As Logical
+	Dim lSingleOnly As Logical
+	If BitWiseTest( iFlags, ALLOW_SINGLE_ONLY ) Then
+		lSingleOnly = TRUE
+	End If
+	
+	If SelectionInfo( SEL_INFO_NROWS ) = 0 Then
+		SelectionIsLines = FALSE
+		Exit Function
+	End If
+	
+	Dim sSelectionQuery As String
+	sSelectionQuery = SelectionInfo( SEL_INFO_SELNAME )
+	
+	If lSingleOnly And TableInfo( sSelectionQuery, TAB_INFO_NROWS ) > 1 Then
+		SelectionIsLines = FALSE
+	Else
+		Select * From sSelectionQuery Where Obj Into __lines NoSelect
+		If TableInfo( "__lines", TAB_INFO_NROWS ) = TableInfo( sSelectionQuery, TAB_INFO_NROWS ) Then
+			' All selected rows have objects
+			Select * From __lines Where Not ( Str$( Obj ) = "Line" Or Str$( Obj ) = "PolyLine" ) Into not_lines NoSelect
+			If TableInfo( "not_lines", TAB_INFO_NROWS ) > 0 Then
+				SelectionIsLines = FALSE
+			Else
+				SelectionIsLines = TRUE
+			End If
+			Call SafeClose( "__lines" )
+		Else
+			' Some non-object rows selected
+			SelectionIsLines = FALSE
+		End If
+	End If
+	
+	Call SafeClose( "not_lines" )
+	Call SafeClose( sSelectionQuery )
+	
+End Function
+
+Function SelectionIsInLayout() As Logical
+	If SelectionInfo( SEL_INFO_NROWS ) = 0 Then
+		SelectionIsInLayout = FALSE
+		Exit Function
+	End If
+	
+	Dim sSelectionTable As String
+	sSelectionTable = SelectionInfo( SEL_INFO_TABLENAME )
+	
+	SelectionIsInLayout = RegExTest( sSelectionTable, "^Layout\d+$" )
+End Function
+
+Function ConcatWithSeperator( ByVal sString1 As String, ByVal sSeperator As String, ByVal sString2 As String ) As String
+	If sString1 <> "" And sString2 <> "" Then
+		ConcatWithSeperator = sString1 + sSeperator + sString2
+	Else
+		ConcatWithSeperator = sString1 + sString2
+	End If
+End Function
+
+Function ColumnTypeAsString( ByVal sTable As String, ByVal sColumn As String ) As String
+	
+	' calculate data type
+	Do Case ColumnInfo( sTable, sColumn, COL_INFO_TYPE )
+		Case COL_TYPE_CHAR
+			ColumnTypeAsString = "Char(" + ColumnInfo( sTable, sColumn, COL_INFO_WIDTH ) + ")"
+		Case COL_TYPE_DECIMAL
+			ColumnTypeAsString = "Decimal(" + ColumnInfo( sTable, sColumn, COL_INFO_WIDTH ) + ", " + ColumnInfo( sTable, sColumn, COL_INFO_DECPLACES ) + ")"
+		Case COL_TYPE_FLOAT
+			ColumnTypeAsString = "Float"
+		Case COL_TYPE_INTEGER
+			ColumnTypeAsString = "Integer"
+		Case COL_TYPE_SMALLINT
+			ColumnTypeAsString = "SmallInt"
+		Case COL_TYPE_DATE
+			ColumnTypeAsString = "Date"
+		Case COL_TYPE_LOGICAL
+			ColumnTypeAsString = "Logical"
+		Case COL_TYPE_TIME
+			ColumnTypeAsString = "Time"
+		Case COL_TYPE_DATETIME
+			ColumnTypeAsString = "DateTime"
+	End Case
+	
+End Function
+
+Function ColumnValueToString( ByVal sTable As String, ByVal sColumn As String ) As String
+	Dim aCol As Alias
+	aCol = sTable + "." + sColumn
+	
+	Do Case ColumnInfo( sTable, sColumn, COL_INFO_TYPE )
+		Case COL_TYPE_CHAR
+			' double quote strings
+			Dim sVal As String
+			sVal = aCol
+			ColumnValueToString = """" + Replace$( sVal, """", """""" ) + """"
+		Case COL_TYPE_DECIMAL
+			ColumnValueToString = Format$( aCol, "" )
+		Case COL_TYPE_FLOAT
+			ColumnValueToString = Format$( aCol, "" )
+		Case COL_TYPE_INTEGER
+			ColumnValueToString = Str$( aCol )
+		Case COL_TYPE_SMALLINT
+			ColumnValueToString = Str$( aCol )
+		Case COL_TYPE_DATE
+			ColumnValueToString = """" + Str$( aCol ) + """"
+		Case COL_TYPE_LOGICAL
+			ColumnValueToString = """" + Str$( aCol ) + """"
+		Case COL_TYPE_TIME
+			ColumnValueToString = """" + Str$( aCol ) + """"
+		Case COL_TYPE_DATETIME
+			ColumnValueToString = """" + Str$( aCol ) + """"
+	End Case
+End Function
+
+Function PrettyStringArray( sStringArray() As String, ByVal sFinalSeperator As String ) As String
+	If UBound( sStringArray ) = 0 Then
+		PrettyStringArray = ""
+		Exit Function
+	End If
+	If UBound( sStringArray ) = 1 Then
+		PrettyStringArray = sStringArray(1)
+		Exit Function
+	End If
+	
+	Dim i As Integer
+	Dim sTemp As String
+	For i = 1 To UBound( sStringArray ) - 1
+		sTemp = sTemp + sStringArray(i)
+		If i < UBound( sStringArray ) - 1 Then
+			sTemp = sTemp + ", "
+		End If
+	Next
+	
+	sTemp = sTemp + " " + sFinalSeperator + " " + sStringArray( UBound( sStringArray ) )
+	PrettyStringArray = sTemp
+End Function
+
+Function ConvertDate( ByVal sDateString As String, dDate As Date ) As Logical
+	Dim sTmpDate, sTmpDate2 As String
+	Dim lResult As Logical
+	
+	' Uppercase
+	sTmpDate2 = Trim$( UCase$( sDateString ))
+	
+	If Len( sTmpDate2 ) < 6 Or Len( sTmpDate2 ) > 11 Then
+		ConvertDate = FALSE
+		Exit Function
+	End If
+	
+	' Flip dashes to slashes
+	sTmpDate = Space$(255)
+	lResult = RegExReplace( sTmpDate2, "-", "/", sTmpDate )
+	
+	' Do we have any seperating characters?
+	If Not InStr( 1, sTmpDate, "/" ) Then
+		If Len( sTmpDate ) = 6 Then
+			' Must be in ddmmyy format
+			sTmpDate = Left$( sTmpDate, 2 ) + "/" + Mid$( sTmpDate, 3, 2 ) + "/" + Right$( sTmpDate, 2 )
+		ElseIf Len( sTmpDate ) = 7 Then
+			' Must be in ddMMMyy format
+			sTmpDate = Left$( sTmpDate, 2 ) + "/" + Mid$( sTmpDate, 3, 3 ) + "/" + Right$( sTmpDate, 2 )
+		ElseIf Len( sTmpDate ) = 9 Then
+			' Must be in ddMMMyyyy format
+			sTmpDate = Left$( sTmpDate, 2 ) + "/" + Mid$( sTmpDate, 3, 3 ) + "/" + Right$( sTmpDate, 4 )
+		End If
+	End If
+	
+	' Replace text month strings with numbers
+	
+	' Flip dashes to slashes
+	sTmpDate2 = Space$(255)
+	lResult = RegExReplace( sTmpDate, "JAN", "01", sTmpDate2 )
+	sTmpDate = Space$(255)
+	lResult = RegExReplace( sTmpDate2, "FEB", "02", sTmpDate )
+	sTmpDate2 = Space$(255)
+	lResult = RegExReplace( sTmpDate, "MAR", "03", sTmpDate2 )
+	sTmpDate = Space$(255)
+	lResult = RegExReplace( sTmpDate2, "APR", "04", sTmpDate )
+	sTmpDate2 = Space$(255)
+	lResult = RegExReplace( sTmpDate, "MAY", "05", sTmpDate2 )
+	sTmpDate = Space$(255)
+	lResult = RegExReplace( sTmpDate2, "JUN", "06", sTmpDate )
+	sTmpDate2 = Space$(255)
+	lResult = RegExReplace( sTmpDate, "JUL", "07", sTmpDate2 )
+	sTmpDate = Space$(255)
+	lResult = RegExReplace( sTmpDate2, "AUG", "08", sTmpDate )
+	sTmpDate2 = Space$(255)
+	lResult = RegExReplace( sTmpDate, "SEP", "09", sTmpDate2 )
+	sTmpDate = Space$(255)
+	lResult = RegExReplace( sTmpDate2, "OCT", "10", sTmpDate )
+	sTmpDate2 = Space$(255)
+	lResult = RegExReplace( sTmpDate, "NOV", "11", sTmpDate2 )
+	sTmpDate = Space$(255)
+	lResult = RegExReplace( sTmpDate2, "DEC", "12", sTmpDate )
+	
+	' Final check - see if date is in backward format, eg yyyy/mm/dd
+	If InStr( 1, sTmpDate, "/" ) = 5 Then
+		sTmpDate = Right$( sTmpDate, 2 ) + "/" + Mid$( sTmpDate, 6, 2 ) + "/" + Left$( sTmpDate, 4 )
+	End If
+	
+	OnError Goto bad_date
+	dDate = StringToDate( sTmpDate )
+	OnError Goto 0
+	ConvertDate = TRUE
+	Exit Function
+	
+	bad_date:
+	OnError Goto 0
+	ConvertDate = FALSE
+	
+End Function
+
+Function IsDateString( ByVal sDateString As String ) As Logical
+	Dim dTemp As Date
+	IsDateString = ConvertDate( sDateString, dTemp )
+End Function
+
+Function ConvertTime( ByVal sTimeString As String, tTime As Time ) As Logical
+	ConvertTime = ConvertTimeAdvanced( sTimeString, tTime, TRUE )
+End Function
+
+Function ConvertTimeAdvanced( ByVal sTimeString As String, tTime As Time, ByVal lHandleNumericTimes As Logical ) As Logical
+	Dim sTmpTime As String
+	Dim sTempVal As String
+	Dim i, iConversionType, iTempTime, iReplaceValues, iNumRows, iTempVal As Integer
+	Dim fTempVal As Float
+	Dim lResult As Logical
+	Dim sTmpTime2 As String
+	
+	sTmpTime = Trim$( UCase$( sTimeString ))
+	
+	If Len( sTmpTime ) = 0 Then
+		ConvertTimeAdvanced = FALSE
+		Exit Function
+	End If
+	
+	Dim sMatch(2) As String
+	If isNum( sTmpTime ) Then
+		
+		fTempVal = sTmpTime
+		
+		'Hack to avoid overflows for integer type
+		If fTempVal > 2147483646 Then
+			iTempVal = 0
+		Else
+			iTempVal = sTmpTime
+		End If
+		
+		If Not lHandleNumericTimes Then
+			'Numeric, but numeric times are not allowed
+			ConvertTimeAdvanced = FALSE
+			Exit Function
+		End If
+		If fTempVal < 1 Then
+			' Decimal format, as fraction of way through day
+			sTmpTime = (( fTempVal * 1440 )\60 ) + ":" + Right$( "00" & Left$( Str$(( fTempVal * 1440 ) Mod 60 ), 2 ), 2 )
+		ElseIf fTempVal <> iTempVal And fTempVal <= 2147483646 Then 'second condition is hack to workaround integer overflows
+			' Decimal format, but Not < 1. Probably of the type "12.45"
+			sMatch(1) = Space$(255)
+			sMatch(2) = Space$(255)
+			lResult = RegExMatchMultiple( sTmpTime, "(\d+)\.(\d+)", sMatch )
+			sTmpTime = sMatch(1) + ":" + Left$( sMatch(2) + "00", 2 )
+		End If
+	Else
+		' Must have string characters
+		sTmpTime2 = sTmpTime
+		sTmpTime = Space$(255)
+		lResult = RegExReplace( sTmpTime2, "\.", ":", sTmpTime )
+	End If
+	
+	' Check string
+	If RegExTest( sTmpTime, "^([0-1]?[0-9]|2[0-3])\:((0[0-9])|([1-5][0-9]))(\:((0[0-9])|([1-5][0-9]))(\:[0-9]+))$" ) Then
+		'Time with milliseconds
+		'Replace last : with a .
+		sMatch(1) = Space$(255)
+		sMatch(2) = Space$(255)
+		lResult = RegExMatchMultiple( sTmpTime, "^(.*)(?::)(.*?)$", sMatch )
+		sTmpTime = sMatch(1) + "." + sMatch(2)
+		tTime = StringToTime( sTmpTime )
+		ConvertTimeAdvanced = TRUE
+		Exit Function
+	ElseIf RegExTest( sTmpTime, "^([0-1]?[0-9]|2[0-3])\:((0[0-9])|([1-5][0-9]))(\:((0[0-9])|([1-5][0-9])))?$" ) Then
+		tTime = StringToTime( sTmpTime )
+		ConvertTimeAdvanced = TRUE
+		Exit Function
+	End If
+	
+	ConvertTimeAdvanced = FALSE
+	
+End Function
+
+Function IsTimeString( ByVal sTimeString As String ) As Logical
+	Dim tTime As Time
+	IsTimeString = ConvertTimeAdvanced( sTimeString, tTime, FALSE )
+End Function
+
+Function GetFileSize( ByVal sFilePath As String ) As Float
+	Dim iFileHandle As Integer
+	iFileHandle = WinFileOpen( sFilePath, 0 )
+	' handle errors??
+	Dim iShortFileSize, iLongFileSize As Integer
+	' Large file sizes not supported
+	iShortFileSize = GetFileSizeA( iFileHandle, iLongFileSize )
+	iFileHandle = WinFileClose( iFileHandle )
+	
+	'Return value in megabytes
+	GetFileSize = iShortFileSize / 1048576
+End Function
+
+Function GetWindowsVersion() As String
+	
+	Dim osinfo As OSVERSIONINFO
+	Dim iRetValue As Integer
+	
+	osinfo.dwOSVersionInfoSize = 148
+	osinfo.szCSDVersion = Space$(128)
+	iRetValue = GetVersionExA( osinfo )
+	
+	GetWindowsVersion = osinfo.dwMajorVersion & "." & osinfo.dwMinorVersion
+	
+End Function
+
+Function WordWrap( ByVal sString As String, ByVal iMaxChars As Integer ) As String
+	If iMaxChars < 1 Or Len( sString ) < iMaxChars Then
+		WordWrap = sString
+		Exit Function
+	End If
+	
+	Dim sParts(2) As String
+	Call PrepareArray( sParts, 2000 )
+	Dim iResult As Integer
+	If RegExTest( sString, "^.{0," + iMaxChars + "}\s" ) Then
+		iResult = RegExMatchMultiple( sString, "^(.{0," + iMaxChars + "})\s(.*)", sParts )
+	Else
+		iResult = RegExMatchMultiple( sString, "^(.{0," + iMaxChars + "})(.*)", sParts )
+	End If
+	WordWrap = Trim$( sParts(1)) + Chr$(13) + Trim$( sParts(2))
+End Function
+
+
+Function GetIniString( ByVal sIniFile As String, ByVal sSection As String, ByVal sIniKey As String, ByVal sDefault As String ) As String
+	GetIniString = ""
+	
+	Dim iResult As Integer
+	Dim sReturned As String
+	
+	If Not FileExists( sIniFile ) Then
+		GetIniString = sDefault
+		Exit Function
+	End If
+	
+	' Setup empty buffer for returned string
+	sReturned = Repeat$( " ", 512 )
+	
+	iResult = GetPrivateProfileString32( sSection, sIniKey, sDefault, sReturned, 512, sIniFile )
+	' Trim returned string to required length
+	If iResult Then
+		GetIniString = Left$( sReturned, iResult )
+	Else
+		GetIniString = sDefault
+	End If
+	
+End Function
+
+Function DaysInMonth( ByVal iMonth As Integer, ByVal iYear As Integer ) As Integer
+	If iMonth = Any( 1, 3, 5, 7, 8, 10, 12 ) Then
+		DaysInMonth = 31
+	ElseIf iMonth <> 2 Then
+		DaysInMonth = 30
+	Else
+		If IsLeapYear( iYear ) Then
+			DaysInMonth = 29
+		Else
+			DaysInMonth = 28
+		End If
+	End If
+End Function
+
+Function IsLeapYear( ByVal iYear As Integer ) As Logical
+	If iYear Mod 4 > 0 Then
+		IsLeapYear = FALSE
+	ElseIf iYear Mod 100 > 0 Then
+		IsLeapYear = TRUE
+	ElseIf iYear Mod 400 > 0 Then
+		IsLeapYear = FALSE
+	Else
+		IsLeapYear = TRUE
+	End If
+End Function
+
+Function RegisterCSV( ByVal sCSVFile As String, ByVal sDestTabName As String, ByVal sDestTabFile As String, ByVal sOpenTabAs As String, sError As String ) As Logical
+	sError = ""
+	
+	Dim sRegisteredCSVName, sRegisteredCSVFile As String
+	sRegisteredCSVName = sDestTabName + "_1"
+	sRegisteredCSVFile = PathToDirectory$( sCSVFile ) + sRegisteredCSVName + ".TAB"
+	
+	If TableExists( sOpenTabAs ) Then
+		sError = "Table " + sDestTabName + " is already open. Please close this table and try again."
+		Call LogMessage( "! Error: Table " + sDestTabName + " is already open!", LOG_LEVEL_HIGH )
+		RegisterCSV = FALSE
+		Exit Function
+	End If
+	
+	' Handle already open tables
+	OnError Goto table_exists
+	open_retry:
+	
+	' Register and open CSV
+	Register Table sCSVFile Type ASCII Delimiter 44 Titles CharSet "windowslatin1" Into sRegisteredCSVFile
+	Open Table sRegisteredCSVFile As sRegisteredCSVName
+	
+	Commit Table sRegisteredCSVName As sDestTabFile
+	OnError Goto 0
+	
+	' Close registered CSV file, and kill corresponding TAB file
+	Close Table sRegisteredCSVName
+	Kill sRegisteredCSVFile
+	
+	' Open converted table
+	Open Table sDestTabFile As sOpenTabAs
+	
+	RegisterCSV = TRUE
+	Exit Function
+	
+	table_exists:
+	sError = "Table " + sDestTabName + " is open in another program. Please close this program and try again."
+	If MsgBox( sError, "Error Opening File", vbExclamation + vbRetryCancel + vbDefaultButton1 ) = vbRetry Then
+		Resume open_retry
+	End If
+	
+	OnError Goto 0
+	
+	Call LogMessage( "! Error: Table " + sDestTabName + " is open in another program!", LOG_LEVEL_HIGH )
+	
+	Call SafeClose( sRegisteredCSVName )
+	RegisterCSV = FALSE
+	Exit Function
+	
+End Function
+
+
+Function TrimColumnListToExisting( ByVal sTable As String, ByVal sColumnList As String ) As String
+	Dim sDesiredCols() As String
+	Call Explode( sColumnList, ",", sDesiredCols )
+	
+	Dim sPresentCols() As String
+	Dim i As Integer
+	For i = 1 To UBound( sDesiredCols )
+		If ColumnExists( sTable, sDesiredCols(i) ) Then
+			Call PushStringArray( sPresentCols, sDesiredCols(i) )
+		End If
+	Next
+	
+	TrimColumnListToExisting = Join( sPresentCols, "," )
+	
+End Function
+

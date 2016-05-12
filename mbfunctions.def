@@ -1,0 +1,1587 @@
+'
+' Contents:
+' 1. Text manipulation functions: everything related to string manipulation and tests
+' 2. Numeric functions: numeric and mathematical functions
+' 3. Date/time functions: everything related to date or time manipulation and tests
+' 4. Array helpers: helps for array manipulation and tests
+' 5. Object manipulation: functions relating to MapInfo objects and styling
+' 6. Selection helpers: helpers for working with selections
+' 7. Table/Column/Query helpers: helpers for working with tables, columns or queries
+' 8. File helpers: helpers for working with files
+' 9. Map window helpers: functions for manipulating and working with map windows and layers
+' 10. Geometry functions: functions which manipulate geometries
+' 11. Workstation functions: Windows and networking functions
+' 12. GUI Functions: Functions which display dialogs and choices to users
+' 13. c++ MapBasicFunctions.dll functions: Functions contained in the MapBasicFunctions DLL
+
+
+' ************
+' Custom types
+' ************
+Type GeoJSONExportSpecs
+	SourceTable As String
+	DestFilename As String
+	JSVariableName As String
+	Precision As Integer
+	Columns() As String
+End Type
+
+'******************
+' Text manipulation
+'******************
+
+' Returns two strings joined with a seperator, where the seperator
+' is only included if both strings are non-empty
+' Parameters:
+'   sString1: first string
+'   sSeperator: seperator string
+'   sString2: second string
+' Returns:
+'   Strings joined with seperator if required
+Declare Function ConcatWithSeperator( ByVal sString1 As String, ByVal sSeperator As String, ByVal sString2 As String) As String
+
+' Counts occurances of one string inside another
+' Parameters:
+'   sString: string to search inside
+'   sCount: substring to count occurences of
+' Returns:
+'   number of times substring was found
+Declare Function CountOccurances(ByVal sString as String, ByVal sCount as String) as Integer
+
+' Stores a string in an array, splitting by a given seperator character
+' Parameters:
+'   sString: string to split
+'	sSeperator: seperator character
+'   sArray: array to store seperated string in
+' See also:
+'   Join
+Declare Sub Explode(ByVal sString As String, ByVal sSeperator As String, sArray() As String)
+
+' Inline if, string version. Evaluates an expression, and returns one of two
+' values. Can be used in update queries, eg "UPDATE table SET col = IIf( val > 2, "high", "low" )"
+' Parameters:
+'   lTest: logical test
+'   sValTrue: value to return if test passes
+'   sValFalse: value to return if test fails
+' Returns:
+'   either sValTrue or sValFalse depending on result of test
+' See also:
+'   IIfVal
+Declare Function IIf(ByVal lTest as Logical, ByVal sValTrue as String, ByVal sValFalse as String) as String
+
+' Reverse of Instr, searches for occurances from the end of a string
+' Parameters:
+'   sString: string to search through
+'   sSearch: string to search for
+' Returns:
+'   rightmost position of found string, or -1 if string was not found
+Declare Function InStrRev(ByVal sString as String, ByVal sSearch as String) as Integer
+
+' Tests whether a string can be interpreted as a number
+' Parameters:
+'   sTest: string to test
+' Returns:
+'   true if string is a number
+Declare Function IsNum(ByVal sTest as String) as Logical
+
+' Joins an array with a specified joining character
+' Parameters:
+'   sArray: array containing strings to join
+'	sJoiner: string to join array elements by
+' Returns:
+'   Elements of array joined by specified character. Eg "a,b,c"
+' See also:
+'   Explode
+'   PrettyStringArray
+Declare Function Join(sArray() As String, ByVal sJoiner As String) As String
+
+' Returns a given number of repeats of a string
+' Parameters:
+'   sString: string to repeat
+'   iMultiples: number of times to repeat string
+' Returns:
+'   string repeated multiple times
+Declare Function Repeat$(ByVal sString as String, ByVal iMultiples as Integer) as String
+
+' Text replace function - written by Hayden Fisher via MapInfo mailing list
+' Note - this is VERY inefficient - use RegEx replaces instead for anything which is repeated
+' or time critical
+' Parameters:
+'   sFullString: input string containing sub strings to replace
+'	sReplaceChars: substring to replace
+'   sReplacementChars: string to use as replacement
+' Returns:
+'   input string with substrings replaced
+Declare Function Replace$(ByVal sFullString As String, ByVal sReplaceChars As String, ByVal sReplacementChars As String) As String 
+
+' Strips any number of a specified character from the left side of a string
+' Parameters:
+'   sFullString: input string
+'	sRemoveChars: characters to remove
+' Returns:
+'   input string with leading matching characters removed
+Declare Function StripLeft$(ByVal sFullString As String, ByVal sRemoveChars As String) As String 
+
+' Strips any number of a specified character from the right side of a string
+' Parameters:
+'   sFullString: input string
+'	sRemoveChars: characters to remove
+' Returns:
+'   input string with trailing matching characters removed
+Declare Function StripRight$(ByVal sFullString As String, ByVal sRemoveChars As String) As String
+
+' Trims spaces from both the beginning and end of string
+' Parameters:
+'   sTrim: string to trim
+' Returns:
+'   string with leading and trailing spaces removed
+Declare Function Trim$(ByVal sTrim as String) as String
+
+' Word wraps a string to a specified max width
+' Parameters:
+'   sString: string to word wrap
+'   iMaxChars: maximum characters per line
+' Returns:
+'   String wrapped on whitespace to max characters
+Declare Function WordWrap( ByVal sString As String, ByVal iMaxChars As Integer ) As String
+
+
+
+
+'******************
+' Numeric functions
+'******************
+
+' Tests whether a given bit is set in an integer
+' Parameters:
+'   iTest: integer to test
+'   iBit: bit to test for
+' Returns:
+'   True if bit is set
+Declare Function BitwiseTest( ByVal iTest As Integer, ByVal iBit As Integer) As Logical
+
+' Rounds a float up to an integer
+' Parameters:
+'   fNumber: float to round up
+' Returns:
+'   Ceiling of float
+Declare Function Ceil(ByVal fNumber As Float) As Integer
+
+' Inline if, numeric version. Evaluates an expression, and returns one of two
+' values. Can be used in update queries, eg "UPDATE table SET col = IIf( val = "High", 10, 5 )"
+' Parameters:
+'   lTest: logical test
+'   fValTrue: value to return if test passes
+'   fValFalse: value to return if test fails
+' Returns:
+'   either fValTrue or fValFalse depending on result of test
+' See also:
+'   IIf
+Declare Function IIfVal(ByVal lTest as Logical, ByVal fValTrue as Float, ByVal fValFalse as Float) as Float
+
+
+
+'********************
+' Date/time functions
+'********************
+
+' Advances a datetime by a specified interval in a given time unit
+' Parameters:
+'   dtTime: initial datetime
+'   fInterval: interval to shift time
+'   sIntervalType: interval units, valid values are "d" (day), "h" (hour), "m" (minutes), "s" (seconds)
+' Returns:
+'   Datetime shifted by specified amount
+Declare Function BufferTime(ByVal dtTime As DateTime, ByVal fInterval As Float, ByVal sIntervalType As String) As DateTime
+
+' Attempts to recognise a date format, and convert it back to the standard MapInfo dd/mm/yyyy format
+' Parameters:
+'   sDateString: string to attempt to convert to a date
+'   dDate: converted date will be stored in this parameter if successful
+' Returns:
+'   Returns true if date could be converted
+' See also:
+'   IsDate
+'   IsDateString
+Declare Function ConvertDate( ByVal sDateString As String, dDate As Date ) As Logical
+
+' Attempts to recognise a time format, and convert it back to a MapInfo Time format
+' Parameters:
+'   sTimeString: string to attempt to convert to a time
+'   tTime: converted time will be stored in this parameter if successful
+' Returns:
+'   Returns true if time could be converted
+' See also:
+'   ConvertTimeAdvanced
+Declare Function ConvertTime( ByVal sTimeString As String, tTime As Time ) As Logical
+
+' Attempts to recognise a time format, and convert it back to a MapInfo Time format
+' Parameters:
+'   sTimeString: string to attempt to convert to a time
+'   tTime: converted time will be stored in this parameter if successful
+'   lHandleNumericTimes: if false then numeric time styles (eg 12.45) are not allowed
+' Returns:
+'   Returns true if time could be converted
+' See also:
+'   ConvertTime
+Declare Function ConvertTimeAdvanced( ByVal sTimeString As String, tTime As Time, ByVal lHandleNumericTimes As Logical ) As Logical
+
+' Returns the midpoint of two datetimes
+' Parameters:
+'   dt1: datetime 1
+'   dt2: datetime 2
+' Returns:
+'   Mid point of the two datetimes
+Declare Function DateTimeCentroid(ByVal dt1 As DateTime, ByVal dt2 As DateTime) As DateTime
+
+' Returns a one letter string corresponding to a day of week, eg 1=M, 2=T, etc
+' Parameters:
+'   iDayNumber: day number, where 1=Monday and 7=Sunday
+' Returns:
+'   Letter representing week day
+Declare Function DayNumToLetter(ByVal iDayNumber As Integer) As String
+
+' Returns the number of days in a month
+' Parameters:
+'   iMonth: month number
+'	iYear: year
+' Returns:
+'   number of days in month
+Declare Function DaysInMonth( ByVal iMonth As Integer, ByVal iYear As Integer ) As Integer
+
+' Returns the duration (in minutes) of an event
+' Parameters:
+'   sEventS: start time
+'   sEventE: end time
+'   dEventStart: start date
+'   dEventEnd: end date
+' Returns:
+'   number of minutes between start and end
+Declare Function EventLength(ByVal sEventS As String, ByVal sEventE As String, ByVal dEventStart As Date, ByVal dEventEnd As Date) As Integer
+
+' Tests if a string is a valid date. IsDateString is
+' more flexible, but requires use of the ConvertDate DLL function
+' IsDate is only true if MapInfo core functions can convert the date.
+' Parameters:
+'   sDate: string to test
+' Returns:
+'   True if string is a date
+' See also:
+'   ConvertDate
+'   IsDateString
+Declare Function IsDate( ByVal sDate As String ) As Logical
+
+' Attempts to recognise a date format, and returns true if string looks like a date
+' See also IsDate, which is a less flexible version of this
+' Parameters:
+'   sDateString: string to test
+' Returns:
+'   True if string is a date
+' See also:
+'   ConvertDate
+'   IsDate
+Declare Function IsDateString( ByVal sDateString As String ) As Logical
+
+' Returns whether a year is a leap year
+' Parameters:
+'   iYear: year to test
+' Returns:
+'   true if year is a leap year
+Declare Function IsLeapYear( ByVal iYear As Integer ) As Logical
+
+' Attempts to recognise a time format, and returns true if string looks like a time
+' Parameters:
+'   sTimeString: string to test
+' Returns:
+'   True if string is a time
+' See also:
+'   ConvertTime
+Declare Function IsTimeString( ByVal sTimeString As String ) As Logical
+
+' Converts a month number to a short name, eg 3 -> Mar
+' Parameters:
+'   iMonthNo: month number, eg 1 = JAN
+' Returns:
+'   Three letter abbreviation of month name
+' See also:
+'   FormatVicPolDate
+Declare Function MonthNumToShortName(ByVal iMonthNo As Integer) As String
+
+' Similar to the builtin MapBasic Weekday function, but (correctly!!) treats
+' Monday as the start of the week (not Sunday)
+' Parameters:
+'   dDate: input date
+' Returns:
+'   numeric day of week, where 1 = Monday and 7 = Sunday
+Declare Function RealWeekDay(ByVal dDate As Date) As Integer
+
+' Checks if two time intervals overlap
+' Parameters:
+'   dtStart1: start datetime of first interval
+'   dtEnd1: end datetime of first interval
+'   dtStart2: start datetime of second interval
+'   dtEnd2: end datetime of second interval
+' Returns:
+'   True if two intervals overlap
+' See also:
+'   TemporalOverlap1Interval
+Declare Function TemporalOverlap(ByVal dtStart1 As DateTime, ByVal dtEnd1 As DateTime, ByVal dtStart2 As DateTime, ByVal dtEnd2 As DateTime) As Logical
+
+' Checks if a time interval and a time overlap
+' Parameters:
+'   dtStart1: start datetime of interval
+'   dtEnd1: end datetime of interval
+'   dtTime2: second datetime
+' Returns:
+'   True if interval and datetime overlap
+' See also:
+'   TemporalOverlap
+Declare Function TemporalOverlap1Interval(ByVal dtStart1 As DateTime, ByVal dtEnd1 As DateTime, ByVal dtTime2 As DateTime) As Logical
+
+
+
+
+'**************
+' Array helpers
+'**************
+
+' Checks through an array, and returns the index if specified string is found in the
+' array. Works for string datatypes only.
+' Parameters:
+'   sArray: array to scan
+'	sVal: value to scan for
+' Returns:
+'   Found element's position in array, or 0 if not found
+Declare Function ArrayContains(sArray() As String, ByVal sVal As String) As Integer
+
+' Clears an array to just one specified value
+' Parameters:
+'   sArray: array. All elements will be removed from the array except the
+'           first, which will be replaced with the given string
+'	sVal: value to replace first element with
+Declare Sub InitializeStringArray(sArray() As String, byVal sVal As String)
+
+' Adds a value in the middle of an array. Note that this function is expensive to call as all
+' elements after the inserted one need to be moved.
+' Parameters:
+'   sArray: array
+'	sVal: value to insert
+'   iNewPosition: position to insert value at, where 1 = new value will be first element in array
+' See also:
+'   PushStringArray
+Declare Sub InsertStringArray(sArray() As String, byVal sVal As String, Byval iNewPosition As Integer)
+
+' Pops a string value from the end of an array. The value will be returned and removed
+' from the array.
+' Parameters:
+'   sArray: array
+' Returns:
+'   Last element in array
+' See also:
+'   PushStringArray
+'   RemoveStringFromArray
+Declare Function PopStringFromArray( sArray() As String ) As String
+
+' Pads out an array with spaces. Useful for arrays which are passed to DLL functions
+' where the array needs to have it's space reserved in advance.
+' Parameters:
+'   sArray: array to pad
+'   iBufferLength: number of spaces to reserve for each array element
+Declare Sub PrepareArray(sArray() As String, ByVal iBufferLength As Integer)
+
+' Turns an array into a nice string of the format "a, b or c"
+' Parameters:
+'   sArray: array to format
+'   sFinalSeperator: seperator to use for final two values, eg "or", "and", etc
+' Returns:
+'   Elements of array joined in a nice comma seperated string, with final elements 
+'   having the specified seperator
+Declare Function PrettyStringArray( sStringArray() As String, ByVal sFinalSeperator As String ) As String
+
+' Prints the content of a string array
+' Parameters:
+'   sArray: array to print
+' See also:
+'   PrintIntegerArray
+'   PrintFloatArray
+Declare Sub PrintArray( sArray() As String )
+
+' Prints the content of a float array
+' Parameters:
+'   fArray: array to print
+' See also:
+'   PrintIntegerArray
+'   PrintArray
+Declare Sub PrintFloatArray( fArray() As Float )
+
+' Prints the content of an integer array
+' Parameters:
+'   iArray: array to print
+' See also:
+'   PrintArray
+'   PrintFloatArray
+Declare Sub PrintIntegerArray( iArray() As Integer )
+
+' Adds an float value to the end of an array
+' Parameters:
+'   fArray: array
+'	fVal: value to insert at end of array
+' See also:
+'   PushIntegerArray
+Declare Sub PushFloatArray(fArray() As Float, ByVal fVal As Float)
+
+' Adds an integer value to the end of an array
+' Parameters:
+'   iArray: array
+'	iVal: value to insert at end of array
+' See also:
+'   PushFloatArray
+Declare Sub PushIntegerArray(iArray() As Integer, byVal iVal As Integer)
+
+' Adds a value to the end of an array
+' Parameters:
+'   sArray: array
+'	sVal: value to insert at end of array
+' See also:
+'   PopStringFromArray
+'   InsertStringArray
+Declare Sub PushStringArray(sArray() As String, ByVal sVal As String)
+
+' Removes a string from an array, by deleting all occurences of the string
+' from the array.
+' Parameters:
+'   sArray: array
+'	sVal: value to remove
+' See also:
+'   PopStringFromArray
+Declare Sub RemoveStringFromArray(sArray() As String, ByVal sVal As String)
+
+' Fast partial sorting of string array. Allows for only some of the array to be sorted (eg, leaving first
+' item in place).
+' Parameters:
+'   sArray: string array to sort. Array is sorted in place.
+'	iStartPos: first position in array to begin sort
+'   iEndPos: last position in array to sort
+' See also:
+'   SortStringArray
+Declare Sub SortPartStringArray( sArray() As String, ByVal iStartPos As Integer, ByVal iEndPos As Integer )
+
+' Fast sorting of entire string array
+' Parameters:
+'   sArray: string array to sort. Array is sorted in place.
+' See also:
+'   SortPartStringArray
+Declare Sub SortStringArray( sArray() As String )
+
+
+
+
+'********************
+' Object manipulation
+'********************
+
+' Alters line styling, for use in update queries such as
+' "Update Selection Set Obj = AlterLineStyle(Obj, CurrentPen())"
+' Parameters:
+'   oLine: line object to update
+'	pNew: pen style to update line with
+' Returns:
+'   line with pen replaced
+Declare Function AlterLineStyle(ByVal oLine As Object, ByVal pNew As Pen) As Object
+
+' Alters symbol styling, for use in update queries such as
+' "Update Selection Set Obj = AlterSymbolStyle(Obj, CurrentSymbol())"
+' Parameters:
+'   oSymbol: symbol object to update
+'	sNew: symbol style to update symbol with
+' Returns:
+'   symbol with style replaced
+Declare Function AlterSymbolStyle(ByVal oSymbol As Object, ByVal sNew As Symbol) As Object
+
+' Alters region styling, for use in update queries such as
+' "Update Selection Set Obj = AlterRegionStyle(Obj, CurrentBrush(), CurrentPen())"
+' Parameters:
+'   oRegion: region object to update
+'   bNew: brush style to update region with
+'	pNew: pen style to update region with
+' Returns:
+'   region with brush and pen replaced
+Declare Function AlterRegionStyle(ByVal oRegion As Object, ByVal bNew As Brush, ByVal pNew as Pen) As Object
+
+' Alters font styling, for use in update queries such as
+' "Update Selection Set Obj = AlterFontStyle(Obj, CurrentFont())"
+' Parameters:
+'   oText: text object to update
+'	fNew: font style to update object with
+' Returns:
+'   object with font replaced
+Declare Function AlterFontStyle(ByVal oText As Object, ByVal fNew As Font) As Object
+
+
+' Tests whether a given object is a polygon
+' Parameters:
+'   oObj: object to test
+' Returns:
+'   True if object is a polygon (including regions, rectangles, etc)
+Declare Function ObjectIsPolygon( ByVal oObj As Object) As Logical
+
+
+
+'******************
+' Selection helpers
+'******************
+
+' Tests whether a selection consists only of lines
+' Parameters:
+'   iFlags: flags for test. See SelectionIsPolygons for details.
+' Returns:
+'   True if selection only consists of lines
+' See also:
+'   SelectionIsPolygons
+Declare Function SelectionIsLines( ByVal iFlags As Integer ) As Logical
+
+' Tests whether a selection consists only of polygons
+' Parameters:
+'   iFlags: flags for test
+DEFINE ALLOW_MULTIPLE 1
+DEFINE ALLOW_SINGLE_ONLY 2
+' Returns:
+'   True if selection only consists of polygons
+' See also:
+'   SelectionIsLines
+Declare Function SelectionIsPolygons( ByVal iFlags As Integer ) As Logical
+
+' Tests whether a selection is from a layout window
+' Returns:
+'   True if selection was made in a layout window
+Declare Function SelectionIsInLayout() As Logical
+
+
+'***************************
+' Table/Column/Query helpers
+'***************************
+
+' Checks whether a column exists in a given table, if so, returns the column number
+' Parameters:
+'   sTable: table name
+'   sColumn: column name
+' Returns:
+'   column number corresponding to name, or 0 if column is not found
+Declare Function ColumnExists(ByVal sTable As String, ByVal sColumn As String) As Integer
+
+' Validates a comma seperated list of column names, removing any which do not exist
+' in a specified table.
+' Parameters:
+'   sTable: table name
+'   sColumnList: desired column name list, seperated by commas
+' Returns:
+'   column name list trimmed only to columns which actually exist
+Declare Function TrimColumnListToExisting(ByVal sTable As String, ByVal sColumnList As String) As String
+
+' Returns a column definition as string
+' Parameters:
+'   sTable: table name
+'   sColumn: column name
+' Returns:
+'   Definition of column. Eg "Char(30)", "Float", etc
+' See also:
+'   ColumnValueToString
+Declare Function ColumnTypeAsString( ByVal sTable As String, ByVal sColumn As String ) As String
+
+' Returns a column value as a string
+' Parameters:
+'   sTable: table name
+'   sColumn: column name
+' Returns:
+'   Column value safely converted to a string, eg wrapped in quotations where required
+' See also:
+'   ColumnTypeAsString
+Declare Function ColumnValueToString( ByVal sTable As String, ByVal sColumn As String ) As String
+
+' Fetches all the columns in a table and stores them in an array
+' Parameters:
+'   sTable: table to fetch columns for
+'   sColumns: array to store column names in
+' Returns:
+'   True
+Declare Function GetColumnList( ByVal sTable As String, sColumns() As String ) As Logical
+
+' Builds an optionally sorted list of tables which match the given criteria
+' Parameters:
+'   sTables: array to fill with table names
+'   sSubstringIgnore: if table names contain this substring, they will not be included in the list
+'   iTableListOptions: options for filtering tables. Can be combined, eg TABLELIST_TABLES_AND_QUERIES + TABLELIST_HIDENONMAPPABLE + TABLELIST_SORT
+DEFINE TABLELIST_BASETABLESONLY 1
+DEFINE TABLELIST_TABLES_AND_QUERIES 2
+DEFINE TABLELIST_HIDEREADONLY 4
+DEFINE TABLELIST_HIDENONMAPPABLE 8
+DEFINE TABLELIST_VECTORONLY 16
+DEFINE TABLELIST_SORT 32
+Declare Sub GetTableList( sTables() As String, ByVal sSubstringIgnore As String, ByVal iTableListOptions As Integer )
+
+' Fills an array with a sorted list of open, writeable tables. Also can find the position
+' of a specified table within the filled array.
+' Parameters:
+'   sTableArray: array to fill with table names
+'   sFindTable: table name to find, if required
+' Returns:
+'   Position of specified table name within array
+Declare Function GetWriteableTables(sTableArray() As String, ByVal sFindTable As String) As Integer
+
+' Saves a query to a table. Saved table will be opened automatically and the query closed.
+' Parameters:
+'   sQuery: name of query
+'	sTable: name of destination table
+'   sFile: filename for destination table
+Declare Sub QueryToTable(ByVal sQuery As String, ByVal sTable As String, ByVal sFile As String)
+
+' Closes a table only if it's actually open. Calling this is preferable to "Close Table ..."
+' as SafeClose will not crash if the table is not open.
+' Parameters:
+'   sTableName: table name to close
+' See also:
+'   SafeOpen
+'   SafeOpenWorkspace
+Declare Sub SafeClose(ByVal sTableName As String)
+
+' Opens a table only if it's safe to do so. Handles already open tables, missing filenames, etc.
+' Parameters:
+'   sTabFilename: table filename to open
+'   sTabName: destination table name
+' Returns:
+'   SafeOpen errors code:
+DEFINE OPEN_SUCCESSFUL 0 ' Table was opened successfully
+DEFINE OPEN_ALREADYOPEN 1 ' Table was already open
+DEFINE OPEN_MISSINGFILE 2 ' File is missing
+DEFINE OPEN_NOFILE 3 ' No filename was specified
+DEFINE OPEN_OTHERERROR 4 ' Other error
+' See also:
+'   SafeOpenWorkspace
+'   SafeClose
+Declare Function SafeOpen(ByVal sTabFilename As String, ByVal sTabName As String) As Integer
+
+' Opens a workspace only if it's safe to do so
+' Parameters:
+'   sWorFilename: filename of workspace to open
+' Returns:
+'   SafeOpenWorkspace errors code:
+DEFINE OPENWOR_SUCCESSFUL 0 ' Workspace was opened successfully
+DEFINE OPENWOR_MISSINGFILE 1 ' Workspace file does not exist
+DEFINE OPENWOR_NOFILE 2 ' No filename was specified 
+DEFINE OPENWOR_NOTWORKSPACE 3 ' Filename is not a workspace
+DEFINE OPENWOR_OTHERERROR 4 ' Other error
+' See also:
+'   SafeOpen
+'   SafeClose
+Declare Function SafeOpenWorkspace( ByVal sWorFilename As String ) As Integer
+
+' Checks whether a given table is open
+' Parameters:
+'   sTable: table name
+' Returns:
+'   true if table with matching name is open
+' See also:
+'   TabFileOpen
+Declare Function TableExists(ByVal sTable As String) As Logical
+
+' Checks whether a given table file is open under any name
+' Parameters:
+'   sFilename: filename of table to check for
+' Returns:
+'   true if table with specified filename is open
+' See also:
+'   TableExists
+Declare Function TabFileOpen( ByVal sFilename As String ) As Logical
+
+' Returns true if specified table is a vector type table
+' Parameters:
+'   sTable: name of table to check
+' Returns:
+'   True if table is a vector table
+Declare Function TableIsVector( ByVal sTable As String ) As Logical
+
+' Registers a CSV file to a MapInfo tab file
+' Parameters:
+'   sCSVFile: input CSV file
+'   sDestTabName: friendly display name for destination table
+'   sDestTabFile: destination table file path
+'   sOpenTabAs: table name to open destination table as within MapInfo (usually same as sDestTabName)
+'   sError: string for storing any error messages
+' Returns:
+'   True if registration was successful
+Declare Function RegisterCSV( ByVal sCSVFile As String, ByVal sDestTabName As String, ByVal sDestTabFile As String, ByVal sOpenTabAs As String, sError As String ) As Logical
+
+'*************
+' File helpers
+'*************
+
+' Converts a Windows style location to a file:// URL string
+' Parameters:
+'   sFilePath: path to convert
+' Returns:
+'   URL representing file
+Declare Function FilePathToUrl(ByVal sFilePath As String) As String
+
+' Searches for matching files in a folder
+' Parameters:
+'   sPath: folder to search in
+'   sFilespec: pattern of filenames to find
+'   sList: array to store found files in
+' See also:
+'   RecursiveSearchFiles
+Declare Sub FindFiles( ByVal sPath As String, ByVal sFilespec As String, sList() As String )
+
+' Gets the size of a file
+' Parameters:
+'   sFilePath: path of file
+' Returns:
+'   File size in megabytes
+Declare Function GetFileSize( ByVal sFilePath As String) As Float
+
+' Gets a string from an ini file
+' Parameters:
+'   sIniFile: full path to ini file
+'	sSection: ini file section
+'   sIniKey: key string
+'   sDefault: default return value
+' Returns:
+'   matching value from ini file, if found, otherwise default value
+Declare Function GetIniString( ByVal sIniFile As String, ByVal sSection As String, ByVal sIniKey As String, ByVal sDefault As String ) As String
+
+' Does a simple test to check whether a folder is a subfolder of
+' another folder. Won't work for relative paths or other complex
+' paths.
+' Parameters:
+'   sSubFolder: folder to check whether it is a subfolder
+'	sFolder: parent folder
+' Returns:
+'   True if sSubFolder is a subfolder of sFolder
+Declare Function IsSubFolder(ByVal sSubFolder As String, ByVal sFolder As String) As Logical
+
+' Strips invalid characters from a string to make a valid filename which is not currently
+' used.
+' Parameters:
+'   sFilename: input filename
+' Returns:
+'   cleaned, unique filename. _1, _2, etc will be appended until filename is
+'   unique.
+Declare Function MakeFilenameSafe$(ByVal sFilename As String) As String
+
+' Creates a random, unique filename for use as a temporary file
+' Parameters:
+'   sPath: path for file
+'   sExt: file extension
+' Returns:
+'   unique random filename with specified extension
+Declare Function MakeRandomFilename$(ByVal sPath As String, ByVal sExt As String ) As String
+
+' Recursively searches for matching files from a parent folder and stores the result in an array
+' Parameters:
+'   sParentFolder: parent folder to search in
+'   sFilePattern: pattern of filenames to find
+'   sMatchingFiles: array to store found files in
+' Returns:
+'   True
+' See also:
+'   FindFiles
+Declare Function RecursiveSearchFiles( ByVal sParentFolder As String, ByVal sFilePattern As String, sMatchingFiles() As String ) As Logical
+
+
+
+'*******************
+' Map window helpers
+'*******************
+
+' Draws an object in the cosmetic layer
+' Parameters:
+'   oObject: object to draw
+'   iWindowID: window ID
+Declare Sub DrawInCosmetic(ByVal oObject As Object, ByVal iWindowID As Integer)
+
+' Finds a layer number in the front window given a table name
+' Parameters:
+'   sTableName: table name to find
+' Returns:
+'   first corresponding layer number, or 0 if layer was not found
+Declare Function GetLayerNumber(ByVal sTableName as String) as Integer
+
+' Returns the top most, visible (and normal, no thematic/cosmetic/etc) layer for a given window
+' Parameters:
+'   iWindowId: window id
+' Returns:
+'   layer name for top layer
+Declare Function GetTopVisibleLayer(ByVal iWindowId As Integer) As String
+
+' Tests whether a given layer exists in any map or browser window except the current window
+' Parameters:
+'   sLayer: layer name to find
+' Returns:
+'   true if layer exists in another window
+' See also:
+'   LayerExists
+'   LayerExistsInWindow
+'   LayerVisible
+Declare Function LayerElsewhere(ByVal sLayer As String) As Logical
+
+' Tests whether a given layer exists in the current map window.
+' Parameters:
+'   sLayer: layer name to find
+' Returns:
+'   layer number if layer exists
+' See also:
+'   LayerExistsInWindow
+'   LayerVisible
+'   LayerElsewhere
+Declare Function LayerExists(ByVal sLayer As String) As Integer
+
+' Tests whether a given layer exists in a specified map window.
+' Parameters:
+'   sLayer: layer name to find
+'   iWindowID: window id of map window
+' Returns:
+'   layer number if layer exists
+' See also:
+'   LayerExists
+'   LayerVisible
+'   LayerElsewhere
+Declare Function LayerExistsInWindow(ByVal sLayer As String, ByVal iWindowID As Integer) As Integer
+
+' Tests whether a given layer exists, and is visible in the current map
+' window
+' Parameters:
+'   sLayerCheck: layer name to check
+' Returns:
+'   true if layer exists and is visible
+' See also:
+'   LayerExists
+'   LayerExistsInWindow
+'   LayerElsewhere
+Declare Function LayerVisible(ByVal sLayerCheck As String) As Logical
+
+
+
+'*******************
+' Geometry functions
+'*******************
+
+' Returns the line joining two points
+' Parameters:
+'   oPoint1: first point
+'	oPoint2: second point
+' Returns:
+'   Line connecting two points
+Declare Function CreateLineBetweenPoints(ByVal oPoint1 As Object, ByVal oPoint2 As Object) As Object
+
+' Returns the bearing between two points
+' Parameters:
+'   oStart: first point
+'	oEnd: second point
+' Returns:
+'   Bearing between points, in degrees
+' See also:
+'   ProjectPoint
+Declare Function GetBearing(ByVal oStart As Object, ByVal oEnd As Object) As Float
+
+' Returns a point object corresponding to the end of a line object
+' Parameters:
+'   oLine: line object
+' Returns:
+'   Point object of end of line
+' See also:
+'   GetStartOfLine
+Declare Function GetEndOfLine(ByVal oLine As Object) As Object
+
+' Returns a point object corresponding to the start of a line object
+' Parameters:
+'   oLine: line object
+' Returns:
+'   Point object of start of line
+' See also:
+'   GetEndOfLine
+Declare Function GetStartOfLine(ByVal oLine As Object) As Object
+
+' Returns a point representing a set distance along a line, returns true if found
+' Parameters:
+'   oLine: line object
+'   fDistance: distance along line
+'   fOffset: optional offset distance
+'   sUnit: unit type (eg "km")
+'   oPoint: referenced point will be stored in this object
+'   fAngle: optional angle to offset point
+' Returns:
+'   True if point could be referenced
+' See also:
+'   PortionOfLine
+Declare Function LinearReference( ByVal oLine As Object, ByVal fDistance As Float, ByVal fOffset As Float, ByVal sUnit As String, oPoint As Object, fAngle As Float) As Logical
+
+' Returns a point corresponding to a specified node in a polyline
+' Parameters:
+'   oObject: polyline/polygon object
+'   iPolyNo: polyline/polygon number
+'   iNodeNo: node number
+' Returns:
+'   Point representing matching node
+Declare Function NodePoint(ByVal oObject As Object, ByVal iPolyNo As Integer, ByVal iNodeNo As Integer) As Object
+
+' Returns a portion of a line from the line start to the specified percentage distance along the line
+' Parameters:
+'   oLine: line object
+'   fPercent: percent of line to return (eg 0.5 = half of line)
+' Returns:
+'   Portion of line
+' See also:
+'   LinearReference
+Declare Function PortionOfLine(ByVal oLine As Object, ByVal fPercent As Float) As Object
+
+' Returns a new point which is projected a given distance and angle from a
+' start point
+' Parameters:
+'   oStart: starting point
+'	fBearing: bearing to project
+'   fDistance: distance to project
+' Returns:
+'   Point projected by given bearing and distance
+' See also:
+'   GetBearing
+Declare Function ProjectPoint(ByVal oStart As Object, ByVal fBearing As Float, ByVal fDistance As Float) As Object
+
+' Randomise a coordinate by a shifting it a random distance
+' Parameters:
+'   fCoord: coordinate to shift
+'   fDistance: maximum distance to shift coordinate
+' Returns:
+'   Randomly shifted coordinate
+' See also:
+'   ShiftPointByRandomDist
+Declare Function RandomiseCoord(ByVal fCoord As Float, ByVal fDistance As Float) As Float
+
+' Returns a random point inside the given boundary polygon
+' Parameters:
+'   oBoundary: boundary polygon
+'   iMaxIterations: maximum number of tries to place a random point. More iterations = slower,
+'   but more reliable
+' Returns:
+'   A random point inside the polygon
+Declare Function RandomPointInPolygon(ByVal oBoundary As Object, ByVal iMaxIterations As Integer) As Object
+
+' Rotates a point's symbol
+' Parameters:
+'   oPoint: point to rotate (in place)
+'   fAngle: angle to rotate point by
+' Returns:
+'   True
+Declare Function RotatePointSymbol( oPoint As Object, ByVal fAngle As Float ) As Logical
+
+' Shifts a point by a random distance and random direction
+' Parameters:
+'   oPoint: point to shift
+'   fMaxDistance: maximum distance to shift point
+' Returns:
+'   Randomly shifted point
+Declare Function ShiftPointByRandomDist(ByVal oPoint As Object, ByVal fMaxDistance As Float) As Object
+
+' Shrinks a line by withdrawing the ends a specified amount
+' Parameters:
+'   oLine: input line
+'	fDistance: distance to shrink line by
+' Returns:
+'   line with end points pulled in by specified amount
+Declare Function ShrinkLine(ByVal oLine as Object, ByVal fDistance as Float) as Object
+
+' Creates a square buffer around an object
+' Parameters:
+'   oInput: input object
+'	fDist: distance to buffer
+' Returns:
+'   object buffered by a square buffer (approximate only)
+Declare Function SquareBuffer(ByVal oInput as Object, ByVal fDist as Float) as Object
+
+
+
+'**********************
+' Workstation functions
+'**********************
+
+' Finds the current logged on user name
+' Parameters:
+'   sUserID: string to store user name in
+' Returns:
+'   True if username could be fetched
+Declare Function GetUserID( sUserID As String) As Logical 
+
+' Gets the current Windows version string
+' Returns:
+'  Windows version
+Declare Function GetWindowsVersion() As String
+
+' Finds the current workstation name
+' Returns:
+'   Workstation name
+Declare Function GetWorkstationName() As String
+
+
+
+' ***************************************************************
+' GUI Functions
+' ***************************************************************
+
+' Quick and easy inputbox
+' Parameters:
+'   sPrompt: prompt text for user. Eg "Enter your name:"
+'   sTitle: dialog title
+'   sDefault: default string for text box
+' Returns:
+'   string value entered by user
+Declare Function InputBox( ByVal sPrompt As String, ByVal sTitle As String, ByVal sDefault As String) As String
+
+' Presents a dialog asking user to choose from open tables
+' Parameters:
+'   sDialogTitle: dialog title
+'   sPrompt: prompt text for user. Eg "Pick a table to delete:"
+' Returns:
+'   name of table selected by user, or "" if user cancelled, or "__no_good_tables!__" if no 
+'   tables are open
+' See also:
+'   ChooseTableAdvanced
+Declare Function ChooseTable(ByVal sDialogTitle As String, ByVal sPrompt As String) As String
+
+' Presents a dialog asking user to choose from open tables, allows for
+' more control than ChooseTable
+' Parameters:
+'   sDialogTitle: dialog title
+'   sPrompt: prompt text for user. Eg "Pick a table to delete:"
+'   sSubstringDefault: if substring is found in any open table name, that table will be selected as the
+'     default
+'   sSubstringIgnore: if substring is found in any open table name, that table will not be shown in the
+'     dialog
+'   iChooseTableOptions: options for controlling the tables shown in the dialog. Options can be 
+'     combined by adding them (eg CHOOSETABLE_HIDEREADONLY + CHOOSETABLE_VECTORONLY ).
+DEFINE CHOOSETABLE_HIDEREADONLY 1 ' Hide all readonly tables from the dialog
+DEFINE CHOOSETABLE_VECTORONLY 2 ' Only show vector tables in the dialog
+' Returns:
+'   name of table selected by user, or "" if user cancelled, or "__no_good_tables!__" if no 
+'   applicable tables are open
+' See also:
+'   ChooseTable
+Declare Function ChooseTableAdvanced(ByVal sDialogTitle As String, ByVal sPrompt As String, ByVal sSubstringDefault As String, ByVal sSubstringIgnore As String, ByVal iChooseTableOptions As Integer) As String
+
+' Presents a dialog asking user to choose from open windows
+' Parameters:
+'   sDialogTitle: dialog title
+'   sPrompt: prompt text for user. Eg "Pick a window to close:"
+' Returns:
+'   name of window selected by user, or "" if user cancelled
+' See also:
+'   ChooseWindowAdvanced
+'   ChooseMapWindow
+'   ChooseLegendWindow
+Declare Function ChooseWindow( ByVal sDialogTitle As String, ByVal sPrompt As String, ByVal iWindowType As Integer ) As String
+
+' Presents a dialog asking user to choose from open windows. Allows for more control than ChooseWindow.
+' Parameters:
+'   sDialogTitle: dialog title
+'   sPrompt: prompt text for user. Eg "Pick a window to close:"
+'   iWindowType: window types to show. Values correspond to WIN_INFO_TYPE from mapbasic.def
+'   iIgnoreWindowId: window id of a window to hide from the dialog (eg, the current window), or 0
+'     if all windows should be shown.
+' Returns:
+'   name of window selected by user, or "" if user cancelled
+' See also:
+'   ChooseWindow
+'   ChooseMapWindow
+'   ChooseLegendWindow
+Declare Function ChooseWindowAdvanced( ByVal sDialogTitle As String, ByVal sPrompt As String, ByVal iWindowType As Integer, ByVal iIgnoreWindowId As Integer ) As String
+
+' Presents a dialog asking user to choose from open map windows
+' Parameters:
+'   sDialogTitle: dialog title
+'   sPrompt: prompt text for user. Eg "Pick a map window:"
+' Returns:
+'   name of map window selected by user, or "" if user cancelled
+' See also:
+'   ChooseWindow
+'   ChooseWindowAdvanced
+'   ChooseLegendWindow
+Declare Function ChooseMapWindow(ByVal sDialogTitle As String, ByVal sPrompt As String) As String
+
+' Presents a dialog asking user to choose from open map legend windows
+' Parameters:
+'   sDialogTitle: dialog title
+'   sPrompt: prompt text for user. Eg "Pick a lgend window:"
+' Returns:
+'   name of legend window selected by user, or "" if user cancelled
+' See also:
+'   ChooseWindow
+'   ChooseWindowAdvanced
+'   ChooseMapWindow
+Declare Function ChooseLegendWindow( ByVal sDialogTitle As String, ByVal sPrompt As String ) As Integer
+
+' Presents a dialog asking user for a layer from the current map window
+' Parameters:
+'   sDialogTitle: dialog title
+'   sPrompt: prompt text for user. Eg "Pick a layer to close:"
+'   iLayerNumber: variable passed by reference to store selected layer number in
+' Returns:
+'   name of layer selected by user, or "" if user cancelled. The layer number will
+'   be stored in the iLayerNumber parameter
+' See also:
+'   ChooseLayerAdvanced
+Declare Function ChooseLayer(ByVal sDialogTitle As String, ByVal sPrompt As String, iLayerNumber As Integer) As String
+
+' Presents a dialog asking user for a layer from the current map window. Allows for greater
+' control than ChooseLayer.
+' Parameters:
+'   sChooseLayerTitle: dialog title
+'   sPrompt: prompt text for user. Eg "Pick a layer to close:"
+'   iLayerNo: variable passed by reference to store selected layer number in
+'   sIgnoreLayer: name of a layer to exclude from the dialog, or "" to show all layers
+'   sDefaultLayer: name of a layer to use as the default selection
+'   iChooseLayerOptions: options for controlling the behaviour of the dialog. Options can be 
+'     combined by adding them.
+DEFINE CHOOSELAYER_WITHOVERRIDES 1 ' Only show layers with style overrides applied
+' Returns:
+'   name of layer selected by user, or "" if user cancelled. The layer number will
+'   be stored in the iLayerNo parameter
+' See also:
+'   ChooseLayer
+Declare Function ChooseLayerAdvanced(ByVal sChooseLayerTitle As String, ByVal sPrompt As String, iLayerNo As Integer, ByVal sIgnoreLayer As String, ByVal sDefaultLayer As String, ByVal iChooseLayerOptions As Integer) As String
+
+' Presents a dialog asking user to choose a column from a given table
+' Parameters:
+'   sTable: table to select columns from
+'   sTitle: dialog title
+'   sPrompt: prompt text for user. Eg "Pick a column to remove:"
+' Returns:
+'   name of column selected by user, or "" if user cancelled
+' See also:
+'   ChooseColumnAdvanced
+'   ChooseMultipleColumns
+Declare Function ChooseColumn(ByVal sTable As String, ByVal sTitle As String, ByVal sPrompt As String) As String
+
+' Presents a dialog asking user to choose a column from a given table. Allows for more control than
+' ChooseColumn
+' Parameters:
+'   sTable: table to select columns from
+'   sTitle: dialog title
+'   sPrompt: prompt text for user. Eg "Pick a column to remove:"
+'   sDefault: name of column to select by default 
+'   sSubstringIgnore: if column names contain this substring they will be excluded
+'     from the dialog. Leave empty to show all columns.
+'   sDataType: either "char", "numeric", "date" (allows shows datetime), "dateonly" (shows date columns only)
+'     to restrict dialog to only show columns with a matching type. Leave empty to show all columns.
+' Returns:
+'   name of column selected by user, or "" if user cancelled
+' See also:
+'   ChooseColumn
+'   ChooseMultipleColumns
+Declare Function ChooseColumnAdvanced(ByVal sTable As String, ByVal sTitle As String, ByVal sPrompt As String, ByVal sDefault As String, ByVal sSubstringIgnore As String, ByVal sDataType As String) As String
+
+' Presents a dialog asking user to choose multiple columns from a given table.
+' Parameters:
+'   sTable: table to select columns from
+'   sTitle: dialog title
+'   sPrompt: prompt text for user. Eg "Pick columns to remove:"
+'   sChosenColumns: array which will be filled with columns selected by the user
+' Returns:
+'   true if the user selected columns, or false if the user clicked cancel
+' See also:
+'   ChooseColumn
+'   ChooseColumnAdvanced
+Declare Function ChooseMultipleColumns( ByVal sTable As String, ByVal sTitle As String, ByVal sPrompt As String, sChosenColumns() As String ) As Logical
+
+' Launches a given filename or url. If filename is a document, the document
+' should open in the default viewer.
+' Parameters:
+'   sFile: filename to open
+Declare Sub LaunchFileOrURL(ByVal sFile as String)
+
+' Wrapper for standard Win32 Msgbox function. This should always be used
+' inplace of the built-in "Note" command as it allows the caption, icon
+' and buttons to be set, resulting in a nicer user experience.
+' Parameters:
+'   sTxt: text to display in message box
+'   sCaption: dialog title
+'   iType: messagebox options. These can be combined, eg vbQuestion + vbYesNo + vbDefaultButton2.
+'          See definitions in MsgBox documentation.
+' Returns:
+'   Return code representing which button was clicked by the user. Eg, vbYes
+' See also:
+'   MessageBox
+Declare Function MsgBox(ByVal sTxt As String, ByVal sCaption as String, ByVal iType as Integer) As Integer
+
+' Wrapper for standard Win32 Msgbox function. This should always be used
+' inplace of the built-in "Note" command as it allows the caption, icon
+' and buttons to be set, resulting in a nicer user experience.
+' Parameters:
+'   sTxt: text to display in message box
+'   sCaption: dialog title
+'   iType: messagebox options. These can be combined, eg vbQuestion + vbYesNo + vbDefaultButton2
+DEFINE vbOKOnly 0
+DEFINE vbOKCancel 1
+DEFINE vbAbortRetryIgnore 2
+DEFINE vbYesNoCancel 3
+DEFINE vbYesNo 4
+DEFINE vbRetryCancel 5
+DEFINE vbCritical 16
+DEFINE vbQuestion 32
+DEFINE vbExclamation 48
+DEFINE vbInformation 64
+DEFINE vbDefaultButton1 0
+DEFINE vbDefaultButton2 256
+DEFINE vbDefaultButton3 512
+DEFINE vbDefaultButton4 768
+DEFINE vbOK 1
+DEFINE vbCancel 2
+DEFINE vbAbort 3
+DEFINE vbRetry 4
+DEFINE vbIgnore 5
+DEFINE vbYes 6
+DEFINE vbNo 7
+' See also:
+'   MsgBox
+Declare Sub MessageBox(ByVal sTxt As String, ByVal sCaption as String, ByVal iType as Integer)
+
+
+' Presents a dialog asking user to choose from values from a string array
+' Parameters:
+'   sDialogTitle: dialog title
+'   sPrompt: prompt text for user. Eg "Pick a value!"
+'   sArray: array containing values to show
+'   sDefault: default value
+' Returns:
+'   selected value from array, or "" if user cancelled
+' See also:
+'   ChooseStringArrayAdvanced
+Declare Function ChooseStringArray( ByVal sDialogTitle As String, ByVal sPrompt As String, sArray() As String, ByVal sDefault As String ) As String
+
+' Presents a dialog asking user to choose from values from a string array. Returned values are taken from a second array.
+' Parameters:
+'   sDialogTitle: dialog title
+'   sPrompt: prompt text for user. Eg "Pick a value!"
+'   sShowValues: array containing values to show to user
+'   sReturnValues: array containing corresponding values to return from the function
+'   sDefault: default value. This should be set to value from sReturnValues which will be the
+'     default for the dialog
+' Returns:
+'   value from sReturnValues corresponding to the user's selection, or "" if user cancelled
+' See also:
+'   ChooseStringArray
+Declare Function ChooseStringArrayAdvanced( ByVal sDialogTitle As String, ByVal sPrompt As String, sShowValues() As String, sReturnValues() As String, ByVal sDefault As String ) As String
+
+' Allows user to choose multiple columns from a table
+' Parameters:
+'   sTable: table to choose columns from
+'   sChosenColumns: array to store selected columns in
+'   lForceSelection: set to true to force users to select at least one column
+' Returns:
+'   True if the dialog was accepted, false if cancel was pressed
+' See also:
+'   MultiChooseColumnsAdvanced
+Declare Function MultiChooseColumns(ByVal sTable As String, sChosenColumns() As String, ByVal lForceSelection As Logical ) As Logical
+
+' Allows user to choose multiple columns from a table. Allows for more customisation then MultiChooseColumns.
+' Parameters:
+'   sTable: table to choose columns from
+'   sChosenColumns: array to store selected columns in
+'   lForceSelection: set to true to force users to select at least one column
+'   sTitle: dialog title
+'   sPrompt: dialog prompt. Eg "Select columns to delete:"
+'   lHideAddRemoveAll: set to true to hide the "Add all"/"Remove all" options
+' Returns:
+'   True if the dialog was accepted, false if cancel was pressed
+' See also:
+'   MultiChooseColumns
+Declare Function MultiChooseColumnsAdvanced( ByVal sTable As String, sChosenColumns() As String, ByVal lForceSelection As Logical, ByVal sTitle As String, ByVal sPrompt As String, ByVal lHideAddRemoveAll As Logical ) As Logical
+
+
+
+
+
+'**************************************************************************
+' Routines included in MapBasicFunctions.dll
+'**************************************************************************
+
+' Tests a string with a given regular expression, returns true if string matches regular expression
+' by default matches any part of string, so 
+' RegExTest("abc","a") returns true.
+' To match whole string, use anchors:
+' RegExTest("abc", "^a$") (returns false)
+Declare Function RegExTest Lib "MBRegEx.dll" Alias "regex_test" (ByVal strInput as String, ByVal strMatch as String) As Logical
+
+' Returns FIRST captured regular expression match from a string
+' eg, RegExMatch("abc", "a(.)") return "b"
+Declare Function RegExMatch Lib "MBRegEx.dll" Alias "regex_match" (ByVal strInput as String, ByVal strMatch as String) As String
+
+' Returns ALL captured regular expression matches from a string, and stores result in an array
+' MAKE SURE ARRAY IS OF SUFFICIENT LENGTH AND STRINGS HAVE BEEN PADDED WITH SPACES 
+' before calling this function
+' Function returns number of matches.
+' eg, RegExMatchAll("A test Match", "([A-Z])", sResult) returns 2, with sResult(1) ="A", sResult(2) = "M"
+Declare Function RegExMatchAll Lib "MBRegEx.dll" Alias "regex_match_all" (ByVal strInput as String, ByVal strMatch as String, sMatches() As String) As Integer
+
+' Returns multiple captured matches when regular expression has more than one
+' capturing group. 
+' MAKE SURE ARRAY IS OF SUFFICIENT LENGTH AND STRINGS HAVE BEEN PADDED WITH SPACES 
+' before calling this function
+' Function returns number of matches.
+' eg, RegExMatchMultiple("3.7.2", "(\d+)\.(\d+)\.(\d+)", sResults) returns 3, with sResult(1) = 3, sResult(2) = 7 and sResult(3) = 2
+Declare Function RegExMatchMultiple Lib "MBRegEx.dll" Alias "regex_match_multiple" (ByVal strInput as String, ByVal strMatch as String, sMatches() As String) As Integer
+
+' Replaces parts of string matching regular expression with specified replacement text
+' MAKE SURE DESTINATION STRING IS PADDED TO SUFFICIENT LENGTH PRIOR TO CALLING
+' returns true if replacements were made
+' eg RegExReplace("add ape hat", "^(.)|(?<=\s)(.)", "\u$1$2", sDest) fills sDest with "Add Ape Hat"
+Declare Function RegExReplace Lib "MBRegEx.dll" Alias "regex_replace" (ByVal strInput as String, ByVal strMatch as String, ByVal sReplace As String, sDest As String) As Logical
+
+' Returns the Levenshtein distance between two strings
+Declare Function LevenshteinDistance Lib "MapBasicFunctions.dll"  Alias "levenshtein_distance" (ByVal string1 as String, ByVal string2 as String) as Integer
+
+' Returns the match percent of two strings, calculated by comparing the Levenshtein distance between the strings
+' with the length of the first string
+Declare Function TestStringMatch Lib "MapBasicFunctions.dll"  Alias "test_string_match" (ByVal string1 as String, ByVal string2 as String) as Float
+
+' Returns the length of the longest common substring between two strings
+Declare Function LongestCommonSubstring Lib "MapBasicFunctions.dll"  Alias "longest_common_substring" (ByVal string1 as String, ByVal string2 as String) as Integer
+
+' Returns the longest common substring of two strings, but first appends a space to beginning and end of both strings
+' Which has the effect of slightly increasing the score if strings begin or end in the same substring
+Declare Function LongestCommonSubstringBuff Lib "MapBasicFunctions.dll"  Alias "longest_common_substring_buff" (ByVal string1 as String, ByVal string2 as String) as Integer
+
+' A different method of ranking the similarity of two strings, which handles out of order words well
+Declare Function CountCommonWords Lib "MapBasicFunctions.dll"  Alias "count_common_words" (ByVal string1 as String, ByVal string2 as String) as Float
+
+' A better (more random) number generator then the builtin Mapbasic function. Doesn't repeat values like the 
+' MapBasic one does
+Declare Function BetterRnd Lib "MapBasicFunctions.dll"  Alias "better_rand" () as Float
+
+' Used by SortStringArray and SortPartStringArray. Use the Mapbasic wrapped functions instead of the dll ones below
+Declare Function DLLSortStringArrayAll Lib "MapBasicFunctions.dll" Alias "sort_char_array_all" ( sArray() As String, ByVal iArrayLength As Integer ) As Integer
+Declare Function DLLSortStringArray Lib "MapBasicFunctions.dll" Alias "sort_char_array" ( sArray() As String, ByVal iStartPos As Integer, ByVal iEndPos As Integer ) As Integer
+		
+Declare Function BrowseForFolder Lib "MapBasicFunctions.dll"  Alias "browseForFolder" (sFolder As String, ByVal sDefaultFolder as String, ByVal sRootPath As String, ByVal sHelpText as String, ByVal lIncludeEdit As Logical , ByVal iHwnd As Integer) as Integer
+
+
+'********************************************
+' Routines included in format_conversions.mb
+'********************************************
+
+' Writes a MapInfo table out as a GeoJSON file
+' Parameters:
+'   sTable: table to write
+'   sDestFile: destination file name
+'   sDestVariable: JavaScript variable name for GeoJSON features, or blank if object should not be stored in a variable
+' Returns:
+'   True if the conversion was successful
+' NOTE:
+'   Currently only point geometries implemented!!
+Declare Function ExportTableToGEOJson( specs As GeoJSONExportSpecs ) As Logical
+
+
+' --------------------
+' PRIVATE DECLARATIONS
+' --------------------
+
+Global FILE_LAST_PATH As String
+Global PROFILE_CODE As Logical
+Global LOGGING_ENABLED As Logical
+Global LOG_TO_WINDOW As Logical
+Global LOG_FILE As String
+Global MIN_LOG_LEVEL As Integer
+Global DIALOG_DBL_CLICKED As Logical
+Global DIALOG_DBL_CLICKED_RETURN_VAL As Integer
+
+DEFINE LOG_LEVEL_HIGH	0
+DEFINE LOG_LEVEL_MEDIUM  1
+DEFINE LOG_LEVEL_LOW	2
+
+'TableList table types
+DEFINE BASE_TABLES_ONLY 1
+DEFINE TABLES_AND_QUERIES 2
+DEFINE ALL_TABLES 3
+
+' Internal (private) routines
+Declare Sub ListBoxDoubleClickHandler
+Declare Sub MultiChooseColumnsChangeHandler
+Declare Sub MultiChooseOkHandler
+Declare Sub MultiChooseColumnsDoubleClickHandler
+
+' Routines included in profile_code.mb
+Declare Sub ProfileCode(ByVal sCodeBlock As String) 
+Declare Sub StopProfile() 
+Declare Sub LogMessage( ByVal sMessage As String, ByVal iMessageLevel As Integer )
+Declare Sub StartLog()
+Declare Sub EndLog()
+
+
+
+DEFINE CSIDL_DESKTOP	0
+DEFINE CSIDL_INTERNET  1
+DEFINE CSIDL_PROGRAMS	2
+DEFINE CSIDL_CONTROLS	3
+DEFINE CSIDL_PRINTERS	4
+DEFINE CSIDL_PERSONAL	5
+DEFINE CSIDL_FAVORITES	6
+DEFINE CSIDL_STARTUP	7
+DEFINE CSIDL_RECENT	8
+DEFINE CSIDL_SENDTO	9
+DEFINE CSIDL_BITBUCKET	10
+DEFINE CSIDL_STARTMENU	11
+DEFINE CSIDL_DESKTOPDIRECTORY	16
+DEFINE CSIDL_DRIVES	17
+DEFINE CSIDL_NETWORK	18
+DEFINE CSIDL_NETHOOD	19
+DEFINE CSIDL_FONTS	20
+DEFINE CSIDL_TEMPLATES	21
+DEFINE CSIDL_COMMON_STARTMENU	22
+DEFINE CSIDL_COMMON_PROGRAMS	23
+DEFINE CSIDL_COMMON_STARTUP	24
+DEFINE CSIDL_COMMON_DESKTOPDIRECTORY	25
+DEFINE CSIDL_APPDATA   26
+DEFINE CSIDL_PRINTHOOD 27
+DEFINE CSIDL_LOCAL_APPDATA 28
+DEFINE CSIDL_ALTSTARTUP    29
+DEFINE CSIDL_COMMON_ALTSTARTUP	30
+DEFINE CSIDL_COMMON_FAVORITES	31
+DEFINE CSIDL_INTERNET_CACHE   32
+DEFINE CSIDL_COOKIES	33
+DEFINE CSIDL_HISTORY	34
+DEFINE CSIDL_COMMON_APPDATA	35
+DEFINE CSIDL_WINDOWS	36
+DEFINE CSIDL_SYSTEM	37
+DEFINE CSIDL_PROGRAM_FILES	38
+DEFINE CSIDL_MYPICTURES	39
+DEFINE CSIDL_PROFILE	40
+DEFINE CSIDL_SYSTEMX86	41
+DEFINE CSIDL_PROGRAM_FILESX86	42
+DEFINE CSIDL_PROGRAM_FILES_COMMON	43
+DEFINE CSIDL_PROGRAM_FILES_COMMONX86	44
+DEFINE CSIDL_COMMON_TEMPLATES	45
+DEFINE CSIDL_COMMON_DOCUMENTS	46
+DEFINE CSIDL_COMMON_ADMINTOOLS	47
+DEFINE CSIDL_ADMINTOOLS	48
+DEFINE CSIDL_CONNECTIONS	49
+DEFINE CSIDL_COMMON_MUSIC	53
+DEFINE CSIDL_COMMON_PICTURES	54
+DEFINE CSIDL_COMMON_VIDEO	55
+DEFINE CSIDL_RESOURCES	56
+DEFINE CSIDL_RESOURCES_LOCALIZED	57
+DEFINE CSIDL_COMMON_OEM_LINKS	58
+DEFINE CSIDL_CDBURN_AREA	59
+DEFINE CSIDL_COMPUTERSNEARME	61
+
+
+Include "asynckeys.def"
+
+' Windows DLL calls
+Declare Function ShellExecute Lib "shell32.dll" Alias "ShellExecuteA" (ByVal hWnd As Integer, ByVal lpOperation As String,
+			ByVal lpFile As String, ByVal lpParameters As String, ByVal lpDirectory As String, ByVal nShowCmd As Integer) As Integer
+Declare Function MsgBoxA Lib "User32.dll" Alias "MessageBoxA" (ByVal hWnd as Integer, ByVal sTxt as String,
+			ByVal sCaption as String, ByVal iType as Integer) As Integer
+Declare Function GetUserName Lib "advapi32" Alias GetUserNameA(lpBuffer As String, nSize As Integer) As Integer
+Declare Function GetComputerName  Lib "Kernel32" Alias GetComputerNameA(lpBuffer As String, nSize As Integer) As Integer
+Declare Function WritePrivateProfileString32 Lib "kernel32" Alias "WritePrivateProfileStringA" (ByVal lpApplicationName As String,
+	ByVal lpKeyName As String, ByVal lpString As String, ByVal lplFileName As String) As Integer
+Declare Function GetPrivateProfileString32 Lib "kernel32" Alias "GetPrivateProfileStringA" (ByVal lpApplicationName As String,
+	ByVal lpKeyName As String, ByVal lpDefault As String, lpReturnedString As String, ByVal nSize As Integer, ByVal lpFileName As String) As Integer	
+Declare Function SHCreateDirectoryEx Lib "shell32.dll" Alias "SHCreateDirectoryExA" (ByVal hwnd As Integer, ByVal LPCWSTR As String, ByVal SecurityAttributes As Integer) As Integer
+Declare Function SHGetSpecialFolderPath Lib "shell32.dll" Alias "SHGetSpecialFolderPathA" (ByVal hWnd As Integer, lpszPath As String, ByVal nFolder As Integer, ByVal fCreate As Logical) As Logical
+
+Declare Function WinFileOpen Lib "kernel32" Alias "_lopen" (ByVal lpPathName As String, ByVal iReadWrite As Integer ) As Integer
+Declare Function WinFileClose Lib "kernel32" Alias "_lclose" (ByVal hFile As Integer ) As Integer
+Declare Function GetFileSizeA Lib "kernel32" Alias "GetFileSize" ( ByVal hFile As Integer, lpFileSizeHigh As Integer ) As Integer
+
+Type BrowseInfo
+	hWndOwner As Integer
+	pIDLRoot As Integer
+	pszDisplayName As Integer
+	lpszTitle As Integer
+	ulFlags As integer
+	lpfnCallback As Integer
+	lParam As Integer
+	iImage As Integer
+End Type
+Declare Sub CoTaskMemFree Lib "ole32.dll" (ByVal hMem as Integer)
+Declare Function SHBrowseForFolder Lib "shell32.dll" (lpbi As BrowseInfo) As Integer
+Declare Function GetActiveWindow Lib "User32" () As Integer
+Declare Function SHGetPathFromIDList Lib "shell32" (ByVal pidList As Integer, lpBuffer As String) As Integer
+
+Declare Function GetDriveType Lib "kernel32" Alias "GetDriveTypeA" (ByVal sDrive As String) As Integer
+DEFINE DRIVE_REMOVABLE 2
+DEFINE DRIVE_FIXED 3
+DEFINE DRIVE_REMOTE 4
+DEFINE DRIVE_CDROM 5
+DEFINE DRIVE_RAMDISK 6
+
+Declare Function WinExec Lib "Kernel32.dll" (ByVal lpszCmdLine$ As String, ByVal fuCmdShow As Integer) As Integer
+
+Define MAX_PATH 260
+Define INVALID_HANDLE_VALUE - 1
+
+Type FILETIME
+	dwLowDateTime As Integer
+	dwHighDateTime As Integer
+End Type
+
+Type WIN32_FIND_DATA
+	dwFileAttributes As Integer
+	ftCreationTime As FILETIME
+	ftLastAccessTime As FILETIME
+	ftLastWriteTime As FILETIME
+	nFileSizeHigh As Integer
+	nFileSizeLow As Integer
+	dwReserved0 As Integer
+	dwReserved1 As Integer
+	cFileName As String * MAX_PATH
+	cAlternate As String * 14
+End Type
+
+Declare Function FindFirstFile Lib "kernel32" Alias "FindFirstFileA" ( ByVal lpFileName As String,
+		lpFindFileData As WIN32_FIND_DATA ) As Integer
+Declare Function FindNextFile Lib "kernel32" Alias "FindNextFileA" ( ByVal hFindFile As integer,
+		lpFindFileData As WIN32_FIND_DATA ) As Integer
+Declare Function FindClose Lib "kernel32" Alias "FindClose" ( ByVal hFindFile As Integer ) As Integer
+        
+Type OSVERSIONINFO
+  dwOSVersionInfoSize As Integer
+  dwMajorVersion As Integer
+  dwMinorVersion As Integer
+  dwBuildNumber As Integer
+  dwPlatformId As Integer
+  szCSDVersion As String * 128
+End Type
+		
+Declare Function GetVersionExA Lib "kernel32" Alias "GetVersionExA" (lpVersionInformation As OSVERSIONINFO) As Integer	
+
+Type USER_INFO_3
+	usri3_name As Integer
+	usri3_password As Integer
+	usri3_password_age As Integer
+	usri3_priv As Integer
+	usri3_home_dir As Integer
+	usri3_comment As Integer
+	usri3_flags As Integer
+	usri3_script_path As Integer
+	usri3_auth_flags As Integer
+	usri3_full_name As Integer
+	usri3_usr_comment As Integer
+	usri3_parms As Integer
+	usri3_workstations As Integer
+	usri3_last_logon As Integer
+	usri3_last_logoff As Integer
+	usri3_acct_expires As Integer
+	usri3_max_storage As Integer
+	usri3_units_per_week As Integer
+	usri3_logon_hours As String
+	usri3_bad_pw_count As Integer
+	usri3_num_logons As Integer
+	usri3_logon_server As String
+	usri3_country_code As Integer
+	usri3_code_page As Integer
+	usri3_user_id As Integer
+	usri3_primary_group_id As Integer
+	usri3_profile As Integer
+	usri3_home_dir_drive As Integer
+	usri3_password_expired As Integer
+End Type	
+
+Declare Function NetUserGetInfo Lib "netapi32" (lpServer As Integer, UserName As String, ByVal Level As Integer, lpBuffer As Integer) As Integer

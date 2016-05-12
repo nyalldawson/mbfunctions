@@ -1,0 +1,115 @@
+'**************************************************************************
+'**************************************************************************
+'
+' profile_code.mb - Functions for measuring time consumed by MapBasic code
+'
+'**************************************************************************
+'**************************************************************************
+
+Include "mbfunctions.def"
+
+Declare Function GetTickCount Lib "kernel32" Alias GetTickCount() As Integer
+
+Dim LAST_TICK As Integer
+Dim LAST_BLOCK As String
+
+
+Sub ProfileCode( ByVal sCodeBlock As String )
+	
+	Dim iTicksElapsed As Integer
+	If PROFILE_CODE Then
+		If LAST_BLOCK <> "" Then
+			iTicksElapsed = GetTickCount() - LAST_TICK
+			
+			Print LAST_BLOCK + ": " + iTicksElapsed
+			
+		End If
+		
+		LAST_BLOCK = sCodeBlock
+		LAST_TICK = GetTickCount()
+	End If
+End Sub
+
+Sub StopProfile()
+	Dim iTicksElapsed As Integer
+	If PROFILE_CODE Then
+		iTicksElapsed = GetTickCount() - LAST_TICK
+		
+		Print LAST_BLOCK + ": " + iTicksElapsed
+		LAST_BLOCK = ""
+	End If
+End Sub
+
+
+Sub StartLog()
+	If Not LOGGING_ENABLED Or LOG_TO_WINDOW Then
+		Exit Sub
+	End If
+	OnError Goto log_open
+	
+	Dim sLogFileDest As String
+	If LOG_FILE <> "" Then
+		sLogFileDest = LOG_FILE
+	Else
+		sLogFileDest = ApplicationDirectory$() + "geocode_log.log"
+	End If
+	
+	Open File sLogFileDest For Output As #9
+	
+	OnError Goto 0
+	Exit Sub
+	log_open:
+	OnError Goto 0
+	Exit Sub
+End Sub
+
+Sub EndLog()
+	If LOG_TO_WINDOW Or Not LOGGING_ENABLED Then
+		Exit Sub
+	End If
+	
+	OnError Goto no_log
+	
+	Close File 9
+	
+	OnError Goto 0
+	Exit Sub
+	no_log:
+	OnError Goto 0
+	Exit Sub
+	
+End Sub
+
+Sub LogMessage( ByVal sMessage As String, ByVal iMessageLevel As Integer )
+	' Logs a debug message
+	' (and can be easily disabled by commenting out the next line!)
+	' (or directed to an output file, etc)
+	
+	If Not LOGGING_ENABLED Or iMessageLevel > MIN_LOG_LEVEL Then
+		Exit Sub
+	End If
+	
+	Dim sStringToWrite As String
+	If MIN_LOG_LEVEL = LOG_LEVEL_LOW Then
+		sStringToWrite = GetTickCount() + "; " + sMessage
+	Else
+		sStringToWrite = sMessage
+	End If
+	
+	If LOG_TO_WINDOW Then
+		Print sStringToWrite
+		Exit Sub
+	End If
+	
+	OnError Goto Fix
+	resume_error:
+	Print #9, sStringToWrite
+	
+	OnError Goto 0
+	Exit Sub
+	fix:
+	OnError Goto 0
+	Call StartLog()
+	Goto resume_error
+	
+End Sub

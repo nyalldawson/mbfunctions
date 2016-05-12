@@ -1,0 +1,308 @@
+'**************************************************************************
+'**************************************************************************
+'
+' format_conversions.mb - contains routines for format translation
+'
+'**************************************************************************
+'**************************************************************************
+
+Include "mapbasic.def"
+Include "menu.def"
+Include "mbfunctions.def"
+
+DEFINE GEOJSON_OUTFILE_REF #4
+
+Declare Function WriteGeoJSONHeader( specs As GeoJSONExportSpecs ) As Logical
+Declare Function WriteGeoJSONFooter( specs As GeoJSONExportSpecs ) As Logical
+Declare Function WriteGeoJSONFeatures( specs As GeoJSONExportSpecs ) As Logical
+Declare Function WriteGeoJSONFeature( specs As GeoJSONExportSpecs ) As Logical
+Declare Function MapInfoToGeoJSONGeomType( ByVal oObj As Object ) As String
+Declare Function WriteGeoJSONGeometry( specs As GeoJSONExportSpecs ) As Logical
+Declare Function ExportNodesToJSON( specs As GeoJSONExportSpecs, ByVal oObj As Object ) As String
+Declare Function RoundCoord( specs As GeoJSONExportSpecs, ByVal fVal As Float ) As String
+Declare Function WriteGeoJSONProperties( specs As GeoJSONExportSpecs ) As Logical
+Declare Function ExportPropertyToGeoJSON( specs As GeoJSONExportSpecs, ByVal sColumn As String ) As String
+
+Function ExportTableToGEOJson( specs As GeoJSONExportSpecs ) As Logical
+	'TODO Print -> log
+	
+	If Not TableExists( specs.SourceTable ) Then
+		Print "Source table does not exist!"
+		Exit Function
+	End If
+	
+	If Not GetColumnList( specs.SourceTable, specs.Columns ) Then
+		Print "Could not fetch column list from table!"
+		Exit Function
+	End If
+	
+	OnError Goto writeErr
+	If FileExists( specs.DestFileName ) Then
+		Kill specs.DestFileName
+	End If
+	
+	Open File specs.DestFileName For Output As GEOJSON_OUTFILE_REF
+	OnError Goto 0
+	
+	If Not WriteGeoJSONHeader( specs ) Then
+		Print "Could not write GEOJSON header"
+		Exit Function
+	End If
+	
+	Set CoordSys Earth Projection 1, 104
+	
+	If Not WriteGeoJSONFeatures( specs ) Then
+		Print "Could not write GEOJSON features"
+		Exit Function
+	End If
+	
+	If Not WriteGeoJSONFooter( specs ) Then
+		Print "Could not write GEOJSON footer"
+		Exit Function
+	End If
+	
+	Close File GEOJSON_OUTFILE_REF
+	
+	
+	ExportTableToGEOJSON = TRUE
+	Exit Function
+	
+	writeErr:
+	OnError Goto 0
+	Print "Could not open output file " + specs.DestFileName
+	Exit Function
+	
+	
+End Function
+
+
+Function WriteGeoJSONFeatures( specs As GeoJSONExportSpecs ) As Logical
+	OnError Goto writeErr
+	
+	Print GEOJSON_OUTFILE_REF, ",""features"":["
+	
+	Dim sTable As String
+	sTable = specs.SourceTable
+	Fetch First From sTable
+	Dim lFirst As Logical
+	lFirst = TRUE
+	Do Until EOT( sTable )
+		If Not lFirst Then
+			Print GEOJSON_OUTFILE_REF, ","
+		Else
+			lFirst = FALSE
+		End If
+		
+		If Not WriteGeoJSONFeature( specs ) Then
+			Print "Error writing GEOJSON feature"
+			Exit Function
+		End If
+		
+		Fetch Next From sTable
+	Loop
+	
+	Print GEOJSON_OUTFILE_REF, "]"
+	
+	OnError Goto 0
+	WriteGeoJSONFeatures = TRUE
+	Exit Function
+	
+	writeErr:
+	OnError Goto 0
+	Exit Function
+End Function
+
+Function WriteGeoJSONFeature( specs As GeoJSONExportSpecs ) As Logical
+	OnError Goto writeErr
+	
+	Dim sLine As String
+	
+	sLine = "{""type"":""Feature"","
+	Print GEOJSON_OUTFILE_REF, sLine
+	
+	' Write geometry node
+	If Not WriteGeoJSONGeometry( specs ) Then
+		Print "Error writing geometry"
+		Exit Function
+	End If
+	
+	' Write properties node
+	If Not WriteGeoJSONProperties( specs ) Then
+		Print "Error writing properties"
+		Exit Function
+	End If
+	
+	Print GEOJSON_OUTFILE_REF, "}"
+	
+	OnError Goto 0
+	WriteGeoJSONFeature = TRUE
+	Exit Function
+	
+	writeErr:
+	OnError Goto 0
+	Exit Function
+End Function
+
+Function WriteGeoJSONProperties( specs As GeoJSONExportSpecs ) As Logical
+	OnError Goto writeErr
+	
+	If UBound( specs.Columns ) = 0 Then
+		' no columns (is this even possible?)
+		WriteGeoJSONProperties = TRUE
+		OnError Goto 0
+		Exit Function
+	End If
+	
+	Print GEOJSON_OUTFILE_REF, """properties"":{"
+	Dim i As Integer
+	Dim sProps() As String
+	For i = 1 To UBound( specs.Columns )
+		Dim sCol As String
+		sCol = specs.Columns(i)
+		Dim sProp As String
+		sProp = ExportPropertyToGeoJSON( specs, sCol )
+		If sProp Then
+			Call PushStringArray( sProps, sProp )
+		End If
+	Next
+	
+	Dim sPropString As String
+	sPropString = Join( sProps, "," )
+	Print GEOJSON_OUTFILE_REF, sPropString
+	
+	Print GEOJSON_OUTFILE_REF, "}"
+	
+	OnError Goto 0
+	WriteGeoJSONProperties = TRUE
+	Exit Function
+	
+	writeErr:
+	OnError Goto 0
+	Exit Function
+End Function
+
+Function ExportPropertyToGeoJSON( specs As GeoJSONExportSpecs, ByVal sColumn As String ) As String
+	Dim sValue As String
+	sValue = ColumnValueToString( specs.SourceTable, sColumn )
+	If sValue = """""" Then
+		Exit Function
+	End If
+	
+	Dim sPropertyNode As String
+	
+	sPropertyNode = """" + sColumn + """:"
+	sPropertyNode = sPropertyNode + sValue
+	
+	ExportPropertyToGeoJSON = sPropertyNode
+End Function
+
+Function WriteGeoJSONGeometry( specs As GeoJSONExportSpecs ) As Logical
+	OnError Goto writeErr
+	
+	Dim aObj As Alias
+	aObj = specs.SourceTable + ".obj"
+	
+	If Not aObj Then
+		' NULL geometry
+		WriteGeoJSONGeometry = TRUE
+		OnError Goto 0
+		Exit Function
+	End If
+	
+	' TODO - implement non-point geometry export
+	If Not Str$( aObj ) = "point" Then
+		Print "ERROR - non point geometry encountered!"
+		OnError Goto 0
+		Exit Function
+	End If
+	
+	'"geometry": {"type": "Point",
+	Print GEOJSON_OUTFILE_REF, """geometry"":{""type"":""" + MapInfoToGeoJSONGeomType( aObj ) + """,""coordinates"":"
+	
+	Print GEOJSON_OUTFILE_REF, ExportNodesToJSON( specs, aObj )
+	
+	' "coordinates": [102.0, 0.5]
+	
+	Print GEOJSON_OUTFILE_REF, "},"
+	
+	OnError Goto 0
+	WriteGeoJSONGeometry = TRUE
+	Exit Function
+	
+	writeErr:
+	OnError Goto 0
+	Exit Function
+End Function
+
+
+Function MapInfoToGeoJSONGeomType( ByVal oObj As Object ) As String
+	Do Case Str$( oObj )
+		Case "Point"
+			MapInfoToGeoJSONGeomType = "Point"
+		Case Else
+			' TODO - not implemented
+	End Case
+End Function
+
+Function ExportNodesToJSON( specs As GeoJSONExportSpecs, ByVal oObj As Object ) As String
+	Do Case Str$( oObj )
+		Case "Point"
+			Dim sX, sY As String
+			sX = RoundCoord( specs, CentroidX( oObj ) )
+			sY = RoundCoord( specs, CentroidY( oObj ) )
+			ExportNodesToJSON = "[" + sX + "," + sY + "]"
+		Case Else
+			' TODO - not implemented
+	End Case
+End Function
+
+Function RoundCoord( specs As GeoJSONExportSpecs, ByVal fVal As Float ) As String
+	Dim iPrecision As Integer
+	iPrecision = specs.Precision
+	
+	If iPrecision = 0 Then
+		RoundCoord = Format$( fVal, "" )
+	Else
+		RoundCoord = Format$( Round( fVal, 10 ^ ( - iPrecision ) ), "" )
+	End If
+End Function
+
+
+Function WriteGeoJSONHeader( specs As GeoJSONExportSpecs ) As Logical
+	OnError Goto writeErr
+	
+	Dim sLine As String
+	If specs.JSVariableName Then
+		sLine = specs.JSVariableName + " = "
+	End If
+	
+	sLine = sLine + "{""type"":""FeatureCollection"""
+	Print GEOJSON_OUTFILE_REF, sLine
+	
+	OnError Goto 0
+	WriteGeoJSONHeader = TRUE
+	Exit Function
+	
+	writeErr:
+	OnError Goto 0
+	Exit Function
+End Function
+
+Function WriteGeoJSONFooter( specs As GeoJSONExportSpecs ) As Logical
+	OnError Goto writeErr
+	
+	If specs.JSVariableName Then
+		Print GEOJSON_OUTFILE_REF, "};"
+	Else
+		Print GEOJSON_OUTFILE_REF, "}"
+	End If
+	
+	OnError Goto 0
+	WriteGeoJSONFooter = TRUE
+	Exit Function
+	
+	writeErr:
+	OnError Goto 0
+	Exit Function
+End Function
+

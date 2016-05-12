@@ -1,0 +1,76 @@
+Define DIRECTION_NORTH 0
+Define DIRECTION_EAST 1
+Define DIRECTION_SOUTH 2
+Define DIRECTION_WEST 3
+
+'***************************
+' Geometry related functions
+'***************************
+
+' Returns the bearing between two nodes in a geometry
+' Parameters:
+'   oObj: geometry object
+'   iPolyNo: polygon index for ring
+'   iNode1: index of first node (starting at 1)
+'   iNode2: index of second node (starting at 1) 
+'   fBearing: will be set to bearing between nodes, in degrees clockwise from North
+' Returns:
+'   TRUE if bearing was successfully calculated
+Declare Function GetNodeBearing( ByVal oObj As Object, ByVal iPolyNo As Integer, ByVal iNode1 As Integer, ByVal iNode2 As Integer, fBearing As Float ) As Logical
+
+' Returns the cardinal direction of a bearing (ie North, East,... ), relative to a specified reference direction for N
+' Also returns an offset amount.
+' Parameters:
+'   fBearing: input bearing, in degrees clockwise
+'   fReference: reference direction for North (usually 0)
+'   fOffset: will be set to offset between cardinal direction and input bearing
+' Returns:
+'   Cardinal direction for bearing as integer, ie DIRECTION_NORTH, DIRECTION_EAST, etc
+Declare Function GetRotatedDirection( ByVal fBearing As Float, ByVal fReference As Float, fOffset As Float ) As Integer
+
+' Fills in an array with cardinal directions between all nodes in an object (relative to
+' a reference angle), and returns the average offset
+' Parameters:
+'   oObj: input object
+'   iPoly: polygon index for ring
+'   fReferenceAngle: reference direction for North (usually 0)
+'   iDirections: destination array for cardinal directions between nodes. Values are DIRECTION_NORTH, DIRECTION_EAST, etc,...
+' Returns:
+'   Average offset for angles
+Declare Function CalculateDirections( ByVal oObj As Object, ByVal iPoly As Integer, ByVal fReferenceAngle As Float, iDirections() As Integer ) As Float
+
+' Rotates a point around a specified origin
+' Parameters:
+'   oPoint: point to rotate
+'   oOrigin: origin to rotate around
+'   fAngle: angle to rotate point by
+' Returns:
+'   Rotated point object
+Declare Function RotatePoint( ByVal oPoint As Object, ByVal oOrigin As Object, ByVal fAngle As Float ) As Object
+
+' Rotates all nodes in a polygon around a specified origin
+' Parameters:
+'   oObj: object to rotate
+'   iPoly: polygon index of polygon to rotate
+'   oOrigin: origin to rotate around
+'   fAngle: angle to rotate point by
+' Returns:
+'   Object with rotated polygon
+Declare Function RotateNodes( ByVal oObj As Object, ByVal iPoly As Integer, ByVal oOrigin As Object, ByVal fAngle As Float ) As Object
+
+'Returns the centroid of a polygon ring
+' Parameters:
+'   oObj: input object
+'   iPoly: polygon index for ring
+' Returns:
+'   Point object for centroid of ring
+Declare Function RingCentroid( ByVal oObj As Object, ByVal iPoly As Integer ) As Object
+
+'Orthagonalizes a polygon ring
+' Parameters:
+'   oObj: input object
+'   iPoly: polygon index for ring
+' Returns:
+'   Object with orthagonalized ring
+Declare Function OrthagonalizeRing( ByVal oObj As Object, ByVal iPoly As Integer ) As Object
+

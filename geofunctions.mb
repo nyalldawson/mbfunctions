@@ -1,0 +1,227 @@
+'**************************************************************************
+'**************************************************************************
+'
+' geofunctions.mb - contains useful, geometry related functions for use
+' throughout MapBasic.
+'
+'**************************************************************************
+'**************************************************************************
+
+Include "mapbasic.def"
+Include "menu.def"
+Include "mbfunctions.def"
+Include "geofunctions.def"
+
+'Node direction
+'Returns true if bearing could be calculated
+Function GetNodeBearing( ByVal oObj As Object, ByVal iPolyNo As Integer, ByVal iNode1 As Integer, ByVal iNode2 As Integer, fBearing As Float ) As Logical
+	
+	' Sanity checks
+	If Not ObjectInfo( oObj, OBJ_INFO_NPOLYGONS ) >= iPolyNo Then
+		GetNodeBearing = FALSE
+		Exit Function
+	End If
+	If Not ObjectInfo( oObj, OBJ_INFO_NPOLYGONS + iPolyNo ) >= iNode1 Or Not ObjectInfo( oObj, OBJ_INFO_NPOLYGONS + iPolyNo ) >= iNode2 Then
+		GetNodeBearing = FALSE
+		Exit Function
+	End If
+	
+	Dim oNode1, oNode2 As Object
+	oNode1 = CreatePoint( ObjectNodeX( oObj, iPolyNo, iNode1 ), ObjectNodeY( oObj, iPolyNo, iNode1 ) )
+	oNode2 = CreatePoint( ObjectNodeX( oObj, iPolyNo, iNode2 ), ObjectNodeY( oObj, iPolyNo, iNode2 ) )
+	
+	fBearing = GetBearing( oNode1, oNode2 )
+	GetNodeBearing = TRUE
+	
+End Function
+
+
+' Returns a direction of a bearing, relative to a specified reference direction for N
+' Also returns an offset amount
+Function GetRotatedDirection( ByVal fBearing As Float, ByVal fReference As Float, fOffset As Float ) As Integer
+	
+	Dim fRotatedBearing As Float
+	fRotatedBearing = fBearing - fReference
+	
+	If fRotatedBearing < 0 Then
+		fRotatedBearing = fRotatedBearing + 360
+	ElseIf fRotatedBearing >= 360 Then
+		fRotatedBearing = fRotatedBearing - 360
+	End If
+	
+	If fRotatedBearing < 45 Or fRotatedBearing >= 315 Then
+		GetRotatedDirection = DIRECTION_NORTH
+		If fRotatedBearing > 180 Then
+			fOffset = fRotatedBearing - 360
+		Else
+			fOffset = fRotatedBearing
+		End If
+	ElseIf fRotatedBearing >= 45 And fRotatedBearing < 135 Then
+		GetRotatedDirection = DIRECTION_EAST
+		fOffset = fRotatedBearing - 90
+	ElseIf fRotatedBearing >= 135 And fRotatedBearing < 225 Then
+		GetRotatedDirection = DIRECTION_SOUTH
+		fOffset = fRotatedBearing - 180
+	ElseIf fRotatedBearing >= 225 And fRotatedBearing < 315 Then
+		GetRotatedDirection = DIRECTION_WEST
+		fOffset = fRotatedBearing - 270
+	End If
+	
+End Function
+
+' Fills in an array with directions between nodes (relative to a reference angle), and returns the average offset
+Function CalculateDirections( ByVal oObj As Object, ByVal iPoly As Integer, ByVal fReferenceAngle As Float, iDirections() As Integer ) As Float
+	
+	' Loop through nodes
+	Dim i As Integer
+	Dim fTotalOffset, fCurrentOffset, fCurrentBearing As Float
+	Dim iCurrentDirection As Integer
+	ReDim iDirections(0)
+	For i = 1 To ObjectInfo( oObj, OBJ_INFO_NPOLYGONS + iPoly ) - 1
+		If Not GetNodeBearing( oObj, iPoly, i, i + 1, fCurrentBearing ) Then
+			Note "Error in geonodebearing"
+			Exit Function
+		End If
+		
+		iCurrentDirection = GetRotatedDirection( fCurrentBearing, fReferenceAngle, fCurrentOffset )
+		Call PushIntegerArray( iDirections, iCurrentDirection )
+		fTotalOffset = fTotalOffset + fCurrentOffset
+	Next
+	
+	If Not GetNodeBearing( oObj, iPoly, ObjectInfo( oObj, OBJ_INFO_NPOLYGONS + iPoly ), 1, fCurrentBearing ) Then
+		Note "Error in geonodebearing"
+		Exit Function
+	End If
+	
+	iCurrentDirection = GetRotatedDirection( fCurrentBearing, fReferenceAngle, fCurrentOffset )
+	Call PushIntegerArray( iDirections, iCurrentDirection )
+	fTotalOffset = fTotalOffset + fCurrentOffset
+	
+	CalculateDirections = fTotalOffset / ( ObjectInfo( oObj, OBJ_INFO_NPOLYGONS + iPoly ))
+	
+End Function
+
+' Rotates a point around a specified origin
+Function RotatePoint( ByVal oPoint As Object, ByVal oOrigin As Object, ByVal fAngle As Float ) As Object
+	
+	' First, get bearing from origin to point
+	Dim fBearing As Float
+	Dim fDistance As Float
+	
+	fBearing = GetBearing( oOrigin, oPoint )
+	fDistance = Sqr( ( CentroidX( oOrigin ) - CentroidX( oPoint ) ) ^ 2 + ( CentroidY( oOrigin ) - CentroidY( oPoint ) ) ^ 2 )
+	
+	' Rotate bearing by angle
+	fBearing = fBearing + fAngle
+	If fBearing < 0 Then
+		fBearing = fBearing + 360
+	ElseIf fBearing >= 360 Then
+		fBearing = fBearing - 360
+	End If
+	
+	' Reproject out from origin
+	RotatePoint = ProjectPoint( oOrigin, fBearing, fDistance )
+	
+End Function
+
+' Rotates all nodes in a polygon around a specified origin
+Function RotateNodes( ByVal oObj As Object, ByVal iPoly As Integer, ByVal oOrigin As Object, ByVal fAngle As Float ) As Object
+	
+	Dim oResult As Object
+	oResult = oObj
+	Dim i As Integer
+	Dim fNewX, fNewY As Float
+	Dim fTheta As Float
+	fTheta = 0 - DEG_2_RAD * fAngle
+	For i = 1 To ObjectInfo( oObj, OBJ_INFO_NPOLYGONS + iPoly )
+		' Rotate node
+		fNewX = Cos( fTheta ) * ( ObjectNodeX( oObj, iPoly, i ) - CentroidX( oOrigin )) - Sin( fTheta ) * ( ObjectNodeY( oObj, iPoly, i ) - CentroidY( oOrigin ))
+		fNewY = Sin( fTheta ) * ( ObjectNodeX( oObj, iPoly, i ) - CentroidX( oOrigin )) + Cos( fTheta ) * ( ObjectNodeY( oObj, iPoly, i ) - CentroidY( oOrigin ))
+		
+		' Update object
+		Alter Object oResult Node Set Position iPoly, i ( fNewX + CentroidX( oOrigin ), fNewY + CentroidY( oOrigin ) )
+	Next
+	
+	RotateNodes = oResult
+	
+End Function
+
+'Returns the centroid of a polygon ring
+Function RingCentroid( ByVal oObj As Object, ByVal iPoly As Integer ) As Object
+	
+	Dim i As Integer
+	Dim fSumX, fSumY As Float
+	For i = 1 To ObjectInfo( oObj, OBJ_INFO_NPOLYGONS + iPoly )
+		fSumX = fSumX + ObjectNodeX( oObj, iPoly, i )
+		fSumY = fSumY + ObjectNodeY( oObj, iPoly, i )
+	Next
+	
+	RingCentroid = CreatePoint( fSumX / ObjectInfo( oObj, OBJ_INFO_NPOLYGONS + iPoly ), fSumY / ObjectInfo( oObj, OBJ_INFO_NPOLYGONS + iPoly ))
+End Function
+
+
+'Orthagonalizes a polygon ring
+Function OrthagonalizeRing( ByVal oObj As Object, ByVal iPoly As Integer ) As Object
+	Dim oResult As Object
+	
+	Dim iDirections() As Integer
+	Dim fAverageOffset As Float
+	Dim lResult As Logical
+	
+	'Find initial angle between first two nodes
+	Dim fInitialAngle As Float
+	lResult = GetNodeBearing( oObj, iPoly, 1, 2, fInitialAngle )
+	
+	'Calculate directions between nodes and average offset
+	fAverageOffset = CalculateDirections( oObj, iPoly, fInitialAngle , iDirections )
+	Print fAverageOffset
+	Dim fRotation As Float
+	fRotation = - fAverageOffset - fInitialAngle
+	
+	' Rotate nodes by average offset so that lines are roughly horizontal/vertical
+	Dim oRingCentroid As Object
+	oRingCentroid = RingCentroid( oObj, iPoly )
+	
+	oResult = RotateNodes( oObj, iPoly, oRingCentroid, fRotation )
+	
+	'Loop through segments
+	Dim i As Integer
+	Dim fAverageY, fAverageX As Float
+	For i = 1 To ObjectInfo( oResult, OBJ_INFO_NPOLYGONS + iPoly ) - 1
+		If iDirections(i) = Any( DIRECTION_EAST, DIRECTION_WEST ) Then
+			'Nodes connected by horizontal segment
+			'Replace y coord by average of nodes y coordinates
+			fAverageY = ( ObjectNodeY( oResult, iPoly, i ) + ObjectNodeY( oResult, iPoly, i + 1 ) ) / 2
+			Alter Object oResult Node Set Position iPoly, i ( ObjectNodeX( oResult, iPoly, i ), fAverageY )
+			Alter Object oResult Node Set Position iPoly, ( i + 1 ) ( ObjectNodeX( oResult, iPoly, i + 1 ), fAverageY )
+			
+		Else
+			'Nodes connected by vertical segment
+			'Replace x coord by average of nodes x coordinates
+			fAverageX = ( ObjectNodeX( oResult, iPoly, i ) + ObjectNodeX( oResult, iPoly, i + 1 ) ) / 2
+			Alter Object oResult Node Set Position iPoly, i ( fAverageX, ObjectNodeY( oResult, iPoly, i ) )
+			Alter Object oResult Node Set Position iPoly, ( i + 1 ) ( fAverageX, ObjectNodeY( oResult, iPoly, i + 1 ) )
+		End If
+	Next
+	
+	'Last segment, back to start
+	If iDirections( UBound( iDirections )) = Any( 1, 3 ) Then
+		'Nodes connected by horizontal segment
+		'Replace y coord by average of nodes y coordinates
+		fAverageY = ( ObjectNodeY( oResult, iPoly, ObjectInfo( oResult, OBJ_INFO_NPOLYGONS + iPoly ) ) + ObjectNodeY( oResult, iPoly, 1 ) ) / 2
+		Alter Object oResult Node Set Position iPoly, ObjectInfo( oResult, OBJ_INFO_NPOLYGONS + iPoly ) ( ObjectNodeX( oResult, iPoly, ObjectInfo( oResult, OBJ_INFO_NPOLYGONS + iPoly ) ), fAverageY )
+		Alter Object oResult Node Set Position iPoly, 1 ( ObjectNodeX( oResult, iPoly, 1 ), fAverageY )
+		
+	Else
+		'Nodes connected by vertical segment
+		'Replace x coord by average of nodes x coordinates
+		fAverageX = ( ObjectNodeX( oResult, iPoly, ObjectInfo( oResult, OBJ_INFO_NPOLYGONS + iPoly ) ) + ObjectNodeX( oResult, iPoly, 1 ) ) / 2
+		Alter Object oResult Node Set Position iPoly, ObjectInfo( oResult, OBJ_INFO_NPOLYGONS + iPoly ) ( fAverageX, ObjectNodeY( oResult, iPoly, ObjectInfo( oResult, OBJ_INFO_NPOLYGONS + iPoly ) ) )
+		Alter Object oResult Node Set Position iPoly, 1 ( fAverageX, ObjectNodeY( oResult, iPoly, 1 ) )
+	End If
+	
+	'Rotate back to original orientation
+	oResult = RotateNodes( oResult, 1, oRingCentroid, 0 - fRotation )
+	
+	OrthagonalizeRing = oResult
+End Function
