@@ -1,0 +1,24 @@
+Include "..\mapbasic\mbfunctions.def"
+
+Declare Function TestStringValue(ByVal sTestName As String, ByVal sResult As String, ByVal sExpected As String) As Logical
+Declare Function TestNumberValue(ByVal sTestName As String, ByVal fResult As Float, ByVal fExpected As Float) As Logical
+Declare Function TestLogicalValue(ByVal sTestName As String, ByVal lResult As Logical, ByVal lExpected As Logical) As Logical
+Declare Function TestDateTimeValue(ByVal sTestName As String, ByVal dtResult As DateTime, ByVal dtExpected As DateTime) As Logical
+Declare Function TestDateValue( ByVal sTestName As String, ByVal dResult As Date, ByVal dExpected As Date ) As Logical
+Declare Function TestTimeValue( ByVal sTestName As String, ByVal tResult As Time, ByVal tExpected As Time ) As Logical
+Declare Function CompareImages(ByVal sTestName As String, ByVal sImageName As String) As Logical
+Declare Sub AppendToLog(ByVal sPrefix As String, ByVal sTest As String, ByVal sMessage As String, ByVal iLevel As Integer )
+
+Declare Function TestMbFunctions() As Logical
+Declare Function TestMbFunctionsGui() As Logical
+Declare Function TestMbFunctionsDll() As Logical
+Declare Function TestGeoFunctions() As Logical
+
+Declare Sub Main
+
+DEFINE LOG_MAX_LEVEL 2
+
+Global TEST_LOG As String
+
+
+

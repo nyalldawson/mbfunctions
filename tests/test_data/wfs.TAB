@@ -1,0 +1,71 @@
+!table
+!version 780
+!charset WindowsLatin1
+
+Definition Table
+  File "wfs.xml"
+  Type WFS Charset "WindowsLatin1"
+  Fields 33
+    pid Float ;
+    station Char (32) ;
+    code Char (32) ;
+    raw_code Char (32) ;
+    cell_category Char (32) ;
+    duty_id Integer ;
+    duty Char (32) ;
+    region Char (32) ;
+    div_code Char (32) ;
+    psa Char (32) ;
+    psa_code Char (32) ;
+    street_no Char (32) ;
+    street_name Char (32) ;
+    street_type Char (32) ;
+    street_suffix Char (32) ;
+    suburb Char (32) ;
+    phone Char (32) ;
+    fax Char (32) ;
+    dx Char (32) ;
+    d24 Char (32) ;
+    radio Char (32) ;
+    fire_ban_region Char (32) ;
+    gda94_x Float ;
+    gda94_y Float ;
+    esta_x Float ;
+    esta_y Float ;
+    seasonal_fallback_code Char (32) ;
+    seasonal_fallback_name Char (32) ;
+    seasonal_date_from Date ;
+    seasonal_date_to Date ;
+    rz_code Char (32) ;
+    seasonal_use_ski_season Logical ;
+    email Char (32) ;
+begin_metadata
+"\IsReadOnly" = "FALSE"
+"\Spatial Reference" = ""
+"\Spatial Reference\Geographic" = ""
+"\Spatial Reference\Geographic\Projection" = ""
+"\Spatial Reference\Geographic\Projection\Clause" = "CoordSys Earth Projection 3, 116, ""m"", 145, -37, -36, -38, 2500000, 2500000 Bounds (-81753571.3132, -90226201.8317) (86753571.3132, 78280940.7947)"
+"\DefaultStyles" = ""
+"\DefaultStyles\Symbol" = ""
+"\DefaultStyles\Symbol\Type" = "0"
+"\DefaultStyles\Symbol\Pointsize" = "12"
+"\DefaultStyles\Symbol\Color" = "0"
+"\DefaultStyles\Symbol\Code" = "35"
+"\DefaultStyles\LinePen" = ""
+"\DefaultStyles\LinePen\LineWidth" = "1"
+"\DefaultStyles\LinePen\LineStyle" = "0"
+"\DefaultStyles\LinePen\Color" = "0"
+"\DefaultStyles\LinePen\Pattern" = "2"
+"\DefaultStyles\Pen" = ""
+"\DefaultStyles\Pen\LineWidth" = "1"
+"\DefaultStyles\Pen\LineStyle" = "0"
+"\DefaultStyles\Pen\Color" = "0"
+"\DefaultStyles\Pen\Pattern" = "2"
+"\DefaultStyles\Brush" = ""
+"\DefaultStyles\Brush\Pattern" = "2"
+"\DefaultStyles\Brush\Forecolor" = "16777215"
+"\DefaultStyles\Brush\Backcolor" = "16777215"
+"\DefaultStyles\Brush\Transparent" = "FALSE"
+"\MapInfo" = ""
+"\MapInfo\TableID" = "bc23f13e-43bb-4ac7-9abe-5554b5074120"
+end_metadata

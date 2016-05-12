@@ -1,0 +1,13 @@
+!table
+!version 750
+!charset WindowsLatin1
+
+Definition Table
+  File "wms.xml"
+  Type "WMS"
+  CoordSys Earth Projection 1, 104
+begin_metadata
+"\IsReadOnly" = "FALSE"
+"\MapInfo" = ""
+"\MapInfo\TableID" = "94ad5d82-4d36-4b34-b314-fb8fd2a81f9f"
+end_metadata

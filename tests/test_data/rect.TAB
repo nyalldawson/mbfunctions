@@ -1,0 +1,23 @@
+!table
+!version 900
+!charset WindowsLatin1
+
+Definition Table
+  Type NATIVE Charset "WindowsLatin1"
+  Fields 11
+    id Integer ;
+    string_column Char (20) ;
+    another_string_column Char (20) ;
+    int_column Integer ;
+    small_int_column Smallint ;
+    float_column Float ;
+    decimal_column Decimal (20, 0) ;
+    date_column Date ;
+    time_column Time ;
+    date_time_column DateTime ;
+    logical_column Logical ;
+begin_metadata
+"\IsReadOnly" = "FALSE"
+"\MapInfo" = ""
+"\MapInfo\TableID" = "a9aca97f-dacf-4b59-86a6-df4584b3a9ca"
+end_metadata

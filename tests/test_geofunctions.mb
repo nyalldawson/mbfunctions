@@ -1,0 +1,184 @@
+Include "test.def"
+
+Declare Function TestGetNodeBearing() As Logical
+Declare Function TestGetRotatedDirection() As Logical
+Declare Function TestCalculateDirections() As Logical
+Declare Function TestRotatePoint() As Logical
+Declare Function TestRotateNodes() As Logical
+
+Function TestGeoFunctions() As Logical
+	Dim lResult As Logical
+	lResult = TRUE
+	
+	Close All
+	
+	' Test GetNodeBearing function
+	lResult = lResult And TestGetNodeBearing()
+	' Test GetRotatedDirection function
+	lResult = lResult And TestGetRotatedDirection()
+	' Test CalculateDirections function
+	lResult = lResult And TestCalculateDirections()
+	' Test RotatePoint function
+	lResult = lResult And TestRotatePoint()
+	' Test RotateNodes function
+	lResult = lResult And TestRotateNodes()
+	
+	TestGeoFunctions = lResult
+End Function
+
+Function TestGetNodeBearing() As Logical
+	Dim lResult As Logical
+	lResult = TRUE
+	
+	Dim fBearing As Float
+	
+	Dim oObj As Object
+	'Line
+	Create Pline Into Variable oObj Multiple 2 2 ( 1, 1 ) ( 2, 2 ) 2 ( 2, 2 ) ( 1, 1 )
+	
+	lResult = lResult And TestLogicalValue( "GetNodeBearing bad polygon number", GetNodeBearing( oObj, 3, 1, 2, fBearing ), FALSE )
+	lResult = lResult And TestLogicalValue( "GetNodeBearing bad node number", GetNodeBearing( oObj, 1, 2, 3, fBearing ), FALSE )
+	
+	lResult = lResult And TestLogicalValue( "GetNodeBearing pline", GetNodeBearing( oObj, 1, 1, 2, fBearing ), TRUE )
+	lResult = lResult And TestNumberValue( "GetNodeBearing pline bearing", fBearing, 45 )
+	
+	lResult = lResult And TestLogicalValue( "GetNodeBearing pline2", GetNodeBearing( oObj, 2, 1, 2, fBearing ), TRUE )
+	lResult = lResult And TestNumberValue( "GetNodeBearing pline2 bearing", fBearing, 225 )
+	
+	' Region
+	Create Region Into Variable oObj 1 3 ( 1, 1 ) ( 2, 2 ) ( 2, 3 )
+	
+	lResult = lResult And TestLogicalValue( "GetNodeBearing poly", GetNodeBearing( oObj, 1, 1, 2, fBearing ), TRUE )
+	lResult = lResult And TestNumberValue( "GetNodeBearing poly bearing", fBearing, 45 )
+	
+	lResult = lResult And TestLogicalValue( "GetNodeBearing poly2", GetNodeBearing( oObj, 1, 2, 3, fBearing ), TRUE )
+	lResult = lResult And TestNumberValue( "GetNodeBearing poly2 bearing", fBearing, 0 )
+	
+	TestGetNodeBearing = lResult
+End Function
+
+Function TestGetRotatedDirection() As Logical
+	Dim lResult As Logical
+	lResult = TRUE
+	
+	Dim fOffset As Float
+	
+	lResult = lResult And TestNumberValue( "GetRotatedDirection 0", GetRotatedDirection( 0, 0, fOffset ), DIRECTION_NORTH )
+	lResult = lResult And TestNumberValue( "GetRotatedDirection offset 0", fOffset, 0 )
+	lResult = lResult And TestNumberValue( "GetRotatedDirection 90", GetRotatedDirection( 90, 0, fOffset ), DIRECTION_EAST )
+	lResult = lResult And TestNumberValue( "GetRotatedDirection offset 90", fOffset, 0 )
+	lResult = lResult And TestNumberValue( "GetRotatedDirection 180", GetRotatedDirection( 180, 0, fOffset ), DIRECTION_SOUTH )
+	lResult = lResult And TestNumberValue( "GetRotatedDirection offset 180", fOffset, 0 )
+	lResult = lResult And TestNumberValue( "GetRotatedDirection 270", GetRotatedDirection( 270, 0, fOffset ), DIRECTION_WEST )
+	lResult = lResult And TestNumberValue( "GetRotatedDirection offset 270", fOffset, 0 )
+	
+	lResult = lResult And TestNumberValue( "GetRotatedDirection 45 10", GetRotatedDirection( 10, 45, fOffset ), DIRECTION_NORTH )
+	lResult = lResult And TestNumberValue( "GetRotatedDirection offset 0", fOffset, - 35 )
+	lResult = lResult And TestNumberValue( "GetRotatedDirection 45 125", GetRotatedDirection( 125, 45, fOffset ), DIRECTION_EAST )
+	lResult = lResult And TestNumberValue( "GetRotatedDirection offset 0", fOffset, - 10 )
+	lResult = lResult And TestNumberValue( "GetRotatedDirection 45 190", GetRotatedDirection( 235, 45, fOffset ), DIRECTION_SOUTH )
+	lResult = lResult And TestNumberValue( "GetRotatedDirection offset 0", fOffset, 10 )
+	lResult = lResult And TestNumberValue( "GetRotatedDirection 45 280", GetRotatedDirection( 359, 45, fOffset ), DIRECTION_WEST )
+	lResult = lResult And TestNumberValue( "GetRotatedDirection offset 0", fOffset, 44 )
+	
+	lResult = lResult And TestNumberValue( "GetRotatedDirection 180 0", GetRotatedDirection( 0, 180, fOffset ), DIRECTION_SOUTH )
+	lResult = lResult And TestNumberValue( "GetRotatedDirection offset 0", fOffset, 0 )
+	lResult = lResult And TestNumberValue( "GetRotatedDirection 180 90", GetRotatedDirection( 90, 180, fOffset ), DIRECTION_WEST )
+	lResult = lResult And TestNumberValue( "GetRotatedDirection offset 0", fOffset, 0 )
+	lResult = lResult And TestNumberValue( "GetRotatedDirection 180 180", GetRotatedDirection( 180, 180, fOffset ), DIRECTION_NORTH )
+	lResult = lResult And TestNumberValue( "GetRotatedDirection offset 0", fOffset, 0 )
+	lResult = lResult And TestNumberValue( "GetRotatedDirection 180 270", GetRotatedDirection( 270, 180, fOffset ), DIRECTION_EAST )
+	lResult = lResult And TestNumberValue( "GetRotatedDirection offset 0", fOffset, 0 )
+	
+	
+	TestGetRotatedDirection = lResult
+End Function
+
+Function TestCalculateDirections() As Logical
+	Dim lResult As Logical
+	lResult = TRUE
+	
+	Dim oObj As Object
+	Dim iDirections() As Integer
+	Dim fAverageOffset As Float
+	
+	Create Region Into Variable oObj 1 4 ( 1, 1 ) ( 1, 2 ) ( 2, 2 ) ( 2, 1 )
+	
+	fAverageOffset = CalculateDirections( oObj, 1, 0, iDirections )
+	lResult = lResult And TestNumberValue( "CalculateDirections Rect 0 1", iDirections(1), DIRECTION_NORTH )
+	lResult = lResult And TestNumberValue( "CalculateDirections Rect 0 2", iDirections(2), DIRECTION_EAST )
+	lResult = lResult And TestNumberValue( "CalculateDirections Rect 0 3", iDirections(3), DIRECTION_SOUTH )
+	lResult = lResult And TestNumberValue( "CalculateDirections Rect 0 4", iDirections(4), DIRECTION_WEST )
+	lResult = lResult And TestNumberValue( "CalculateDirections Rect 0 avg offset", fAverageOffset, 0 )
+	
+	'wonky
+	Create Region Into Variable oObj 1 4 ( 0.9, 1.1 ) ( 1.05, 2.05 ) ( 1.99, 2.02 ) ( 1.95, .99 )
+	
+	fAverageOffset = CalculateDirections( oObj, 1, 0, iDirections )
+	lResult = lResult And TestNumberValue( "CalculateDirections Wonky 0 1", iDirections(1), DIRECTION_NORTH )
+	lResult = lResult And TestNumberValue( "CalculateDirections Wonky 0 2", iDirections(2), DIRECTION_EAST )
+	lResult = lResult And TestNumberValue( "CalculateDirections Wonky 0 3", iDirections(3), DIRECTION_SOUTH )
+	lResult = lResult And TestNumberValue( "CalculateDirections Wonky 0 4", iDirections(4), DIRECTION_WEST )
+	lResult = lResult And TestNumberValue( "CalculateDirections Wonky 0 avg offset", Round( fAverageOffset, 0.001 ), Round( 3.801, 0.001 ) )
+	
+	TestCalculateDirections = lResult
+End Function
+
+Function TestRotatePoint() As Logical
+	Dim lResult As Logical
+	lResult = TRUE
+	
+	Dim oOrigin, oPoint, oResult As Object
+	oOrigin = CreatePoint( 1, 1 )
+	oPoint = CreatePoint( 1, 2 )
+	
+	oResult = RotatePoint( oPoint, oOrigin, 180 )
+	lResult = lResult And TestNumberValue( "Rotate Point 1 x", CentroidX( oResult ), 1 )
+	lResult = lResult And TestNumberValue( "Rotate Point 1 y", CentroidY( oResult ), 0 )
+	
+	oResult = RotatePoint( oPoint, oOrigin, 90 )
+	lResult = lResult And TestNumberValue( "Rotate Point 1 x", CentroidX( oResult ), 2 )
+	lResult = lResult And TestNumberValue( "Rotate Point 1 y", CentroidY( oResult ), 1 )
+	
+	oOrigin = CreatePoint( 1.5, 1.5 )
+	oPoint = CreatePoint( 1, 2 )
+	
+	oResult = RotatePoint( oPoint, oOrigin, 90 )
+	lResult = lResult And TestNumberValue( "Rotate Point float round error 1 x", CentroidX( oResult ), 2 )
+	lResult = lResult And TestNumberValue( "Rotate Point float round error 1 y", CentroidY( oResult ), 2 )
+	
+	oOrigin = CreatePoint( 1.5, 1.5 )
+	oPoint = CreatePoint( 2, 1 )
+	
+	oResult = RotatePoint( oPoint, oOrigin, 90 )
+	lResult = lResult And TestNumberValue( "Rotate Point float round error 2 x", CentroidX( oResult ), 1 )
+	lResult = lResult And TestNumberValue( "Rotate Point float round error 2 y", CentroidY( oResult ), 1 )
+	
+	
+	TestRotatePoint = lResult
+End Function
+
+Function TestRotateNodes() As Logical
+	Dim lResult As Logical
+	lResult = TRUE
+	
+	Dim oObj As Object
+	Dim iDirections() As Integer
+	Dim fAverageOffset As Float
+	
+	Set CoordSys Nonearth Units "m" Bounds ( 0, 0 ) ( 10, 10 )
+	Create Region Into Variable oObj 1 4 ( 1, 1 ) ( 1, 2 ) ( 2, 2 ) ( 2, 1 )
+	Dim oResult As Object
+	oResult = RotateNodes( oObj, 1, CreatePoint( 1.5, 1.5 ), 90 )
+	
+	lResult = lResult And TestNumberValue( "RotateNodes 1 x", ObjectNodeX( oResult, 1, 1 ), 1 )
+	lResult = lResult And TestNumberValue( "RotateNodes 1 y", ObjectNodeY( oResult, 1, 1 ), 2 )
+	lResult = lResult And TestNumberValue( "RotateNodes 2 x", ObjectNodeX( oResult, 1, 2 ), 2 )
+	lResult = lResult And TestNumberValue( "RotateNodes 2 y", ObjectNodeY( oResult, 1, 2 ), 2 )
+	lResult = lResult And TestNumberValue( "RotateNodes 3 x", ObjectNodeX( oResult, 1, 3 ), 2 )
+	lResult = lResult And TestNumberValue( "RotateNodes 3 y", ObjectNodeY( oResult, 1, 3 ), 1 )
+	lResult = lResult And TestNumberValue( "RotateNodes 4 x", ObjectNodeX( oResult, 1, 4 ), 1 )
+	lResult = lResult And TestNumberValue( "RotateNodes 4 y", ObjectNodeY( oResult, 1, 4 ), 1 )
+	
+	TestRotateNodes = lResult
+End Function

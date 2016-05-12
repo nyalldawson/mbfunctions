@@ -1,0 +1,11 @@
+[LINK]
+Application=test.mbx
+Module=..\mapbasic\mbfunctions.mbo
+Module=..\mapbasic\profile_code.mbo
+Module=test_main.mbo
+Module=test_utilities.mbo
+Module=test_mbfunctions.mbo
+Module=test_mbfunctions_gui.mbo
+Module=test_mbfunctions_dll.mbo
+Module=test_geofunctions.mbo
+

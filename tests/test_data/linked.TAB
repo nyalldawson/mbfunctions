@@ -1,0 +1,21 @@
+!table
+!version 400
+!charset WindowsLatin1
+
+Definition Table
+  Type LINKED Charset "WindowsLatin1"
+  Fields 2
+    depi_region_code Char (1) ;
+    ufi Float ;
+begin_metadata
+"\IsReadOnly" = "FALSE"
+"\MapInfo" = ""
+"\MapInfo\TableID" = "b5d8d6db-9f5b-4f70-aad5-83810d7bc326"
+"\DATALINK" = ""
+"\DATALINK\ConnectionString" =
+"DRIVER={PostgreSQL ANSI};DATABASE=gisdb;SERVER=gausvr001;PORT=5432;UID=postgres;SSLmode=disable;ReadOnly=0;Protocol=7.4;FakeOidIndex=0;ShowOidColumn=0;RowVersioning=0;ShowSystemTables=0;ConnSettings;Fetch=100;Socket=4096;UnknownSizes=0;M"
+"\DATALINK\ConnectionString\+1" =
+"axVarcharSize=255;MaxLongVarcharSize=8190;Debug=0;CommLog=0;Optimizer=0;Ksqo=1;UseDeclareFetch=0;TextAsLongVarchar=1;UnknownsAsLongVarchar=0;BoolsAsChar=1;Parse=0;CancelAsFreeStmt=0;ExtraSysTablePrefixes=dd_;LFConversion=1;UpdatableCurso"
+"\DATALINK\ConnectionString\+2" = "rs=1;DisallowPremature=0;TrueIsMinus1=0;BI=0;ByteaAsLongVarBinary=0;UseServerSidePrepare=1;LowerCaseIdentifier=0;GssAuthUseGSS=0;XaOpt=1"
+"\DATALINK\Query" = "select ""depi_region_code"" from ""gisdb"".""vmadmin"".""depi_region"""
+end_metadata

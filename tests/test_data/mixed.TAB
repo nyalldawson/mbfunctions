@@ -1,0 +1,15 @@
+!table
+!version 300
+!charset WindowsLatin1
+!edit_version 650
+
+Definition Table
+  Type NATIVE Charset "Neutral"
+  Fields 2
+    ID Integer ;
+    type Char (30) ;
+begin_metadata
+"\IsReadOnly" = "FALSE"
+"\MapInfo" = ""
+"\MapInfo\TableID" = "52cc697a-c402-4702-8277-d9638b2b5b52"
+end_metadata

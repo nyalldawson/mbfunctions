@@ -1,0 +1,1 @@
+<MI_WMS_MapDefinition version="1.0" wms_version="1.3.0"><HTTP GetCapabilities="xx" GetMap="xx"/><Exception format="XML"/><SRS>EPSG:4326</SRS><Image bgcolor="16777215" transparent="true" format="image/png"/><Layer><Name>response_zones</Name><Style></Style><LatLonBoundingBox minx="-180" miny="-90" maxx="180" maxy="90"/></Layer></MI_WMS_MapDefinition>

@@ -1,0 +1,43 @@
+Include "test.def"
+
+Sub Main
+	Print Chr$(12)
+	
+	Dim lResult As Logical
+	lResult = TRUE
+	
+	' Test mb_functions
+	lResult = lResult And TestMbFunctions()
+	Print TEST_LOG
+	TEST_LOG = ""
+	If Not lResult Then
+		Note lResult
+		Exit Sub
+	End If
+	If MsgBox( "Test GUI functions?", "Test", vbYesNo + vbQuestion ) = vbYes Then
+		lResult = lResult And TestMbFunctionsGui()
+		Print TEST_LOG
+		TEST_LOG = ""
+		If Not lResult Then
+			Note lResult
+			Exit Sub
+		End If
+	End If
+	
+	lResult = lResult And TestMbFunctionsDll()
+	Print TEST_LOG
+	TEST_LOG = ""
+	If Not lResult Then
+		Note lResult
+		Exit Sub
+	End If
+	lResult = lResult And TestGeoFunctions()
+	Print TEST_LOG
+	TEST_LOG = ""
+	If Not lResult Then
+		Note lResult
+		Exit Sub
+	End If
+	
+	Note lResult
+End Sub

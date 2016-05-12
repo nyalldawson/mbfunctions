@@ -1,0 +1,7 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TileServerInfo Type="LevelRowColumn">
+  <Url>http://services.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{LEVEL}/{COL}/{ROW}.png</Url>
+  <MinLevel>0</MinLevel>
+  <MaxLevel>18</MaxLevel>
+  <TileSize Height="256" Width="256" />	
+</TileServerInfo>

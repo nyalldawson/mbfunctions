@@ -1,0 +1,2349 @@
+Include "test.def"
+
+Declare Function TestReplace() As Logical
+Declare Function TestStripLeft() As Logical
+Declare Function TestStripRight() As Logical
+Declare Function TestAlterLineStyle() As Logical
+Declare Function TestAlterSymbolStyle() As Logical
+Declare Function TestAlterRegionStyle() As Logical
+Declare Function TestAlterFontStyle() As Logical
+Declare Function TestGetLayerNumber() As Logical
+Declare Function TestIsNum() As Logical
+Declare Function TestTrim() As Logical
+Declare Function TestCountOccurances() As Logical
+Declare Function TestInstrRev() As Logical
+Declare Function TestLayerExists() As Logical
+Declare Function TestLayerExistsInWindow() As Logical
+Declare Function TestLayerVisible() As Logical
+Declare Function TestColumnExists() As Logical
+Declare Function TestSortStringArray() As Logical
+Declare Function TestSortPartStringArray() As Logical
+Declare Function TestMakeRandomFilename() As Logical
+Declare Function TestLayerElsewhere() As Logical
+Declare Function TestMakeFilenameSafe() As Logical
+Declare Function TestTableExists() As Logical
+Declare Function TestTabFileOpen() As Logical
+Declare Function TestIif() As Logical
+Declare Function TestIifVal() As Logical
+Declare Function TestRepeat() As Logical
+Declare Function TestSafeClose() As Logical
+Declare Function TestSafeOpen() As Logical
+Declare Function TestSafeOpenWorkspace() As Logical
+Declare Function TestPrepareArray() As Logical
+Declare Function TestMonthNumToShortName() As Logical
+Declare Function TestGetTopVisibleLayer() As Logical
+Declare Function TestExplode() As Logical
+Declare Function TestJoinFunction() As Logical
+Declare Function TestFilepathToUrl() As Logical
+Declare Function TestEventLength() As Logical
+Declare Function TestRealWeekDay() As Logical
+Declare Function TestDayNumToLetter() As Logical
+Declare Function TestPushStringArray() As Logical
+Declare Function TestPopStringArray() As Logical
+Declare Function TestPushIntegerArray() As Logical
+Declare Function TestInitializeStringArray() As Logical
+Declare Function TestArrayContains() As Logical
+Declare Function TestRemoveStringFromArray() As Logical
+Declare Function TestGetEndOfLine() As Logical
+Declare Function TestGetStartOfLine() As Logical
+Declare Function TestProjectPoint() As Logical
+Declare Function TestGetBearing() As Logical
+Declare Function TestQueryToTable() As Logical
+Declare Function TestGetUserId() As Logical
+Declare Function TestRandomPointInPolygon() As Logical
+Declare Function TestCeil() As Logical
+Declare Function TestRandomiseCoord() As Logical
+Declare Function TestShiftPointByRandomDist() As Logical
+Declare Function TestTemporalOverlap() As Logical
+Declare Function TestTemporalOverlap1Int() As Logical
+Declare Function TestBufferTime() As Logical
+Declare Function TestDateTimeCentroid() As Logical
+Declare Function TestGetTableList() As Logical
+Declare Function TestGetWriteableTables() As Logical
+Declare Function TestRecursiveSearchFiles() As Logical
+Declare Function TestFindFiles() As Logical
+Declare Function TestDrawInCosmetic() As Logical
+Declare Function TestSquareBuffer() As Logical
+Declare Function TestShrinkLine() As Logical
+Declare Function TestCreateLineBetweenPoints() As Logical
+Declare Function TestGetPortionOfLine() As Logical
+Declare Function TestNodePoint() As Logical
+Declare Function TestIsSubFolder() As Logical
+Declare Function TestIsDate() As Logical
+Declare Function TestTableIsVector() As Logical
+Declare Function TestGetColumnList() As Logical
+Declare Function TestBitwiseTest() As Logical
+Declare Function TestObjectIsPolygon() As Logical
+Declare Function TestSelectionIsPolygons() As Logical
+Declare Function TestConcatWithSeperator() As Logical
+Declare Function TestPrettyStringArray() As Logical
+Declare Function TestConvertDate() As Logical
+Declare Function TestConvertTime() As Logical
+Declare Function TestGetWindowsVersion() As Logical
+Declare Function TestGetWorkstationName() As Logical
+Declare Function TestWordWrap() As Logical
+Declare Function TestIsLeapYear() As Logical
+Declare Function TestDaysInMonth() As Logical
+Declare Function TestTrimColumnListToExisting() As Logical
+
+
+Function TestMbFunctions() As Logical
+	Dim lResult As Logical
+	lResult = TRUE
+	
+	Close All
+	
+	' Test Replace function
+	lResult = lResult And TestReplace()
+	' Test StripLeft function
+	lResult = lResult And TestStripLeft()
+	' Test StripRight function
+	lResult = lResult And TestStripRight()
+	' Test AlterLineStyle function
+	lResult = lResult And TestAlterLineStyle()
+	' Test AlterSymbolStyle function
+	lResult = lResult And TestAlterSymbolStyle()
+	' Test AlterRegionStyle function
+	lResult = lResult And TestAlterRegionStyle()
+	' Test AlterFontStyle function
+	lResult = lResult And TestAlterFontStyle()
+	' Test GetLayerNumber function
+	lResult = lResult And TestGetLayerNumber()
+	' Test IsNum function
+	lResult = lResult And TestIsNum()
+	' Test Trim function
+	lResult = lResult And TestTrim()
+	' Test CountOccurences function
+	lResult = lResult And TestCountOccurances()
+	' Test InstrRev function
+	lResult = lResult And TestInstrRev()
+	' Test LayerExists function
+	lResult = lResult And TestLayerExists()
+	' Test LayerExistsInWindow function
+	lResult = lResult And TestLayerExistsInWindow()
+	' Test LayerVisible function
+	lResult = lResult And TestLayerVisible()
+	' Test ColumnExists function
+	lResult = lResult And TestColumnExists()
+	' Test SortStringArray procedure
+	lResult = lResult And TestSortStringArray()
+	' Test SortPartStringArray procedure
+	lResult = lResult And TestSortPartStringArray()
+	' Test MakeRandomFilename function
+	lResult = lResult And TestMakeRandomFilename()
+	' Test LayerElsewhere function
+	lResult = lResult And TestLayerElsewhere()
+	' Test MakeFilenameSafe$ function
+	lResult = lResult And TestMakeFilenameSafe()
+	' Test TableExists function
+	lResult = lResult And TestTableExists()
+	' Test TabFileOpen function
+	lResult = lResult And TestTabFileOpen()
+	' Test IIf function
+	lResult = lResult And TestIif()
+	' Test IIfVal function
+	lResult = lResult And TestIifVal()
+	' Test Repeat function
+	lResult = lResult And TestRepeat()
+	' Test SafeClose function
+	lResult = lResult And TestSafeClose()
+	' Test SafeOpen function
+	lResult = lResult And TestSafeOpen()
+	' Test SafeOpenWorkspace function
+	lResult = lResult And TestSafeOpenWorkspace()
+	' Test PrepareArray function
+	lResult = lResult And TestPrepareArray()
+	' Test MonthNumToShortName function
+	lResult = lResult And TestMonthNumToShortName()
+	' Test GetTopVisibleLayer function
+	lResult = lResult And TestGetTopVisibleLayer()
+	' Test Explode function
+	lResult = lResult And TestExplode()
+	' Test Join function
+	lResult = lResult And TestJoinFunction()
+	' Test FilePathToUrl
+	lResult = lResult And TestFilepathToUrl()
+	' Test EventLength
+	lResult = lResult And TestEventLength()
+	' Test RealWeekDay
+	lResult = lResult And TestRealWeekDay()
+	' Test DayNumToLetter
+	lResult = lResult And TestDayNumToLetter()
+	' Test PushStringArray
+	lResult = lResult And TestPushStringArray()
+	' Test PopStringFromArray
+	lResult = lResult And TestPopStringArray()
+	' Test PushIntegerArray
+	lResult = lResult And TestPushIntegerArray()
+	' Test InitializeStringArray
+	lResult = lResult And TestInitializeStringArray()
+	' Test ArrayContains
+	lResult = lResult And TestArrayContains()
+	' Test RemoveStringFromArray
+	lResult = lResult And TestRemoveStringFromArray()
+	' Test GetEndOfLine
+	lResult = lResult And TestGetEndOfLine()
+	' Test GetStartOfLine
+	lResult = lResult And TestGetStartOfLine()
+	' Test ProjectPoint
+	lResult = lResult And TestProjectPoint()
+	' Test GetBearing
+	lResult = lResult And TestGetBearing()
+	'Test QueryToTable
+	lResult = lResult And TestQueryToTable()
+	'Test GetUserId
+	lResult = lResult And TestGetUserId()
+	'Test RandomPointInPolygon
+	lResult = lResult And TestRandomPointInPolygon()
+	'Test Ceil
+	lResult = lResult And TestCeil()
+	'Test RandomiseCoord
+	lResult = lResult And TestRandomiseCoord()
+	'Test hiftPointByRandomDist
+	lResult = lResult And TestShiftPointByRandomDist()
+	'Test TemporalOverlap
+	lResult = lResult And TestTemporalOverlap()
+	'Test TemporalOverlap1Interval
+	lResult = lResult And TestTemporalOverlap1Int()
+	'Test BufferTime
+	lResult = lResult And TestBufferTime()
+	'Test DateTimeCentroid
+	lResult = lResult And TestDateTimeCentroid()
+	'Test GetWriteableTables
+	lResult = lResult And TestGetWriteableTables()
+	'Test RecursiveSearchFiles
+	lResult = lResult And TestRecursiveSearchFiles()
+	'Test FindFiles
+	lResult = lResult And TestFindFiles()
+	'Test DrawInCosmetic
+	lResult = lResult And TestDrawInCosmetic()
+	'Test SquareBuffer
+	lResult = lResult And TestSquareBuffer()
+	'Test ShrinkLine
+	lResult = lResult And TestShrinkLine()
+	' Test GetTables
+	lResult = lResult And TestGetTableList()
+	' Test CreateLineBetweenPoints function
+	lResult = lResult And TestCreateLineBetweenPoints()
+	' Test GetPortionOfLine function
+	lResult = lResult And TestGetPortionOfLine()
+	' Test NodePoint function
+	lResult = lResult And TestNodePoint()
+	' Test IsSubFolder Function
+	lResult = lResult And TestIsSubFolder()
+	' Test IsDate function
+	lResult = lResult And TestIsDate()
+	' Test TableIsVector function
+	lResult = lResult And TestTableIsVector()
+	' Test GetColumnList function
+	lResult = lResult And TestGetColumnList()
+	' Test BitwiseTest function
+	lResult = lResult And TestBitwiseTest()
+	' Test ObjectIsPolygon function
+	lResult = lResult And TestObjectIsPolygon()
+	' Test SelectionIsPolygons function
+	lResult = lResult And TestSelectionIsPolygons()
+	' Test ConcatWithSeperator function
+	lResult = lResult And TestConcatWithSeperator()
+	' Test PrettyStringArray function
+	lResult = lResult And TestPrettyStringArray()
+	' Test ConvertDate function
+	lResult = lResult And TestConvertDate()
+	' Test ConvertTime function
+	lResult = lResult And TestConvertTime()
+	' Test GetWindowsVersion function
+	lResult = lResult And TestGetWindowsVersion()
+	' Test GetWorkstationName function
+	lResult = lResult And TestGetWorkstationName()
+	' Test WordWrap function
+	lResult = lResult And TestWordWrap()
+	' Test IsLeapYear function
+	lResult = lResult And TestIsLeapYear()
+	' Test DaysInMonth function
+	lResult = lResult And TestDaysInMonth()
+	' Test TestTrimColumnListToExisting function
+	lResult = lResult And TestTrimColumnListToExisting()
+	
+	TestMbFunctions = lResult
+End Function
+
+Function TestReplace() As Logical
+	Dim lResult As Logical
+	lResult = TRUE
+	
+	lResult = lResult And TestStringValue( "Replace simple", Replace$( "pig face", "pig", "goat" ), "goat face" )
+	lResult = lResult And TestStringValue( "Replace full", Replace$( "horse", "horse", "goat" ), "goat" )
+	lResult = lResult And TestStringValue( "Replace missing", Replace$( "horse", "zebra", "goat" ), "horse" )
+	lResult = lResult And TestStringValue( "Replace empty", Replace$( "", "zebra", "goat" ), "" )
+	lResult = lResult And TestStringValue( "Replace with empty", Replace$( "pig face", "pig", "" ), " face" )
+	lResult = lResult And TestStringValue( "Replace null", Replace$( "", "", "" ), "" )
+	lResult = lResult And TestStringValue( "Replace recursive", Replace$( "pig face", "pig", "pig pig" ), "pig pig face" )
+	lResult = lResult And TestStringValue( "Replace bad characters", Replace$( Chr$(34), Chr$(9), Chr$(13)), """" )
+	
+	TestReplace = lResult
+End Function
+
+Function TestStripLeft() As Logical
+	Dim lResult As Logical
+	lResult = TRUE
+	
+	lResult = lResult And TestStringValue( "Strip left simple", StripLeft$( "     spaces before    ", " " ), "spaces before    " )
+	lResult = lResult And TestStringValue( "Strip left none", StripLeft$( "test string", " " ), "test string" )
+	lResult = lResult And TestStringValue( "Strip left no character", StripLeft$( "   test string", "" ), "   test string" )
+	lResult = lResult And TestStringValue( "Strip other character", StripLeft$( "aaaaatest string", "a" ), "test string" )
+	lResult = lResult And TestStringValue( "Strip two character", StripLeft$( "abababtest string", "ab" ), "abababtest string" )
+	
+	TestStripLeft = lResult
+End Function
+
+Function TestStripRight() As Logical
+	Dim lResult As Logical
+	lResult = TRUE
+	
+	lResult = lResult And TestStringValue( "Strip right simple", StripRight$( "     spaces after    ", " " ), "     spaces after" )
+	lResult = lResult And TestStringValue( "Strip right none", StripRight$( "test string", " " ), "test string" )
+	lResult = lResult And TestStringValue( "Strip right no character", StripRight$( "test string    ", "" ), "test string    " )
+	lResult = lResult And TestStringValue( "Strip right other character", StripRight$( "test stringaaaaa", "a" ), "test string" )
+	lResult = lResult And TestStringValue( "Strip right two character", StripRight$( "test stringababab", "ab" ), "test stringababab" )
+	
+	TestStripRight = lResult
+End Function
+
+Function TestSortStringArray() As Logical
+	Dim lResult As Logical
+	lResult = TRUE
+	
+	Dim sTestArray(5) As String
+	sTestArray(1) = "ccc ccc ccc ccc"
+	sTestArray(2) = "G"
+	sTestArray(3) = "75abc"
+	sTestArray(4) = ""
+	sTestArray(5) = "!"
+	
+	Call SortStringArray( sTestArray )
+	
+	lResult = lResult And TestStringValue( "Sort string array 1", sTestArray(1), "" )
+	lResult = lResult And TestStringValue( "Sort string array 2", sTestArray(2), "!" )
+	lResult = lResult And TestStringValue( "Sort string array 3", sTestArray(3), "75abc" )
+	lResult = lResult And TestStringValue( "Sort string array 4", sTestArray(4), "ccc ccc ccc ccc" )
+	lResult = lResult And TestStringValue( "Sort string array 5", sTestArray(5), "G" )
+	
+	TestSortStringArray = lResult
+End Function
+
+Function TestSortPartStringArray() As Logical
+	Dim lResult As Logical
+	lResult = TRUE
+	
+	Dim sTestArray(5) As String
+	sTestArray(1) = "ccc ccc ccc ccc"
+	sTestArray(2) = "g"
+	sTestArray(3) = "75abc"
+	sTestArray(4) = ""
+	sTestArray(5) = "!"
+	Call SortPartStringArray( sTestArray, 2, 4 )
+	
+	lResult = lResult And TestStringValue( "Sort part string array 1", sTestArray(1), "ccc ccc ccc ccc" )
+	lResult = lResult And TestStringValue( "Sort part string array 2", sTestArray(2), "" )
+	lResult = lResult And TestStringValue( "Sort part string array 3", sTestArray(3), "75abc" )
+	lResult = lResult And TestStringValue( "Sort part string array 4", sTestArray(4), "g" )
+	lResult = lResult And TestStringValue( "Sort part string array 5", sTestArray(5), "!" )
+	
+	TestSortPartStringArray = lResult
+End Function
+
+Function TestAlterLineStyle() As Logical
+	Dim lResult As Logical
+	lResult = TRUE
+	
+	Dim oLine As Object
+	oLine = CreateLine( 1, 1, 2, 2 )
+	Dim oResult As Object
+	oResult = AlterLineStyle( oLine, MakePen( 3, 9, RED ))
+	
+	' Check Results
+	Dim pResult As Pen
+	pResult = ObjectInfo( oResult, OBJ_INFO_PEN )
+	
+	lResult = lResult And TestNumberValue( "Alter Line pen width", StyleAttr( pResult, PEN_WIDTH ), 3 )
+	lResult = lResult And TestNumberValue( "Alter Line pen color", StyleAttr( pResult, PEN_COLOR ), RED )
+	lResult = lResult And TestNumberValue( "Alter Line pen pattern", StyleAttr( pResult, PEN_PATTERN ), 9 )
+	
+	TestAlterLineStyle = lResult
+End Function
+
+Function TestAlterSymbolStyle() As Logical
+	Dim lResult As Logical
+	lResult = TRUE
+	
+	Dim oPoint As Object
+	oPoint = CreatePoint( 1, 1 )
+	Dim oResult As Object
+	oResult = AlterSymbolStyle( oPoint, MakeFontSymbol( 65, RED, 24, "WingDings", 32, 45 ) )
+	
+	' Check Results
+	Dim symResult As Symbol
+	symResult = ObjectInfo( oResult, OBJ_INFO_SYMBOL )
+	
+	lResult = lResult And TestNumberValue( "Alter symbol code", StyleAttr( symResult, SYMBOL_CODE ), 65 )
+	lResult = lResult And TestNumberValue( "Alter symbol  color", StyleAttr( symResult, SYMBOL_COLOR ), RED )
+	lResult = lResult And TestNumberValue( "Alter symbol  point size", StyleAttr( symResult, SYMBOL_POINTSIZE ), 24 )
+	lResult = lResult And TestStringValue( "Alter symbol  font name", StyleAttr( symResult, SYMBOL_FONT_NAME ), "WingDings" )
+	lResult = lResult And TestNumberValue( "Alter symbol  font style", StyleAttr( symResult, SYMBOL_FONT_STYLE ), 32 )
+	lResult = lResult And TestNumberValue( "Alter symbol  rotation", StyleAttr( symResult, SYMBOL_ANGLE ), 45 )
+	
+	TestAlterSymbolStyle = lResult
+End Function
+
+Function TestAlterRegionStyle() As Logical
+	Dim lResult As Logical
+	lResult = TRUE
+	
+	Dim oRegion As Object
+	Create Rect Into Variable oRegion ( 1, 1 )( 2, 2 )
+	Dim oResult As Object
+	oResult = AlterRegionStyle( oRegion, MakeBrush( 64, CYAN, BLUE ), MakePen( 3, 9, RED ) )
+	
+	' Check Results
+	Dim bResult As Brush
+	bResult = ObjectInfo( oResult, OBJ_INFO_BRUSH )
+	
+	lResult = lResult And TestNumberValue( "Alter region brush pattern", StyleAttr( bResult, BRUSH_PATTERN ), 64 )
+	lResult = lResult And TestNumberValue( "Alter region brush color 1", StyleAttr( bResult, BRUSH_FORECOLOR ), CYAN )
+	lResult = lResult And TestNumberValue( "Alter region brush color 2", StyleAttr( bResult, BRUSH_BACKCOLOR ), BLUE )
+	
+	Dim pResult As Pen
+	pResult = ObjectInfo( oResult, OBJ_INFO_PEN )
+	
+	lResult = lResult And TestNumberValue( "Alter region pen width", StyleAttr( pResult, PEN_WIDTH ), 3 )
+	lResult = lResult And TestNumberValue( "Alter region pen color", StyleAttr( pResult, PEN_COLOR ), RED )
+	lResult = lResult And TestNumberValue( "Alter region pen pattern", StyleAttr( pResult, PEN_PATTERN ), 9 )
+	
+	TestAlterRegionStyle = lResult
+End Function
+
+Function TestAlterFontStyle() As Logical
+	Dim lResult As Logical
+	lResult = TRUE
+	
+	Dim oText As Object
+	Create Text Into Variable oText "1" ( 1, 1 )( 2, 2 )
+	Dim oResult As Object
+	oResult = AlterFontStyle( oText, MakeFont( "Arial", 1, 20, BLACK, WHITE ) )
+	
+	' Check Results
+	Dim fonResult As Font
+	fonResult = ObjectInfo( oResult, OBJ_INFO_TEXTFONT )
+	
+	lResult = lResult And TestStringValue( "Alter font name", StyleAttr( fonResult, FONT_NAME ), "Arial" )
+	lResult = lResult And TestNumberValue( "Alter font style", StyleAttr( fonResult, FONT_STYLE ), 1 )
+	lResult = lResult And TestNumberValue( "Alter font point size", StyleAttr( fonResult, FONT_POINTSIZE ), 20 )
+	lResult = lResult And TestNumberValue( "Alter font color1", StyleAttr( fonResult, FONT_FORECOLOR ), BLACK )
+	lResult = lResult And TestNumberValue( "Alter font color2", StyleAttr( fonResult, FONT_BACKCOLOR ), WHITE )
+	
+	TestAlterFontStyle = lResult
+End Function
+
+Function TestGetLayerNumber() As Logical
+	Dim lResult As Logical
+	lResult = TRUE
+	
+	Open Table ApplicationDirectory$() + "test_data\rect.tab" As RectTable1
+	Open Table ApplicationDirectory$() + "test_data\rect2.tab" As RectTable2
+	Open Table ApplicationDirectory$() + "test_data\rect3.tab" As RectTable3
+	Open Table ApplicationDirectory$() + "test_data\rect4.tab" As RectTable4
+	
+	Map From RectTable1, RectTable2, RectTable3
+	
+	lResult = lResult And TestNumberValue( "Get layer number", GetLayerNumber( "RectTable1" ), 1 )
+	lResult = lResult And TestNumberValue( "Get layer number 2", GetLayerNumber( "RectTable2" ), 2 )
+	lResult = lResult And TestNumberValue( "Get layer number 3", GetLayerNumber( "RectTable3" ), 3 )
+	lResult = lResult And TestNumberValue( "Get layer number missing", GetLayerNumber( "RectTable4" ), 0 )
+	
+	Close All
+	
+	TestGetLayerNumber = lResult
+End Function
+
+Function TestIsNum() As Logical
+	Dim lResult As Logical
+	lResult = TRUE
+	
+	lResult = lResult And TestLogicalValue( "IsNum 1", IsNum( "1" ), TRUE )
+	lResult = lResult And TestLogicalValue( "IsNum 1.123", IsNum( "1.123" ), TRUE )
+	lResult = lResult And TestLogicalValue( "IsNum -99999", IsNum( "-99999" ), TRUE )
+	lResult = lResult And TestLogicalValue( "IsNum -12.6789", IsNum( "-12.6789" ), TRUE )
+	lResult = lResult And TestLogicalValue( "IsNum 0", IsNum( "0" ), TRUE )
+	lResult = lResult And TestLogicalValue( "IsNum 00010", IsNum( "00010" ), TRUE )
+	lResult = lResult And TestLogicalValue( "IsNum 000.10", IsNum( "000.10" ), TRUE )
+	lResult = lResult And TestLogicalValue( "IsNum 1000", IsNum( "1000" ), TRUE )
+	lResult = lResult And TestLogicalValue( "IsNum .", IsNum( "." ), FALSE )
+	lResult = lResult And TestLogicalValue( "IsNum 0a", IsNum( "0a" ), FALSE )
+	lResult = lResult And TestLogicalValue( "IsNum abc", IsNum( "abc" ), FALSE )
+	lResult = lResult And TestLogicalValue( "IsNum   10", IsNum( "  10" ), FALSE )
+	lResult = lResult And TestLogicalValue( "IsNum null", IsNum( "" ), FALSE )
+	lResult = lResult And TestLogicalValue( "IsNum 0.04.01", IsNum( "0.04.01" ), FALSE )
+	lResult = lResult And TestLogicalValue( "IsNum 0.04166667", IsNum( "0.04166667" ), TRUE )
+	
+	TestIsNum = lResult
+End Function
+
+Function TestTrim() As Logical
+	Dim lResult As Logical
+	lResult = TRUE
+	
+	lResult = lResult And TestStringValue( "Trim simple", Trim$( "    a a a    " ), "a a a" )
+	lResult = lResult And TestStringValue( "Trim none", Trim$( "a a a" ), "a a a" )
+	lResult = lResult And TestStringValue( "Trim null", Trim$( "" ), "" )
+	
+	TestTrim = lResult
+End Function
+
+Function TestCountOccurances() As Logical
+	Dim lResult As Logical
+	lResult = TRUE
+	
+	lResult = lResult And TestNumberValue( "CountOccurances simple", CountOccurances( "abc abc abc", "a" ), 3 )
+	lResult = lResult And TestNumberValue( "CountOccurances none", CountOccurances( "a a a", "b" ), 0 )
+	lResult = lResult And TestNumberValue( "CountOccurances null", CountOccurances( "a a a", "" ), 0 )
+	lResult = lResult And TestNumberValue( "CountOccurances null 2", CountOccurances( "", "a" ), 0 )
+	lResult = lResult And TestNumberValue( "CountOccurances long string", CountOccurances( "abc abc abc", "abc" ), 3 )
+	
+	TestCountOccurances = lResult
+End Function
+
+Function TestInstrRev() As Logical
+	Dim lResult As Logical
+	lResult = TRUE
+	
+	lResult = lResult And TestNumberValue( "InstrRev simple", InstrRev( "abc abc abc", "a" ), 9 )
+	lResult = lResult And TestNumberValue( "InstrRev none", InstrRev( "a a a", "b" ), 0 )
+	lResult = lResult And TestNumberValue( "InstrRev first", InstrRev( "b a a", "b" ), 1 )
+	lResult = lResult And TestNumberValue( "InstrRev null", InstrRev( "a a a", "" ), 0 )
+	lResult = lResult And TestNumberValue( "InstrRev null 2", InstrRev( "", "a" ), 0 )
+	lResult = lResult And TestNumberValue( "InstrRev long string", InstrRev( "abc abc abc", "abc" ), 9 )
+	
+	TestInstrRev = lResult
+End Function
+
+Function TestLayerExists() As Logical
+	Dim lResult As Logical
+	lResult = TRUE
+	
+	Open Table ApplicationDirectory$() + "test_data\rect.tab" As RectTable1
+	Open Table ApplicationDirectory$() + "test_data\rect2.tab" As RectTable2
+	Open Table ApplicationDirectory$() + "test_data\rect3.tab" As RectTable3
+	Open Table ApplicationDirectory$() + "test_data\rect4.tab" As RectTable4
+	
+	Map From RectTable1
+	Map From RectTable2, RectTable3
+	
+	lResult = lResult And TestLogicalValue( "Test layer exists 1", LayerExists( "RectTable1" ), FALSE )
+	lResult = lResult And TestLogicalValue( "Test layer exists 2", LayerExists( "RectTable2" ), TRUE )
+	lResult = lResult And TestLogicalValue( "Test layer exists 3", LayerExists( "RectTable3" ), TRUE )
+	lResult = lResult And TestLogicalValue( "Test layer exists 4", LayerExists( "RectTable4" ), FALSE )
+	
+	Close All
+	
+	TestLayerExists = lResult
+End Function
+
+Function TestLayerExistsInWindow() As Logical
+	Dim lResult As Logical
+	lResult = TRUE
+	
+	Open Table ApplicationDirectory$() + "test_data\rect.tab" As RectTable1
+	Open Table ApplicationDirectory$() + "test_data\rect2.tab" As RectTable2
+	Open Table ApplicationDirectory$() + "test_data\rect3.tab" As RectTable3
+	Open Table ApplicationDirectory$() + "test_data\rect4.tab" As RectTable4
+	
+	Map From RectTable1
+	Dim iWindow1 As Integer
+	iWindow1 = FrontWindow()
+	Map From RectTable2, RectTable3
+	Dim iWindow2 As Integer
+	iWindow2 = FrontWindow()
+	
+	lResult = lResult And TestLogicalValue( "Test layer exists in window 1", LayerExistsInWindow( "RectTable1", iWindow1 ), TRUE )
+	lResult = lResult And TestLogicalValue( "Test layer exists in window 2", LayerExistsInWindow( "RectTable1", iWindow2 ), FALSE )
+	lResult = lResult And TestLogicalValue( "Test layer exists in window 3", LayerExistsInWindow( "RectTable2", iWindow1 ), FALSE )
+	lResult = lResult And TestLogicalValue( "Test layer exists in window 4", LayerExistsInWindow( "RectTable2", iWindow2 ), TRUE )
+	lResult = lResult And TestLogicalValue( "Test layer exists in window 5", LayerExistsInWindow( "RectTable3", iWindow2 ), TRUE )
+	lResult = lResult And TestLogicalValue( "Test layer exists in window 6", LayerExistsInWindow( "RectTable4", iWindow1 ), FALSE )
+	lResult = lResult And TestLogicalValue( "Test layer exists in window 7", LayerExistsInWindow( "RectTable4", iWindow2 ), FALSE )
+	
+	Close All
+	
+	TestLayerExistsInWindow = lResult
+End Function
+
+Function TestLayerVisible() As Logical
+	Dim lResult As Logical
+	lResult = TRUE
+	
+	Open Table ApplicationDirectory$() + "test_data\rect.tab" As RectTable1
+	Open Table ApplicationDirectory$() + "test_data\rect2.tab" As RectTable2
+	Open Table ApplicationDirectory$() + "test_data\rect3.tab" As RectTable3
+	Open Table ApplicationDirectory$() + "test_data\rect4.tab" As RectTable4
+	
+	Map From RectTable1
+	Map From RectTable2, RectTable3
+	Set Map Window FrontWindow() Layer 1 Display Off
+	
+	lResult = lResult And TestLogicalValue( "Test layer visible 1", LayerVisible( "RectTable1" ), FALSE )
+	lResult = lResult And TestLogicalValue( "Test layer visible 2", LayerVisible( "RectTable2" ), FALSE )
+	lResult = lResult And TestLogicalValue( "Test layer visible 3", LayerVisible( "RectTable3" ), TRUE )
+	lResult = lResult And TestLogicalValue( "Test layer visible 4", LayerVisible( "RectTable4" ), FALSE )
+	
+	Close All
+	
+	TestLayerVisible = lResult
+End Function
+
+Function TestColumnExists() As Logical
+	Dim lResult As Logical
+	lResult = TRUE
+	
+	Open Table ApplicationDirectory$() + "test_data\rect.tab" As RectTable1
+	
+	lResult = lResult And TestLogicalValue( "Test column exists missing", ColumnExists( "RectTable1", "a" ), FALSE )
+	lResult = lResult And TestLogicalValue( "Test column exists true", ColumnExists( "RectTable1", "id" ), TRUE )
+	lResult = lResult And TestLogicalValue( "Test column exists null", ColumnExists( "RectTable1", "" ), FALSE )
+	lResult = lResult And TestLogicalValue( "Test column exists no table", ColumnExists( "RectTable2", "a" ), FALSE )
+	lResult = lResult And TestLogicalValue( "Test column exists null table", ColumnExists( "", "a" ), FALSE )
+	
+	Close All
+	
+	TestColumnExists = lResult
+End Function
+
+Function TestMakeRandomFilename() As Logical
+	Dim lResult As Logical
+	lResult = TRUE
+	
+	Dim sFilename As String
+	sFilename = MakeRandomFilename$( "C:", ".tab" )
+	
+	lResult = lResult And TestLogicalValue( "Random filename exists", FileExists( sFilename ), FALSE )
+	
+	sFilename = MakeRandomFilename$( "C:", ".tab" )
+	lResult = lResult And TestStringValue( "Random filename extension 1", Right$( sFilename, 4 ), ".tab" )
+	sFilename = MakeRandomFilename$( "C:", "tif" )
+	lResult = lResult And TestStringValue( "Random filename extension 2", Right$( sFilename, 4 ), ".tif" )
+	
+	sFilename = MakeRandomFilename$( "C:", "tab" )
+	lResult = lResult And TestStringValue( "Random filename path 1", Left$( sFilename, 3 ), "C:\" )
+	
+	TestMakeRandomFilename = lResult
+End Function
+
+Function TestLayerElsewhere() As Logical
+	Dim lResult As Logical
+	lResult = TRUE
+	
+	Open Table ApplicationDirectory$() + "test_data\rect.tab" As RectTable1
+	Open Table ApplicationDirectory$() + "test_data\rect2.tab" As RectTable2
+	Open Table ApplicationDirectory$() + "test_data\rect3.tab" As RectTable3
+	Open Table ApplicationDirectory$() + "test_data\rect4.tab" As RectTable4
+	
+	Map From RectTable1
+	Map From RectTable2, RectTable3
+	Set Map Window FrontWindow() Layer 1 Display Off
+	
+	lResult = lResult And TestLogicalValue( "Test layer elsewhere 1", LayerElsewhere( "RectTable1" ), TRUE )
+	lResult = lResult And TestLogicalValue( "Test layer elsewhere 2", LayerElsewhere( "RectTable2" ), FALSE )
+	lResult = lResult And TestLogicalValue( "Test layer elsewhere 3", LayerElsewhere( "RectTable3" ), FALSE )
+	lResult = lResult And TestLogicalValue( "Test layer elsewhere 4", LayerElsewhere( "RectTable4" ), FALSE )
+	
+	Close All
+	
+	TestLayerElsewhere = lResult
+End Function
+
+Function TestMakeFilenameSafe() As Logical
+	Dim lResult As Logical
+	lResult = TRUE
+	
+	Open Table ApplicationDirectory$() + "test_data\rect.tab" As RectTable
+	Open Table ApplicationDirectory$() + "test_data\rect2.tab" As TestTable_1
+	Open Table ApplicationDirectory$() + "test_data\rect3.tab" As Long56789012345678901234567890
+	
+	lResult = lResult And TestStringValue( "Make filename safe existing", MakeFilenameSafe$( "RectTable" ), "RectTable_1" )
+	lResult = lResult And TestStringValue( "Make filename safe existing 2", MakeFilenameSafe$( "TestTable_1" ), "TestTable_2" )
+	lResult = lResult And TestStringValue( "Make filename safe bad chars", MakeFilenameSafe$( "I'm a 1 bad^ f*i()len~Me" ), "I_m_a_1_bad__f_i__len_Me" )
+	lResult = lResult And TestStringValue( "Make filename safe long", MakeFilenameSafe$( "a123456789012345678901234567890123456789" ), "a12345678901234567890123456789" )
+	lResult = lResult And TestStringValue( "Make filename safe long existing", MakeFilenameSafe$( "Long56789012345678901234567890" ), "Long567890123456789012345678_1" )
+	lResult = lResult And TestStringValue( "Make filename initial digit", MakeFilenameSafe$( "123" ), "file123" )
+	
+	Close All
+	
+	TestMakeFilenameSafe = lResult
+End Function
+
+Function TestTableExists() As Logical
+	Dim lResult As Logical
+	lResult = TRUE
+	
+	Open Table ApplicationDirectory$() + "test_data\rect.tab"
+	Open Table ApplicationDirectory$() + "test_data\rect2.tab" As Renamed
+	
+	Select * From Rect Into a_query NoSelect
+	
+	lResult = lResult And TestLogicalValue( "Table exists true", TableExists( "rect" ), TRUE )
+	lResult = lResult And TestLogicalValue( "Table exists false", TableExists( "notthere" ), FALSE )
+	lResult = lResult And TestLogicalValue( "Table exists renamed", TableExists( "renamed" ), TRUE )
+	lResult = lResult And TestLogicalValue( "Table exists renamed 2", TableExists( "rect2" ), FALSE )
+	lResult = lResult And TestLogicalValue( "Table exists blank", TableExists( "" ), FALSE )
+	lResult = lResult And TestLogicalValue( "Table exists query", TableExists( "a_query" ), TRUE )
+	
+	Close All
+	
+	lResult = lResult And TestLogicalValue( "Table exists no tables", TableExists( "rect" ), FALSE )
+	
+	TestTableExists = lResult
+End Function
+
+Function TestTabFileOpen() As Logical
+	Dim lResult As Logical
+	lResult = TRUE
+	
+	Open Table ApplicationDirectory$() + "test_data\rect.tab"
+	Open Table ApplicationDirectory$() + "test_data\rect2.tab" As Renamed
+	
+	Select * From Rect Into a_query NoSelect
+	
+	lResult = lResult And TestLogicalValue( "TabFileOpen true", TabFileOpen( ApplicationDirectory$() + "test_data\rect.tab" ), TRUE )
+	lResult = lResult And TestLogicalValue( "TabFileOpen false", TabFileOpen( "notthere" ), FALSE )
+	lResult = lResult And TestLogicalValue( "TabFileOpen renamed", TabFileOpen( ApplicationDirectory$() + "test_data\rect2.tab" ), TRUE )
+	lResult = lResult And TestLogicalValue( "TabFileOpen renamed 2", TabFileOpen( "Renamed" ), FALSE )
+	lResult = lResult And TestLogicalValue( "TabFileOpen blank", TabFileOpen( "" ), FALSE )
+	lResult = lResult And TestLogicalValue( "TabFileOpen query", TabFileOpen( "a_query" ), FALSE )
+	
+	Close All
+	
+	lResult = lResult And TestLogicalValue( "TabFileOpen no tables", TabFileOpen( "rect" ), FALSE )
+	
+	TestTabFileOpen = lResult
+End Function
+
+Function TestIif() As Logical
+	Dim lResult As Logical
+	lResult = TRUE
+	
+	lResult = lResult And TestStringValue( "Iif true", Iif( True, "a", "b" ), "a" )
+	lResult = lResult And TestStringValue( "Iif false", Iif( False, "a", "b" ), "b" )
+	lResult = lResult And TestStringValue( "Iif blank true", Iif( True, "", "b" ), "" )
+	lResult = lResult And TestStringValue( "Iif blank false", Iif( False, "a", "" ), "" )
+	
+	TestIif = lResult
+End Function
+
+Function TestIifVal() As Logical
+	Dim lResult As Logical
+	lResult = TRUE
+	
+	lResult = lResult And TestNumberValue( "Iifval true", IifVal( True, 1, 2 ), 1 )
+	lResult = lResult And TestNumberValue( "Iifval false", IifVal( False, 1, 2 ), 2 )
+	lResult = lResult And TestNumberValue( "Iifval double", IifVal( True, 1.009, 2 ), 1.009 )
+	
+	TestIifVal = lResult
+End Function
+
+Function TestRepeat() As Logical
+	Dim lResult As Logical
+	lResult = TRUE
+	
+	lResult = lResult And TestStringValue( "Repeat 1", Repeat$( "abc", 1 ), "abc" )
+	lResult = lResult And TestStringValue( "Repeat 3", Repeat$( "abc", 3 ), "abcabcabc" )
+	lResult = lResult And TestStringValue( "Repeat 0", Repeat$( "abc", 0 ), "" )
+	lResult = lResult And TestStringValue( "Repeat -1", Repeat$( "abc", - 1 ), "" )
+	lResult = lResult And TestStringValue( "Repeat blank", Repeat$( "", 10 ), "" )
+	
+	TestRepeat = lResult
+End Function
+
+Function TestSafeClose() As Logical
+	Dim lResult As Logical
+	lResult = TRUE
+	
+	Open Table ApplicationDirectory$() + "test_data\rect.tab" As RectTable1
+	Open Table ApplicationDirectory$() + "test_data\rect2.tab" As RectTable2
+	Select * From RectTable2 Into "test_query"
+	
+	Call SafeClose( "i do Not Exist!" )
+	Call SafeClose( "RectTable1" )
+	Call SafeClose( "rect" )
+	Call SafeClose( "" )
+	Call SafeClose( "RectTable1" )
+	Call SafeClose( "rect2" )
+	Call SafeClose( "Selection" )
+	Call SafeClose( "test_query" )
+	Call SafeClose( "RectTable2" )
+	
+	lResult = lResult And TestNumberValue( "Test safeclose", NumTables(), 0 )
+	Close All
+	
+	' Test closing hidden tables
+	Open Table ApplicationDirectory$() + "test_data\rect2.tab" As Hidden Hide
+	Select * From Hidden Into "test" NoSelect
+	lResult = lResult And TestLogicalValue( "Test safeclose hidden", TableExists("test"), TRUE )
+	Call SafeClose("Hidden")
+	lResult = lResult And TestLogicalValue( "Test safeclose hidden", TableExists("test"), FALSE )
+	
+	TestSafeClose = lResult
+End Function
+
+Function TestSafeOpen() As Logical
+	Dim lResult As Logical
+	lResult = TRUE
+	
+	lResult = lResult And TestNumberValue( "SafeOpen no filename", SafeOpen( "", "" ), OPEN_NOFILE )
+	lResult = lResult And TestNumberValue( "SafeOpen ok", SafeOpen( ApplicationDirectory$() + "test_data\rect.tab", "RectTable1" ), OPEN_SUCCESSFUL )
+	lResult = lResult And TestLogicalValue( "SafeOpen correct name", TableExists( "RectTable1" ), TRUE )
+	lResult = lResult And TestNumberValue( "SafeOpen already open", SafeOpen( ApplicationDirectory$() + "test_data\rect.tab", "" ), OPEN_ALREADYOPEN )
+	lResult = lResult And TestNumberValue( "SafeOpen already open numtables", NumTables(), 1 )
+	lResult = lResult And TestNumberValue( "SafeOpen missing file", SafeOpen( ApplicationDirectory$() + "test_data\rectxxxxx.tab", "" ), OPEN_MISSINGFILE )
+	lResult = lResult And TestNumberValue( "SafeOpen not a tabfile", SafeOpen( ApplicationDirectory$() + "test.mbx", "" ), OPEN_OTHERERROR )
+	
+	Close All
+	
+	TestSafeOpen = lResult
+End Function
+
+Function TestSafeOpenWorkspace() As Logical
+	Dim lResult As Logical
+	lResult = TRUE
+	
+	lResult = lResult And TestNumberValue( "SafeOpenWorkspace no filename", SafeOpenWorkspace( "" ), OPENWOR_NOFILE )
+	lResult = lResult And TestNumberValue( "SafeOpenWorkspace ok", SafeOpenWorkspace( ApplicationDirectory$() + "test_data\test_workspace.wor" ), OPENWOR_SUCCESSFUL )
+	lResult = lResult And TestNumberValue( "SafeOpenWorkspace not workspace", SafeOpenWorkspace( ApplicationDirectory$() + "test_data\rect.tab" ), OPENWOR_NOTWORKSPACE )
+	lResult = lResult And TestNumberValue( "SafeOpenWorkspace missing file", SafeOpenWorkspace( ApplicationDirectory$() + "test_data\worrrrrr.wor" ), OPENWOR_MISSINGFILE )
+	lResult = lResult And TestNumberValue( "SafeOpenWorkspace not a worfile", SafeOpenWorkspace( ApplicationDirectory$() + "test_data\not_workspace.wor" ), OPENWOR_OTHERERROR )
+	
+	Close All
+	
+	TestSafeOpenWorkspace = lResult
+End Function
+
+Function TestPrepareArray() As Logical
+	Dim lResult As Logical
+	lResult = TRUE
+	
+	Dim sArray1(10) As String
+	Dim sArray2() As String
+	
+	Call PrepareArray( sArray1, 10 )
+	Dim i As Integer
+	For i = 1 To UBound( sArray1 )
+		lResult = lResult And TestStringValue( "Prepare Array " + i, sArray1(i), "          " )
+	Next
+	Call PrepareArray( sArray1, 0 )
+	For i = 1 To UBound( sArray1 )
+		lResult = lResult And TestStringValue( "Prepare Array blank " + i, sArray1(i), "" )
+	Next
+	
+	Call PrepareArray( sArray1, - 5 )
+	For i = 1 To UBound( sArray1 )
+		lResult = lResult And TestStringValue( "Prepare Array negative" + i, sArray1(i), "" )
+	Next
+	
+	Call PrepareArray( sArray2, 10 )
+	lResult = lResult And TestNumberValue( "Prepare Array empty", UBound( sArray2 ), 0 )
+	
+	
+	TestPrepareArray = lResult
+End Function
+
+Function TestMonthNumToShortName() As Logical
+	Dim lResult As Logical
+	lResult = TRUE
+	
+	lResult = lResult And TestStringValue( "MonthNumToShortName 1", MonthNumToShortName(1), "Jan" )
+	lResult = lResult And TestStringValue( "MonthNumToShortName 5", MonthNumToShortName(5), "May" )
+	lResult = lResult And TestStringValue( "MonthNumToShortName 0", MonthNumToShortName(0), "" )
+	lResult = lResult And TestStringValue( "MonthNumToShortName 13", MonthNumToShortName(13), "" )
+	lResult = lResult And TestStringValue( "MonthNumToShortName -1", MonthNumToShortName( - 1 ), "" )
+	
+	TestMonthNumToShortName = lResult
+End Function
+
+Function TestGetTopVisibleLayer() As Logical
+	Dim lResult As Logical
+	lResult = TRUE
+	
+	Open Table ApplicationDirectory$() + "test_data\rect.tab" As RectTable1
+	Open Table ApplicationDirectory$() + "test_data\rect2.tab" As RectTable2
+	Open Table ApplicationDirectory$() + "test_data\rect3.tab" As RectTable3
+	
+	Map From RectTable1
+	Dim iWindow1, iWindow2 As Integer
+	iWindow1 = FrontWindow()
+	Map From RectTable2, RectTable3
+	iWindow2 = FrontWindow()
+	Set Map Window iWindow2 Layer 1 Display Off
+	
+	lResult = lResult And TestStringValue( "Test get top visible layer 1", GetTopVisibleLayer( iWindow1 ), "RectTable1" )
+	lResult = lResult And TestStringValue( "Test get top visible layer 2", GetTopVisibleLayer( iWindow2 ), "RectTable3" )
+	
+	Close All
+	
+	TestGetTopVisibleLayer = lResult
+End Function
+
+Function TestExplode() As Logical
+	Dim lResult As Logical
+	lResult = TRUE
+	
+	Dim sArray() As String
+	Dim sTest As String
+	
+	sTest = "a b c;abc;a.b.c."
+	Call Explode( sTest, ";", sArray )
+	lResult = lResult And TestNumberValue( "Explode", UBound( sArray ), 3 )
+	lResult = lResult And TestStringValue( "Explode 1", sArray(1), "a b c" )
+	lResult = lResult And TestStringValue( "Explode 2", sArray(2), "abc" )
+	lResult = lResult And TestStringValue( "Explode 3", sArray(3), "a.b.c." )
+	
+	sTest = ""
+	Call Explode( sTest, ";", sArray )
+	lResult = lResult And TestNumberValue( "Explode null size", UBound( sArray ), 1 )
+	lResult = lResult And TestStringValue( "Explode null element 1", sArray(1), "" )
+	
+	sTest = "a;;c"
+	Call Explode( sTest, ";", sArray )
+	lResult = lResult And TestNumberValue( "Explode empty element", UBound( sArray ), 3 )
+	lResult = lResult And TestStringValue( "Explode empty element 1", sArray(1), "a" )
+	lResult = lResult And TestStringValue( "Explode empty element 2", sArray(2), "" )
+	lResult = lResult And TestStringValue( "Explode empty element 3", sArray(3), "c" )
+	
+	sTest = "a;b;c"
+	Call Explode( sTest, ",", sArray )
+	lResult = lResult And TestNumberValue( "Explode missing seperator", UBound( sArray ), 1 )
+	lResult = lResult And TestStringValue( "Explode missing seperator 1", sArray(1), "a;b;c" )
+	
+	sTest = "a;b;c"
+	Call Explode( sTest, "", sArray )
+	lResult = lResult And TestNumberValue( "Explode no seperator", UBound( sArray ), 0 )
+	
+	
+	TestExplode = lResult
+End Function
+
+Function TestJoinFunction() As Logical
+	Dim lResult As Logical
+	lResult = TRUE
+	
+	Dim sArray(3) As String
+	sArray(1) = "abc"
+	sArray(2) = "def"
+	sArray(3) = "ghi"
+	
+	lResult = lResult And TestStringValue( "Join 1", Join( sArray, "," ), "abc,def,ghi" )
+	lResult = lResult And TestStringValue( "Join no sep", Join( sArray, "" ), "abcdefghi" )
+	lResult = lResult And TestStringValue( "Join long sep", Join( sArray, "xxx" ), "abcxxxdefxxxghi" )
+	ReDim sArray(1)
+	lResult = lResult And TestStringValue( "Join one element", Join( sArray, "," ), "abc" )
+	ReDim sArray(0)
+	lResult = lResult And TestStringValue( "Join no elements", Join( sArray, "," ), "" )
+	
+	TestJoinFunction = lResult
+End Function
+
+Function TestFilepathToUrl() As Logical
+	Dim lResult As Logical
+	lResult = TRUE
+	
+	lResult = lResult And TestStringValue( "FilePathToUrl 1", FilePathToUrl( "C:\GAS3\" ), "file://c:/gas3/" )
+	lResult = lResult And TestStringValue( "FilePathToUrl 2", FilePathToUrl( "test" ), "file://test" )
+	lResult = lResult And TestStringValue( "FilePathToUrl 3", FilePathToUrl( "d:\test\files with space\" ), "file://d:/test/files with space/" )
+	lResult = lResult And TestStringValue( "FilePathToUrl 4", FilePathToUrl( "" ), "file://" )
+	
+	TestFilepathToUrl = lResult
+End Function
+
+Function TestEventLength() As Logical
+	Dim lResult As Logical
+	lResult = TRUE
+	
+	lResult = lResult And TestNumberValue( "Event length normal", EventLength( "3:15", "3:30", StringToDate( "1/1/2000" ), StringToDate( "1/1/2000" )), 15 )
+	lResult = lResult And TestNumberValue( "Event length dates", EventLength( "3:15", "3:30", StringToDate( "1/1/2000" ), StringToDate( "1/1/2010" )), 5260335 )
+	lResult = lResult And TestNumberValue( "Event length negative", EventLength( "3:15", "3:30", StringToDate( "2/1/2000" ), StringToDate( "1/1/2000" )), - 1425 )
+	lResult = lResult And TestNumberValue( "Event length bad", EventLength( "", "3:30", StringToDate( "2/1/2000" ), StringToDate( "1/1/2000" )), 0 )
+	lResult = lResult And TestNumberValue( "Event length bad 2", EventLength( "3:00", "", StringToDate( "2/1/2000" ), StringToDate( "1/1/2000" )), 0 )
+	lResult = lResult And TestNumberValue( "Event length bad 3", EventLength( "3:00", "3:30", "", StringToDate( "1/1/2000" )), 0 )
+	
+	TestEventLength = lResult
+End Function
+
+Function TestRealWeekDay() As Logical
+	Dim lResult As Logical
+	lResult = TRUE
+	
+	lResult = lResult And TestNumberValue( "Real week day monday", RealWeekDay( StringToDate( "30/12/2013" )), 1 )
+	lResult = lResult And TestNumberValue( "Real week day tuesday", RealWeekDay( StringToDate( "31/12/2013" )), 2 )
+	lResult = lResult And TestNumberValue( "Real week day wednesday", RealWeekDay( StringToDate( "1/1/2014" )), 3 )
+	lResult = lResult And TestNumberValue( "Real week day thursday", RealWeekDay( StringToDate( "2/1/2014" )), 4 )
+	lResult = lResult And TestNumberValue( "Real week day friday", RealWeekDay( StringToDate( "3/1/2014" )), 5 )
+	lResult = lResult And TestNumberValue( "Real week day saturday", RealWeekDay( StringToDate( "4/1/2014" )), 6 )
+	lResult = lResult And TestNumberValue( "Real week day sunday", RealWeekDay( StringToDate( "29/12/2013" )), 7 )
+	lResult = lResult And TestNumberValue( "Real week day none", RealWeekDay( "" ), 0 )
+	
+	TestRealWeekDay = lResult
+End Function
+
+Function TestDayNumToLetter() As Logical
+	Dim lResult As Logical
+	lResult = TRUE
+	
+	lResult = lResult And TestStringValue( "DayNumToLetter 1", DayNumToLetter(1), "m" )
+	lResult = lResult And TestStringValue( "DayNumToLetter 2", DayNumToLetter(2), "t" )
+	lResult = lResult And TestStringValue( "DayNumToLetter 3", DayNumToLetter(3), "w" )
+	lResult = lResult And TestStringValue( "DayNumToLetter 4", DayNumToLetter(4), "t" )
+	lResult = lResult And TestStringValue( "DayNumToLetter 5", DayNumToLetter(5), "f" )
+	lResult = lResult And TestStringValue( "DayNumToLetter 6", DayNumToLetter(6), "s" )
+	lResult = lResult And TestStringValue( "DayNumToLetter 7", DayNumToLetter(7), "s" )
+	lResult = lResult And TestStringValue( "DayNumToLetter 0", DayNumToLetter(0), "" )
+	lResult = lResult And TestStringValue( "DayNumToLetter 8", DayNumToLetter(8), "" )
+	
+	TestDayNumToLetter = lResult
+End Function
+
+Function TestPushStringArray() As Logical
+	Dim lResult As Logical
+	lResult = TRUE
+	
+	Dim sArray() As String
+	Call PushStringArray( sArray, "test1" )
+	lResult = lResult And TestNumberValue( "PushStringArray size 1", UBound( sArray ), 1 )
+	lResult = lResult And TestStringValue( "PushStringArray 1", sArray(1), "test1" )
+	
+	Call PushStringArray( sArray, "test2" )
+	lResult = lResult And TestNumberValue( "PushStringArray size 2", UBound( sArray ), 2 )
+	lResult = lResult And TestStringValue( "PushStringArray 2a", sArray(1), "test1" )
+	lResult = lResult And TestStringValue( "PushStringArray 2b", sArray(2), "test2" )
+	
+	Call PushStringArray( sArray, "test3" )
+	lResult = lResult And TestNumberValue( "PushStringArray size 3", UBound( sArray ), 3 )
+	lResult = lResult And TestStringValue( "PushStringArray 3a", sArray(1), "test1" )
+	lResult = lResult And TestStringValue( "PushStringArray 3b", sArray(2), "test2" )
+	lResult = lResult And TestStringValue( "PushStringArray 3c", sArray(3), "test3" )
+	
+	ReDim sArray(0)
+	Call PushStringArray( sArray, "" )
+	lResult = lResult And TestNumberValue( "PushStringArray null size 1", UBound( sArray ), 1 )
+	lResult = lResult And TestStringValue( "PushStringArray null 1", sArray(1), "" )
+	Call PushStringArray( sArray, "a" )
+	lResult = lResult And TestNumberValue( "PushStringArray null size 1", UBound( sArray ), 1 )
+	lResult = lResult And TestStringValue( "PushStringArray null 2a", sArray(1), "a" )
+	
+	Call PushStringArray( sArray, "b" )
+	sArray(1) = ""
+	Call PushStringArray( sArray, "c" )
+	lResult = lResult And TestNumberValue( "PushStringArray null size 3", UBound( sArray ), 3 )
+	lResult = lResult And TestStringValue( "PushStringArray null 3a", sArray(1), "" )
+	lResult = lResult And TestStringValue( "PushStringArray null 3b", sArray(2), "b" )
+	lResult = lResult And TestStringValue( "PushStringArray null 3c", sArray(3), "c" )
+	
+	TestPushStringArray = lResult
+End Function
+
+
+Function TestPopStringArray() As Logical
+	Dim lResult As Logical
+	lResult = TRUE
+	
+	Dim sArray() As String
+	Dim sTest As String
+	sTest = PopStringFromArray( sArray )
+	lResult = lResult And TestNumberValue( "PopStringFromArray size 1", UBound( sArray ), 0 )
+	lResult = lResult And TestStringValue( "PopStringFromArray 1", sTest, "" )
+	
+	ReDim sArray(5)
+	sArray(1) = "a"
+	sArray(2) = "b"
+	sArray(3) = "c"
+	sArray(4) = "d"
+	sArray(5) = "e"
+	
+	sTest = PopStringFromArray( sArray )
+	lResult = lResult And TestNumberValue( "PopStringFromArray size 2", UBound( sArray ), 4 )
+	lResult = lResult And TestStringValue( "PopStringFromArray 2", sTest, "e" )
+	sTest = PopStringFromArray( sArray )
+	lResult = lResult And TestNumberValue( "PopStringFromArray size 3", UBound( sArray ), 3 )
+	lResult = lResult And TestStringValue( "PopStringFromArray 3", sTest, "d" )
+	sTest = PopStringFromArray( sArray )
+	lResult = lResult And TestNumberValue( "PopStringFromArray size 4", UBound( sArray ), 2 )
+	lResult = lResult And TestStringValue( "PopStringFromArray 4", sTest, "c" )
+	sTest = PopStringFromArray( sArray )
+	lResult = lResult And TestNumberValue( "PopStringFromArray size 5", UBound( sArray ), 1 )
+	lResult = lResult And TestStringValue( "PopStringFromArray 5", sTest, "b" )
+	sTest = PopStringFromArray( sArray )
+	lResult = lResult And TestNumberValue( "PopStringFromArray size 6", UBound( sArray ), 0 )
+	lResult = lResult And TestStringValue( "PopStringFromArray 6", sTest, "a" )
+	
+	TestPopStringArray = lResult
+End Function
+
+Function TestPushIntegerArray() As Logical
+	Dim lResult As Logical
+	lResult = TRUE
+	
+	Dim iArray() As Integer
+	Call PushIntegerArray( iArray, 5 )
+	lResult = lResult And TestNumberValue( "PushIntegerArray size 1", UBound( iArray ), 1 )
+	lResult = lResult And TestNumberValue( "PushIntegerArray 1", iArray(1), 5 )
+	
+	Call PushIntegerArray( iArray, 6 )
+	lResult = lResult And TestNumberValue( "PushIntegerArray size 2", UBound( iArray ), 2 )
+	lResult = lResult And TestNumberValue( "PushIntegerArray 2a", iArray(1), 5 )
+	lResult = lResult And TestNumberValue( "PushIntegerArray 2b", iArray(2), 6 )
+	
+	Call PushIntegerArray( iArray, 7 )
+	lResult = lResult And TestNumberValue( "PushIntegerArray size 3", UBound( iArray ), 3 )
+	lResult = lResult And TestNumberValue( "PushIntegerArray 3a", iArray(1), 5 )
+	lResult = lResult And TestNumberValue( "PushIntegerArray 3b", iArray(2), 6 )
+	lResult = lResult And TestNumberValue( "PushIntegerArray 3c", iArray(3), 7 )
+	
+	ReDim iArray(0)
+	Call PushIntegerArray( iArray, 0 )
+	lResult = lResult And TestNumberValue( "PushIntegerArray null size 1", UBound( iArray ), 1 )
+	lResult = lResult And TestNumberValue( "PushIntegerArray null 1", iArray(1), 0 )
+	Call PushIntegerArray( iArray, 1 )
+	lResult = lResult And TestNumberValue( "PushIntegerArray null size 1", UBound( iArray ), 2 )
+	lResult = lResult And TestNumberValue( "PushIntegerArray null 2a", iArray(1), 0 )
+	lResult = lResult And TestNumberValue( "PushIntegerArray null 2b", iArray(2), 1 )
+	
+	TestPushIntegerArray = lResult
+End Function
+
+Function TestInitializeStringArray() As Logical
+	Dim lResult As Logical
+	lResult = TRUE
+	
+	Dim sArray() As String
+	Call InitializeStringArray( sArray, "test" )
+	lResult = lResult And TestNumberValue( "InitializeStringArray size 1", UBound( sArray ), 1 )
+	lResult = lResult And TestStringValue( "InitializeStringArray 1", sArray(1), "test" )
+	ReDim sArray(3)
+	sArray(2) = "a"
+	sArray(3) = "b"
+	Call InitializeStringArray( sArray, "test2" )
+	lResult = lResult And TestNumberValue( "InitializeStringArray size 2", UBound( sArray ), 1 )
+	lResult = lResult And TestStringValue( "InitializeStringArray 2", sArray(1), "test2" )
+	
+	TestInitializeStringArray = lResult
+End Function
+
+Function TestArrayContains() As Logical
+	Dim lResult As Logical
+	lResult = TRUE
+	
+	Dim sArray(5) As String
+	sArray(1) = "a"
+	sArray(2) = "b"
+	sArray(3) = "c"
+	sArray(4) = "d"
+	sArray(5) = "e"
+	
+	lResult = lResult And TestLogicalValue( "ArrayContains true", ArrayContains( sArray, "c" ), TRUE )
+	lResult = lResult And TestLogicalValue( "ArrayContains false", ArrayContains( sArray, "h" ), FALSE )
+	lResult = lResult And TestLogicalValue( "ArrayContains null", ArrayContains( sArray, "" ), FALSE )
+	ReDim sArray(0)
+	lResult = lResult And TestLogicalValue( "ArrayContains empty", ArrayContains( sArray, "c" ), FALSE )
+	
+	
+	TestArrayContains = lResult
+End Function
+
+Function TestRemoveStringFromArray() As Logical
+	Dim lResult As Logical
+	lResult = TRUE
+	
+	Dim sArray(5) As String
+	sArray(1) = "a"
+	sArray(2) = "b"
+	sArray(3) = "c"
+	sArray(4) = "b"
+	sArray(5) = "e"
+	
+	Call RemoveStringFromArray( sArray, "b" )
+	
+	lResult = lResult And TestNumberValue( "RemoveStringFromArray size", UBound( sArray ), 3 )
+	lResult = lResult And TestStringValue( "RemoveStringFromArray elements 1", sArray(1), "a" )
+	lResult = lResult And TestStringValue( "RemoveStringFromArray elements 2", sArray(2), "c" )
+	lResult = lResult And TestStringValue( "RemoveStringFromArray elements 3", sArray(3), "e" )
+	
+	
+	ReDim sArray(0)
+	Call RemoveStringFromArray( sArray, "b" )
+	lResult = lResult And TestNumberValue( "RemoveStringFromArray empty array", UBound( sArray ), 0 )
+	
+	TestRemoveStringFromArray = lResult
+End Function
+
+Function TestGetEndOfLine() As Logical
+	Dim lResult As Logical
+	lResult = TRUE
+	
+	Dim oLine As Object
+	oLine = CreateLine( 1, 2, 3, 4 )
+	Dim oPoint As Object
+	oPoint = GetEndOfLine( oLine )
+	
+	lResult = lResult And TestNumberValue( "GetEndOfLine x", CentroidX( oPoint ), 3 )
+	lResult = lResult And TestNumberValue( "GetEndOfLine y", CentroidY( oPoint ), 4 )
+	
+	TestGetEndOfLine = lResult
+End Function
+
+Function TestGetStartOfLine() As Logical
+	Dim lResult As Logical
+	lResult = TRUE
+	
+	Dim oLine As Object
+	oLine = CreateLine( 1, 2, 3, 4 )
+	Dim oPoint As Object
+	oPoint = GetStartOfLine( oLine )
+	
+	lResult = lResult And TestNumberValue( "GetStartOfLine x", CentroidX( oPoint ), 1 )
+	lResult = lResult And TestNumberValue( "GetStartOfLine y", CentroidY( oPoint ), 2 )
+	
+	TestGetStartOfLine = lResult
+End Function
+
+Function TestProjectPoint() As Logical
+	Dim lResult As Logical
+	lResult = TRUE
+	
+	Dim oStart As Object
+	oStart = CreatePoint( 1, 1 )
+	Dim oPoint As Object
+	oPoint = ProjectPoint( oStart, 0, 1 )
+	lResult = lResult And TestNumberValue( "ProjectPoint 1 x", CentroidX( oPoint ), 1 )
+	lResult = lResult And TestNumberValue( "ProjectPoint 1 y", CentroidY( oPoint ), 2 )
+	
+	oPoint = ProjectPoint( oStart, 90, 1 )
+	lResult = lResult And TestNumberValue( "ProjectPoint 2 x", CentroidX( oPoint ), 2 )
+	lResult = lResult And TestNumberValue( "ProjectPoint 2 y", CentroidY( oPoint ), 1 )
+	
+	oPoint = ProjectPoint( oStart, 180, 1 )
+	lResult = lResult And TestNumberValue( "ProjectPoint 3 x", CentroidX( oPoint ), 1 )
+	lResult = lResult And TestNumberValue( "ProjectPoint 3 y", CentroidY( oPoint ), 0 )
+	
+	oPoint = ProjectPoint( oStart, 270, 1 )
+	lResult = lResult And TestNumberValue( "ProjectPoint 4 x", CentroidX( oPoint ), 0 )
+	lResult = lResult And TestNumberValue( "ProjectPoint 4 y", CentroidY( oPoint ), 1 )
+	
+	oPoint = ProjectPoint( oStart, 360, 1 )
+	lResult = lResult And TestNumberValue( "ProjectPoint 5 x", CentroidX( oPoint ), 1 )
+	lResult = lResult And TestNumberValue( "ProjectPoint 5 y", CentroidY( oPoint ), 2 )
+	
+	oPoint = ProjectPoint( oStart, 45, 1 )
+	lResult = lResult And TestNumberValue( "ProjectPoint 6 x", CentroidX( oPoint ), 1.707107 )
+	lResult = lResult And TestNumberValue( "ProjectPoint 6 y", CentroidY( oPoint ), 1.707107 )
+	
+	oPoint = ProjectPoint( oStart, 135, 1 )
+	lResult = lResult And TestNumberValue( "ProjectPoint 7 x", CentroidX( oPoint ), 1.707107 )
+	lResult = lResult And TestNumberValue( "ProjectPoint 7 y", CentroidY( oPoint ), 1 - 0.707107 )
+	
+	oPoint = ProjectPoint( oStart, 225, 1 )
+	lResult = lResult And TestNumberValue( "ProjectPoint 8 x", CentroidX( oPoint ), 1 - 0.707107 )
+	lResult = lResult And TestNumberValue( "ProjectPoint 8 y", CentroidY( oPoint ), 1 - 0.707107 )
+	
+	oPoint = ProjectPoint( oStart, 315, 1 )
+	lResult = lResult And TestNumberValue( "ProjectPoint 9 x", CentroidX( oPoint ), 1 - 0.707107 )
+	lResult = lResult And TestNumberValue( "ProjectPoint 9 y", CentroidY( oPoint ), 1.707107 )
+	
+	TestProjectPoint = lResult
+End Function
+
+Function TestGetBearing() As Logical
+	Dim lResult As Logical
+	lResult = TRUE
+	
+	Dim oStart As Object
+	oStart = CreatePoint( 1, 1 )
+	Dim oEnd As Object
+	oEnd = CreatePoint( 1, 2 )
+	lResult = lResult And TestNumberValue( "GetBearing 1", GetBearing( oStart, oEnd ), 0 )
+	oEnd = CreatePoint( 2, 1 )
+	lResult = lResult And TestNumberValue( "GetBearing 2", GetBearing( oStart, oEnd ), 90 )
+	oEnd = CreatePoint( 1, 0 )
+	lResult = lResult And TestNumberValue( "GetBearing 3", GetBearing( oStart, oEnd ), 180 )
+	oEnd = CreatePoint( 0, 1 )
+	lResult = lResult And TestNumberValue( "GetBearing 4", GetBearing( oStart, oEnd ), 270 )
+	oEnd = CreatePoint( 1.707107, 1.707107 )
+	lResult = lResult And TestNumberValue( "GetBearing 5", Round( GetBearing( oStart, oEnd ), 1 ), 45 )
+	oEnd = CreatePoint( 1.707107, 1 - 0.707107 )
+	lResult = lResult And TestNumberValue( "GetBearing 6", Round( GetBearing( oStart, oEnd ), 1 ), 135 )
+	oEnd = CreatePoint( 1 - 0.70710, 1 - 0.707107 )
+	lResult = lResult And TestNumberValue( "GetBearing 7", Round( GetBearing( oStart, oEnd ), 1 ), 225 )
+	oEnd = CreatePoint( 1 - 0.70710, 1.707107 )
+	lResult = lResult And TestNumberValue( "GetBearing 8", Round( GetBearing( oStart, oEnd ), 1 ), 315 )
+	
+	TestGetBearing = lResult
+End Function
+
+Function TestQueryToTable() As Logical
+	Dim lResult As Logical
+	lResult = TRUE
+	
+	Open Table ApplicationDirectory$() + "test_data\rect.tab" As RectTable1
+	Select * From RectTable1 Into q_test NoSelect
+	
+	' Normal operation
+	Call QueryToTable( "q_test", "query_table", "C:\Temp\test.tab" )
+	lResult = lResult And TestLogicalValue( "QueryToTable name", TableExists( "query_table" ), TRUE )
+	lResult = lResult And TestLogicalValue( "QueryToTable old closed", TableExists( "q_test" ), FALSE )
+	lResult = lResult And TestNumberValue( "QueryToTable type", TableInfo( "query_table", TAB_INFO_TYPE ), TAB_TYPE_BASE )
+	
+	Drop Table query_table
+	' No table - expect nothing, just no crash
+	Call QueryToTable( "q_testx", "query_table", "C:\Temp\test.tab" )
+	
+	Select * From RectTable1 Into q_test NoSelect
+	' no table name
+	Call QueryToTable( "q_test", "", "C:\Temp\test.tab" )
+	lResult = lResult And TestLogicalValue( "QueryToTable no name", TableExists( "q_test" ), TRUE )
+	lResult = lResult And TestNumberValue( "QueryToTable no nametype", TableInfo( "q_test", TAB_INFO_TYPE ), TAB_TYPE_BASE )
+	
+	' bad file name - expect nothing, just no crash
+	Call QueryToTable( "q_test", "query_table", "" )
+	
+	Close All
+	
+	TestQueryToTable = lResult
+End Function
+
+Function TestGetUserId() As Logical
+	Dim lResult As Logical
+	lResult = TRUE
+	
+	Dim sUser As String
+	Dim lResult2 As Logical
+	lResult2 = GetUserId( sUser )
+	
+	lResult = lResult And TestLogicalValue( "GetUserId success", lResult2, TRUE )
+	lResult = lResult And TestStringValue( "GetUserId name", sUser, "GAU" )
+	
+	TestGetUserId = lResult
+End Function
+
+Function TestRandomPointInPolygon() As Logical
+	Dim lResult As Logical
+	lResult = TRUE
+	
+	Dim oBounds As Object
+	Create Rect Into Variable oBounds ( 0, 0 ) ( 1, 1 )
+	
+	Dim oPoint As Object
+	oPoint = RandomPointInPolygon( oBounds, 1 )
+	
+	lResult = lResult And TestLogicalValue( "RandomPointInPolygon in bounds", oPoint Within oBounds, TRUE )
+	
+	TestRandomPointInPolygon = lResult
+End Function
+
+Function TestCeil() As Logical
+	Dim lResult As Logical
+	lResult = TRUE
+	
+	lResult = lResult And TestNumberValue( "Ceil 0.5", Ceil( 0.5 ), 1 )
+	lResult = lResult And TestNumberValue( "Ceil 0", Ceil(0), 0 )
+	lResult = lResult And TestNumberValue( "Ceil 1", Ceil(1), 1 )
+	lResult = lResult And TestNumberValue( "Ceil 1.0000001", Ceil( 1.000001 ), 2 )
+	lResult = lResult And TestNumberValue( "Ceil -10", Ceil( - 10 ), - 10 )
+	lResult = lResult And TestNumberValue( "Ceil -0.5", Ceil( - 0.5 ), 0 )
+	lResult = lResult And TestNumberValue( "Ceil -0.1", Ceil( - 0.1 ), 0 )
+	lResult = lResult And TestNumberValue( "Ceil -0.9", Ceil( - 0.9 ), 0 )
+	
+	TestCeil = lResult
+End Function
+
+Function TestRandomiseCoord() As Logical
+	Dim lResult As Logical
+	lResult = TRUE
+	
+	Dim i As Integer
+	Dim fResult As Float
+	For i = 1 To 20
+		fResult = RandomiseCoord( 1, 1 )
+		lResult = lResult And TestLogicalValue( "RandomiseCoord " + i, fResult >= 0 And fResult <= 2, TRUE )
+		lResult = lResult And TestLogicalValue( "RandomiseCoord " + i, fResult <> 1, TRUE )
+	Next
+	
+	TestRandomiseCoord = lResult
+End Function
+
+Function TestShiftPointByRandomDist() As Logical
+	Dim lResult As Logical
+	lResult = TRUE
+	
+	Dim i As Integer
+	Dim oPoint, oResult As Object
+	oPoint = CreatePoint( 1, 1 )
+	Dim oBounds As Object
+	Create Rect Into Variable oBounds ( 0, 0 ) ( 2, 2 )
+	
+	For i = 1 To 20
+		oResult = ShiftPointByRandomDist( oPoint, 1 )
+		lResult = lResult And TestLogicalValue( "ShiftPointByRandomDist x " + i, CentroidX( oResult ) >= 0 And CentroidX( oResult ) <= 2 And CentroidX( oResult ) <> 1, TRUE )
+		lResult = lResult And TestLogicalValue( "ShiftPointByRandomDist y " + i, CentroidY( oResult ) >= 0 And CentroidY( oResult ) <= 2 And CentroidY( oResult ) <> 1, TRUE )
+	Next
+	
+	TestShiftPointByRandomDist = lResult
+End Function
+
+Function TestTemporalOverlap() As Logical
+	Dim lResult As Logical
+	lResult = TRUE
+	
+	Dim dtStart1, dtEnd1 As DateTime
+	dtStart1 = StringToDate( "3/1/2000" ) + StringToTime( "10:00" )
+	dtEnd1 = StringToDate( "3/1/2000" ) + StringToTime( "20:00" )
+	Dim dtStart2, dtEnd2 As DateTime
+	dtStart2 = StringToDate( "4/1/2000" ) + StringToTime( "10:00" )
+	dtEnd2 = StringToDate( "4/1/2000" ) + StringToTime( "20:00" )
+	lResult = lResult And TestLogicalValue( "Temporal Overlap false 1", TemporalOverlap( dtStart1, dtEnd1, dtStart2, dtEnd2 ), FALSE )
+	dtEnd1 = StringToDate( "4/1/2000" ) + StringToTime( "12:00" )
+	lResult = lResult And TestLogicalValue( "Temporal Overlap true 1", TemporalOverlap( dtStart1, dtEnd1, dtStart2, dtEnd2 ), TRUE )
+	dtStart1 = StringToDate( "4/1/2000" ) + StringToTime( "12:00" )
+	dtEnd1 = StringToDate( "4/1/2000" ) + StringToTime( "13:00" )
+	lResult = lResult And TestLogicalValue( "Temporal Overlap true 2", TemporalOverlap( dtStart1, dtEnd1, dtStart2, dtEnd2 ), TRUE )
+	dtStart1 = StringToDate( "4/1/2000" ) + StringToTime( "12:00" )
+	dtEnd1 = StringToDate( "4/1/2000" ) + StringToTime( "21:00" )
+	lResult = lResult And TestLogicalValue( "Temporal Overlap true 3", TemporalOverlap( dtStart1, dtEnd1, dtStart2, dtEnd2 ), TRUE )
+	dtStart1 = StringToDate( "5/1/2000" ) + StringToTime( "12:00" )
+	dtEnd1 = StringToDate( "5/1/2000" ) + StringToTime( "13:00" )
+	lResult = lResult And TestLogicalValue( "Temporal Overlap false 2", TemporalOverlap( dtStart1, dtEnd1, dtStart2, dtEnd2 ), FALSE )
+	
+	TestTemporalOverlap = lResult
+End Function
+
+Function TestTemporalOverlap1Int() As Logical
+	Dim lResult As Logical
+	lResult = TRUE
+	
+	Dim dtStart1, dtEnd1 As DateTime
+	dtStart1 = StringToDate( "3/1/2000" ) + StringToTime( "10:00" )
+	dtEnd1 = StringToDate( "3/1/2000" ) + StringToTime( "20:00" )
+	
+	Dim dtTime2 As DateTime
+	dtTime2 = StringToDate( "4/1/2000" ) + StringToTime( "10:00" )
+	lResult = lResult And TestLogicalValue( "Temporal Overlap 1 Int false 1", TemporalOverlap1Interval( dtStart1, dtEnd1, dtTime2 ), FALSE )
+	dtTime2 = StringToDate( "3/1/2000" ) + StringToTime( "12:00" )
+	lResult = lResult And TestLogicalValue( "Temporal Overlap 1 Int true 2", TemporalOverlap1Interval( dtStart1, dtEnd1, dtTime2 ), TRUE )
+	dtTime2 = StringToDate( "3/1/2000" ) + StringToTime( "2:00" )
+	lResult = lResult And TestLogicalValue( "Temporal Overlap 1 Int false 3", TemporalOverlap1Interval( dtStart1, dtEnd1, dtTime2 ), FALSE )
+	
+	TestTemporalOverlap1Int = lResult
+End Function
+
+Function TestBufferTime() As Logical
+	Dim lResult As Logical
+	lResult = TRUE
+	
+	Dim dtStart As DateTime
+	dtStart = StringToDate( "10/1/2000" ) + StringToTime( "10:00" )
+	
+	lResult = lResult And TestDateTimeValue( "Buffer Time 1 day", BufferTime( dtStart, 1, "d" ), StringToDate( "11/1/2000" ) + StringToTime( "10:00" ) )
+	lResult = lResult And TestDateTimeValue( "Buffer Time 10 days", BufferTime( dtStart, 10, "d" ), StringToDate( "20/1/2000" ) + StringToTime( "10:00" ) )
+	lResult = lResult And TestDateTimeValue( "Buffer Time -5 days", BufferTime( dtStart, - 5, "d" ), StringToDate( "5/1/2000" ) + StringToTime( "10:00" ) )
+	lResult = lResult And TestDateTimeValue( "Buffer Time 1 hour", BufferTime( dtStart, 1, "h" ), StringToDate( "10/1/2000" ) + StringToTime( "11:00" ) )
+	lResult = lResult And TestDateTimeValue( "Buffer Time 24 hours", BufferTime( dtStart, 24, "h" ), StringToDate( "11/1/2000" ) + StringToTime( "10:00" ) )
+	lResult = lResult And TestDateTimeValue( "Buffer Time -5 hours", BufferTime( dtStart, - 5, "h" ), StringToDate( "10/1/2000" ) + StringToTime( "5:00" ) )
+	lResult = lResult And TestDateTimeValue( "Buffer Time 1 minutes", BufferTime( dtStart, 1, "m" ), StringToDate( "10/1/2000" ) + StringToTime( "10:01" ) )
+	lResult = lResult And TestDateTimeValue( "Buffer Time 60 minutes", BufferTime( dtStart, 60, "m" ), StringToDate( "10/1/2000" ) + StringToTime( "11:00" ) )
+	lResult = lResult And TestDateTimeValue( "Buffer Time -5 minutes", BufferTime( dtStart, - 5, "m" ), StringToDate( "10/1/2000" ) + StringToTime( "9:55" ) )
+	lResult = lResult And TestDateTimeValue( "Buffer Time 1 second", BufferTime( dtStart, 1, "s" ), StringToDate( "10/1/2000" ) + StringToTime( "10:00:01" ) )
+	lResult = lResult And TestDateTimeValue( "Buffer Time 60 second", BufferTime( dtStart, 60, "s" ), StringToDate( "10/1/2000" ) + StringToTime( "10:01" ) )
+	lResult = lResult And TestDateTimeValue( "Buffer Time -5 second", BufferTime( dtStart, - 5, "s" ), StringToDate( "10/1/2000" ) + StringToTime( "9:59:55" ) )
+	
+	TestBufferTime = lResult
+End Function
+
+Function TestDateTimeCentroid() As Logical
+	Dim lResult As Logical
+	lResult = TRUE
+	
+	lResult = lResult And TestDateTimeValue( "DateTime Centroid 1", DateTimeCentroid( StringToDate( "10/1/2000" ) + StringToTime( "10:00" ), StringToDate( "10/1/2000" ) + StringToTime( "12:00" )), StringToDate( "10/1/2000" ) + StringToTime( "11:00" ) )
+	lResult = lResult And TestDateTimeValue( "DateTime Centroid 2", DateTimeCentroid( StringToDate( "10/1/2000" ) + StringToTime( "10:00" ), StringToDate( "12/1/2000" ) + StringToTime( "12:00" )), StringToDate( "11/1/2000" ) + StringToTime( "11:00" ) )
+	
+	TestDateTimeCentroid = lResult
+End Function
+
+Function TestGetWriteableTables() As Logical
+	Dim lResult As Logical
+	lResult = TRUE
+	
+	Open Table ApplicationDirectory$() + "test_data\rect.tab" As XTable
+	Open Table ApplicationDirectory$() + "test_data\rect2.tab" As ZTable
+	Open Table ApplicationDirectory$() + "test_data\rect3.tab" As ATable
+	Open Table ApplicationDirectory$() + "test_data\rect4.tab" As CTable
+	
+	Dim sArray(5) As String
+	sArray(1) = "junk"
+	
+	Dim iReturn As Integer
+	iReturn = GetWriteableTables( sArray, "CTable" )
+	
+	lResult = lResult And TestNumberValue( "GetWriteableTables size", UBound( sArray ), 4 )
+	lResult = lResult And TestStringValue( "GetWriteableTables 1", sArray(1), "ATable" )
+	lResult = lResult And TestStringValue( "GetWriteableTables 2", sArray(2), "CTable" )
+	lResult = lResult And TestStringValue( "GetWriteableTables 3", sArray(3), "XTable" )
+	lResult = lResult And TestStringValue( "GetWriteableTables 4", sArray(4), "ZTable" )
+	lResult = lResult And TestNumberValue( "GetWriteableTables return", iReturn, 2 )
+	
+	Close All
+	
+	TestGetWriteableTables = lResult
+End Function
+
+Function TestRecursiveSearchFiles() As Logical
+	Dim lResult As Logical
+	lResult = TRUE
+	
+	Dim sArray(5) As String
+	sArray(1) = "junk"
+	
+	Dim iReturn As Integer
+	iReturn = RecursiveSearchFiles( ApplicationDirectory$() + "test_data\recursive_find", "*.txt", sArray )
+	
+	lResult = lResult And TestNumberValue( "RecursiveSearchFiles size", UBound( sArray ), 6 )
+	lResult = lResult And TestStringValue( "RecursiveSearchFiles 1", sArray(1), ApplicationDirectory$() + "test_data\recursive_find\file5.txt" )
+	lResult = lResult And TestStringValue( "RecursiveSearchFiles 2", sArray(2), ApplicationDirectory$() + "test_data\recursive_find\file6.txt" )
+	lResult = lResult And TestStringValue( "RecursiveSearchFiles 3", sArray(3), ApplicationDirectory$() + "test_data\recursive_find\folder 2\file4.txt" )
+	lResult = lResult And TestStringValue( "RecursiveSearchFiles 4", sArray(4), ApplicationDirectory$() + "test_data\recursive_find\folder 1\sub folder 2\file3.txt" )
+	lResult = lResult And TestStringValue( "RecursiveSearchFiles 5", sArray(5), ApplicationDirectory$() + "test_data\recursive_find\folder 1\sub folder 1\file1.txt" )
+	lResult = lResult And TestStringValue( "RecursiveSearchFiles 6", sArray(6), ApplicationDirectory$() + "test_data\recursive_find\folder 1\sub folder 1\file2.txt" )
+	
+	iReturn = RecursiveSearchFiles( ApplicationDirectory$() + "test_data\recursive_find", "*.log", sArray )
+	lResult = lResult And TestNumberValue( "RecursiveSearchFiles other ext size", UBound( sArray ), 1 )
+	lResult = lResult And TestStringValue( "RecursiveSearchFiles other ext 1", sArray(1), ApplicationDirectory$() + "test_data\recursive_find\folder 1\sub folder 1\otherext.log" )
+	
+	iReturn = RecursiveSearchFiles( ApplicationDirectory$() + "test_data\recursive_find", "*.xxx", sArray )
+	lResult = lResult And TestNumberValue( "RecursiveSearchFiles no match size", UBound( sArray ), 0 )
+	
+	iReturn = RecursiveSearchFiles( ApplicationDirectory$() + "xxx", "*.xxx", sArray )
+	lResult = lResult And TestNumberValue( "RecursiveSearchFiles bad folder", UBound( sArray ), 0 )
+	
+	iReturn = RecursiveSearchFiles( ApplicationDirectory$() + "test_data\recursive_find", "", sArray )
+	lResult = lResult And TestNumberValue( "RecursiveSearchFiles no ext", UBound( sArray ), 0 )
+	
+	iReturn = RecursiveSearchFiles( ApplicationDirectory$() + "test_data\recursive_find", "*.*", sArray )
+	lResult = lResult And TestNumberValue( "RecursiveSearchFiles *.*", UBound( sArray ), 7 )
+	
+	TestRecursiveSearchFiles = lResult
+End Function
+
+Function TestFindFiles() As Logical
+	Dim lResult As Logical
+	lResult = TRUE
+	
+	Dim sArray(5) As String
+	sArray(1) = "junk"
+	
+	Dim iReturn As Integer
+	Call FindFiles( ApplicationDirectory$() + "test_data\find_files", "*.txt", sArray )
+	
+	lResult = lResult And TestNumberValue( "FindFiles size", UBound( sArray ), 4 )
+	lResult = lResult And TestStringValue( "FindFiles 1", sArray(1), ApplicationDirectory$() + "test_data\find_files\file1.txt" )
+	lResult = lResult And TestStringValue( "FindFiles 2", sArray(2), ApplicationDirectory$() + "test_data\find_files\file2.txt" )
+	lResult = lResult And TestStringValue( "FindFiles 3", sArray(3), ApplicationDirectory$() + "test_data\find_files\file3.txt" )
+	lResult = lResult And TestStringValue( "FindFiles 4", sArray(4), ApplicationDirectory$() + "test_data\find_files\file5.txt" )
+	
+	Call FindFiles( ApplicationDirectory$() + "test_data\find_files", "*.log", sArray )
+	lResult = lResult And TestNumberValue( "FindFiles other ext size", UBound( sArray ), 1 )
+	lResult = lResult And TestStringValue( "FindFiles other ext 1", sArray(1), ApplicationDirectory$() + "test_data\find_files\file4.log" )
+	
+	Call FindFiles( ApplicationDirectory$() + "test_data\find_files", "*.xxx", sArray )
+	lResult = lResult And TestNumberValue( "FindFiles no match size", UBound( sArray ), 0 )
+	
+	Call FindFiles( ApplicationDirectory$() + "xxx", "*.xxx", sArray )
+	lResult = lResult And TestNumberValue( "FindFiles bad folder", UBound( sArray ), 0 )
+	
+	Call FindFiles( ApplicationDirectory$() + "test_data\find_files", "", sArray )
+	lResult = lResult And TestNumberValue( "FindFiles no ext", UBound( sArray ), 0 )
+	
+	Call FindFiles( ApplicationDirectory$() + "test_data\find_files", "*.*", sArray )
+	lResult = lResult And TestNumberValue( "find_files *.*", UBound( sArray ), 5 )
+	
+	TestFindFiles = lResult
+End Function
+
+Function TestDrawInCosmetic() As Logical
+	Dim lResult As Logical
+	lResult = TRUE
+	
+	Open Table ApplicationDirectory$() + "test_data\blank.tab"
+	Map From blank
+	
+	Set Window FrontWindow() Width 5 Height 5
+	Set Map Center ( 1, 1 ) Zoom 500
+	
+	Dim oRect As Object
+	Create Rect Into Variable oRect ( 1, 1 ) ( 2, 2 )
+	
+	Call DrawInCosmetic( oRect, FrontWindow())
+	
+	Save Window FrontWindow() As "C:\Temp\DrawInCosmetic_rendered.png" Type "PNG" Width 5 Units "in" Height 5 Units "in" Resolution 96
+	
+	lResult = lResult And CompareImages( "DrawInCosmetic", "DrawInCosmetic" )
+	
+	Close All
+	TestDrawInCosmetic = lResult
+End Function
+
+Function TestSquareBuffer() As Logical
+	Dim lResult As Logical
+	lResult = TRUE
+	
+	Open Table ApplicationDirectory$() + "test_data\blank.tab"
+	Map From blank
+	
+	Set Window FrontWindow() Width 5 Height 5
+	Set Map Center ( 1, 1 ) Zoom 300
+	
+	Dim oLine As Object
+	Create Pline Into Variable oLine 6 ( 1, 1 ) ( 1.1, 1 ) ( 1.3, 1.1 ) ( 1.5, 1.2 ) ( 1.7, 1.5 ) ( 1.9, 2.0 )
+	
+	Dim oResult As Object
+	oResult = SquareBuffer( oLine, .2 )
+	Call DrawInCosmetic( oResult, FrontWindow())
+	Call DrawInCosmetic( oLine, FrontWindow())
+	
+	Save Window FrontWindow() As "C:\Temp\SquareBuffer_rendered.png" Type "PNG" Width 5 Units "in" Height 5 Units "in" Resolution 96
+	
+	lResult = lResult And CompareImages( "SquareBuffer", "SquareBuffer" )
+	Close All
+	TestSquareBuffer = lResult
+End Function
+
+Function TestShrinkLine() As Logical
+	Dim lResult As Logical
+	lResult = TRUE
+	
+	Open Table ApplicationDirectory$() + "test_data\blank.tab"
+	Map From blank
+	
+	Set Window FrontWindow() Width 5 Height 5
+	Set Map Center ( 1, 1 ) Zoom 300
+	
+	Dim oLine As Object
+	Create Pline Into Variable oLine 6 ( 1, 1 ) ( 1.1, 1 ) ( 1.3, 1.1 ) ( 1.5, 1.2 ) ( 1.7, 1.5 ) ( 1.9, 2.0 )
+	
+	Dim oResult As Object
+	oResult = ShrinkLine( oLine, .2 )
+	Call DrawInCosmetic( oResult, FrontWindow())
+	Call DrawInCosmetic( oLine, FrontWindow())
+	
+	Save Window FrontWindow() As "C:\Temp\ShrinkLine_rendered.png" Type "PNG" Width 5 Units "in" Height 5 Units "in" Resolution 96
+	
+	lResult = lResult And CompareImages( "ShrinkLine", "ShrinkLine" )
+	Close All
+	TestShrinkLine = lResult
+End Function
+
+Function TestGetTableList() As Logical
+	Dim lResult As Logical
+	lResult = TRUE
+	
+	Dim sArray(1) As String
+	sArray(1) = "junk"
+	
+	Call GetTableList( sArray, "", TABLELIST_SORT )
+	lResult = lResult And TestNumberValue( "GetTableList none size", UBound( sArray ), 1 )
+	lResult = lResult And TestStringValue( "GetTableList none 1", sArray(1), "junk" )
+	
+	Open Table ApplicationDirectory$() + "test_data\rect.tab" As XTable
+	Open Table ApplicationDirectory$() + "test_data\rect2.tab" As ZTable ReadOnly
+	Open Table ApplicationDirectory$() + "test_data\rect3.tab" As ATable ReadOnly
+	Open Table ApplicationDirectory$() + "test_data\rect4.tab" As CTable
+	
+	
+	Call GetTableList( sArray, "", 0 )
+	
+	lResult = lResult And TestNumberValue( "GetTableList size", UBound( sArray ), 5 )
+	lResult = lResult And TestStringValue( "GetTableList 1", sArray(1), "junk" )
+	lResult = lResult And TestStringValue( "GetTableList 2", sArray(2), "XTable" )
+	lResult = lResult And TestStringValue( "GetTableList 3", sArray(3), "ZTable" )
+	lResult = lResult And TestStringValue( "GetTableList 4", sArray(4), "ATable" )
+	lResult = lResult And TestStringValue( "GetTableList 5", sArray(5), "CTable" )
+	
+	ReDim sArray(1)
+	sArray(1) = "junk"
+	Call GetTableList( sArray, "", TABLELIST_SORT )
+	lResult = lResult And TestNumberValue( "GetTableList sorted size", UBound( sArray ), 5 )
+	lResult = lResult And TestStringValue( "GetTableList sorted 1", sArray(1), "ATable" )
+	lResult = lResult And TestStringValue( "GetTableList sorted 2", sArray(2), "CTable" )
+	lResult = lResult And TestStringValue( "GetTableList sorted 3", sArray(3), "junk" )
+	lResult = lResult And TestStringValue( "GetTableList sorted 4", sArray(4), "XTable" )
+	lResult = lResult And TestStringValue( "GetTableList sorted 5", sArray(5), "ZTable" )
+	
+	ReDim sArray(1)
+	sArray(1) = "junk"
+	Call GetTableList( sArray, "X", TABLELIST_SORT )
+	lResult = lResult And TestNumberValue( "GetTableList ignore size", UBound( sArray ), 4 )
+	lResult = lResult And TestStringValue( "GetTableList ignore 1", sArray(1), "ATable" )
+	lResult = lResult And TestStringValue( "GetTableList ignore 2", sArray(2), "CTable" )
+	lResult = lResult And TestStringValue( "GetTableList ignore 3", sArray(3), "junk" )
+	lResult = lResult And TestStringValue( "GetTableList ignore 4", sArray(4), "ZTable" )
+	
+	Select * From ATable Into AQuery
+	Select * From ZTable Into ZQuery
+	ReDim sArray(0)
+	Call GetTableList( sArray, "", TABLELIST_BASETABLESONLY + TABLELIST_SORT )
+	lResult = lResult And TestNumberValue( "GetTableList noqueries size", UBound( sArray ), 4 )
+	lResult = lResult And TestStringValue( "GetTableList noqueries 1", sArray(1), "ATable" )
+	lResult = lResult And TestStringValue( "GetTableList noqueries 2", sArray(2), "CTable" )
+	lResult = lResult And TestStringValue( "GetTableList noqueries 3", sArray(3), "XTable" )
+	lResult = lResult And TestStringValue( "GetTableList noqueries 4", sArray(4), "ZTable" )
+	
+	ReDim sArray(0)
+	Call GetTableList( sArray, "", TABLELIST_TABLES_AND_QUERIES + TABLELIST_SORT )
+	lResult = lResult And TestNumberValue( "GetTableList queries size", UBound( sArray ), 6 )
+	lResult = lResult And TestStringValue( "GetTableList queries 1", sArray(1), "AQuery" )
+	lResult = lResult And TestStringValue( "GetTableList queries 2", sArray(2), "ATable" )
+	lResult = lResult And TestStringValue( "GetTableList queries 3", sArray(3), "CTable" )
+	lResult = lResult And TestStringValue( "GetTableList queries 4", sArray(4), "XTable" )
+	lResult = lResult And TestStringValue( "GetTableList queries 5", sArray(5), "ZQuery" )
+	lResult = lResult And TestStringValue( "GetTableList queries 6", sArray(6), "ZTable" )
+	
+	ReDim sArray(0)
+	Call GetTableList( sArray, "", TABLELIST_BASETABLESONLY + TABLELIST_HIDEREADONLY + TABLELIST_SORT )
+	lResult = lResult And TestNumberValue( "GetTableList noreadonly size", UBound( sArray ), 2 )
+	lResult = lResult And TestStringValue( "GetTableList noreadonly 1", sArray(1), "CTable" )
+	lResult = lResult And TestStringValue( "GetTableList noreadonly 2", sArray(2), "XTable" )
+	
+	Open Table ApplicationDirectory$() + "test_data\non_mappable.tab"
+	
+	ReDim sArray(0)
+	Call GetTableList( sArray, "", TABLELIST_BASETABLESONLY + TABLELIST_HIDENONMAPPABLE + TABLELIST_SORT )
+	lResult = lResult And TestNumberValue( "GetTableList mappable only size", UBound( sArray ), 4 )
+	lResult = lResult And TestStringValue( "GetTableList mappable only 1", sArray(1), "ATable" )
+	lResult = lResult And TestStringValue( "GetTableList mappable only 2", sArray(2), "CTable" )
+	lResult = lResult And TestStringValue( "GetTableList mappable only 3", sArray(3), "XTable" )
+	lResult = lResult And TestStringValue( "GetTableList mappable only 4", sArray(4), "ZTable" )
+	
+	ReDim sArray(0)
+	Call GetTableList( sArray, "", TABLELIST_BASETABLESONLY + TABLELIST_SORT )
+	lResult = lResult And TestNumberValue( "GetTableList inc non-mappable size", UBound( sArray ), 5 )
+	lResult = lResult And TestStringValue( "GetTableList inc non-mappable only 1", sArray(1), "ATable" )
+	lResult = lResult And TestStringValue( "GetTableList inc non-mappable only 2", sArray(2), "CTable" )
+	lResult = lResult And TestStringValue( "GetTableList inc non-mappable only 3", sArray(3), "non_mappable" )
+	lResult = lResult And TestStringValue( "GetTableList inc non-mappable only 4", sArray(4), "XTable" )
+	lResult = lResult And TestStringValue( "GetTableList inc non-mappable only 5", sArray(5), "ZTable" )
+	
+	Open Table ApplicationDirectory$() + "test_data\raster.tab"
+	Open Table ApplicationDirectory$() + "test_data\tileserver.tab"
+	Open Table ApplicationDirectory$() + "test_data\wfs.tab"
+	Open Table ApplicationDirectory$() + "test_data\wms.tab"
+	
+	ReDim sArray(0)
+	Call GetTableList( sArray, "", TABLELIST_VECTORONLY + TABLELIST_SORT )
+	lResult = lResult And TestNumberValue( "GetTableList vectoronly size", UBound( sArray ), 8 )
+	lResult = lResult And TestStringValue( "GetTableList vectoronly 1", sArray(1), "AQuery" )
+	lResult = lResult And TestStringValue( "GetTableList vectoronly 2", sArray(2), "ATable" )
+	lResult = lResult And TestStringValue( "GetTableList vectoronly 3", sArray(3), "CTable" )
+	lResult = lResult And TestStringValue( "GetTableList vectoronly 4", sArray(4), "non_mappable" )
+	lResult = lResult And TestStringValue( "GetTableList vectoronly 5", sArray(5), "wfs" )
+	lResult = lResult And TestStringValue( "GetTableList vectoronly 6", sArray(6), "XTable" )
+	lResult = lResult And TestStringValue( "GetTableList vectoronly 7", sArray(7), "ZQuery" )
+	lResult = lResult And TestStringValue( "GetTableList vectoronly 8", sArray(8), "ZTable" )
+	
+	ReDim sArray(0)
+	Call GetTableList( sArray, "", TABLELIST_SORT )
+	lResult = lResult And TestNumberValue( "GetTableList not-vectoronly size", UBound( sArray ), 11 )
+	lResult = lResult And TestStringValue( "GetTableList not-vectoronly 1", sArray(1), "AQuery" )
+	lResult = lResult And TestStringValue( "GetTableList not-vectoronly 2", sArray(2), "ATable" )
+	lResult = lResult And TestStringValue( "GetTableList not-vectoronly 3", sArray(3), "CTable" )
+	lResult = lResult And TestStringValue( "GetTableList not-vectoronly 4", sArray(4), "non_mappable" )
+	lResult = lResult And TestStringValue( "GetTableList not-vectoronly 5", sArray(5), "raster" )
+	lResult = lResult And TestStringValue( "GetTableList not-vectoronly 6", sArray(6), "tileserver" )
+	lResult = lResult And TestStringValue( "GetTableList not-vectoronly 7", sArray(7), "wfs" )
+	lResult = lResult And TestStringValue( "GetTableList not-vectoronly 8", sArray(8), "wms" )
+	lResult = lResult And TestStringValue( "GetTableList not-vectoronly 9", sArray(9), "XTable" )
+	lResult = lResult And TestStringValue( "GetTableList not-vectoronly 10", sArray(10), "ZQuery" )
+	lResult = lResult And TestStringValue( "GetTableList not-vectoronly 11", sArray(11), "ZTable" )
+	
+	Close All
+	
+	TestGetTableList = lResult
+End Function
+
+Function TestCreateLineBetweenPoints() As Logical
+	Dim lResult As Logical
+	lResult = TRUE
+	
+	Dim oPoint1, oPoint2 As Object
+	oPoint1 = CreatePoint( 1, 2 )
+	oPoint2 = CreatePoint( 3, 4 )
+	Dim oLine As Object
+	oLine = CreateLineBetweenPoints( oPoint1, oPoint2 )
+	
+	Dim oResult As Object
+	oResult = GetStartOfLine( oLine )
+	lResult = lResult And TestNumberValue( "CreateLineBetweenPoints 1 x", CentroidX( oResult ), 1 )
+	lResult = lResult And TestNumberValue( "CreateLineBetweenPoints 1 y", CentroidY( oResult ), 2 )
+	oResult = GetEndOfLine( oLine )
+	lResult = lResult And TestNumberValue( "CreateLineBetweenPoints 2 x", CentroidX( oResult ), 3 )
+	lResult = lResult And TestNumberValue( "CreateLineBetweenPoints 2 y", CentroidY( oResult ), 4 )
+	
+	TestCreateLineBetweenPoints = lResult
+End Function
+
+Function TestGetPortionOfLine() As Logical
+	Dim lResult As Logical
+	lResult = TRUE
+	
+	Dim oLine As Object
+	oLine = CreateLine( 1, 1, 1, 1 )
+	Dim oResult, oResultStart, oResultEnd As Object
+	oResult = PortionOfLine( oLine, 0.5 )
+	oResultStart = GetStartOfLine( oResult )
+	oResultEnd = GetEndOfLine( oResult )
+	
+	lResult = lResult And TestNumberValue( "CreateLineBetweenPoints 1 x", CentroidX( oResultStart ), 1 )
+	lResult = lResult And TestNumberValue( "CreateLineBetweenPoints 1 y", CentroidY( oResultStart ), 1 )
+	lResult = lResult And TestNumberValue( "CreateLineBetweenPoints 2 x", CentroidX( oResultEnd ), 1 )
+	lResult = lResult And TestNumberValue( "CreateLineBetweenPoints 2 y", CentroidY( oResultEnd ), 1 )
+	
+	oLine = CreateLine( 0, 2, 10, 12 )
+	oResult = PortionOfLine( oLine, 0 )
+	oResultStart = GetStartOfLine( oResult )
+	oResultEnd = GetEndOfLine( oResult )
+	
+	lResult = lResult And TestNumberValue( "CreateLineBetweenPoints 3 x", CentroidX( oResultStart ), 0 )
+	lResult = lResult And TestNumberValue( "CreateLineBetweenPoints 3 y", CentroidY( oResultStart ), 2 )
+	lResult = lResult And TestNumberValue( "CreateLineBetweenPoints 4 x", CentroidX( oResultEnd ), 0 )
+	lResult = lResult And TestNumberValue( "CreateLineBetweenPoints 4 y", CentroidY( oResultEnd ), 2 )
+	
+	oResult = PortionOfLine( oLine, 1 )
+	oResultStart = GetStartOfLine( oResult )
+	oResultEnd = GetEndOfLine( oResult )
+	
+	lResult = lResult And TestNumberValue( "CreateLineBetweenPoints 5 x", CentroidX( oResultStart ), 0 )
+	lResult = lResult And TestNumberValue( "CreateLineBetweenPoints 5 y", CentroidY( oResultStart ), 2 )
+	lResult = lResult And TestNumberValue( "CreateLineBetweenPoints 6 x", CentroidX( oResultEnd ), 10 )
+	lResult = lResult And TestNumberValue( "CreateLineBetweenPoints 6 y", CentroidY( oResultEnd ), 12 )
+	
+	oResult = PortionOfLine( oLine, 0.5 )
+	oResultStart = GetStartOfLine( oResult )
+	oResultEnd = GetEndOfLine( oResult )
+	
+	lResult = lResult And TestNumberValue( "CreateLineBetweenPoints 7 x", CentroidX( oResultStart ), 0 )
+	lResult = lResult And TestNumberValue( "CreateLineBetweenPoints 7 y", CentroidY( oResultStart ), 2 )
+	lResult = lResult And TestNumberValue( "CreateLineBetweenPoints 8 x", CentroidX( oResultEnd ), 5 )
+	lResult = lResult And TestNumberValue( "CreateLineBetweenPoints 8 y", CentroidY( oResultEnd ), 7 )
+	
+	TestGetPortionOfLine = lResult
+End Function
+
+Function TestNodePoint() As Logical
+	Dim lResult As Logical
+	lResult = TRUE
+	
+	Dim oLine As Object
+	Create Pline Into Variable oLine 3 ( 1, 1 ) ( 10, 2 ) ( 20, 5 )
+	
+	Dim oResult As Object
+	oResult = NodePoint( oLine, 1, 1 )
+	lResult = lResult And TestNumberValue( "NodePoint 1 x", CentroidX( oResult ), 1 )
+	lResult = lResult And TestNumberValue( "NodePoint 1 y", CentroidY( oResult ), 1 )
+	oResult = NodePoint( oLine, 1, 2 )
+	lResult = lResult And TestNumberValue( "NodePoint 1 x", CentroidX( oResult ), 10 )
+	lResult = lResult And TestNumberValue( "NodePoint 1 y", CentroidY( oResult ), 2 )
+	oResult = NodePoint( oLine, 1, 3 )
+	lResult = lResult And TestNumberValue( "NodePoint 1 x", CentroidX( oResult ), 20 )
+	lResult = lResult And TestNumberValue( "NodePoint 1 y", CentroidY( oResult ), 5 )
+	
+	Create Pline Into Variable oLine Multiple 3 3 ( 1, 1 ) ( 10, 2 ) ( 20, 5 ) 3 ( 10, 10 ) ( 100, 20 ) ( 200, 50 ) 3 ( 100, 100 ) ( 1000, 200 ) ( 20, 500 )
+	oResult = NodePoint( oLine, 2, 1 )
+	lResult = lResult And TestNumberValue( "NodePoint 1 x", CentroidX( oResult ), 10 )
+	lResult = lResult And TestNumberValue( "NodePoint 1 y", CentroidY( oResult ), 10 )
+	oResult = NodePoint( oLine, 2, 2 )
+	lResult = lResult And TestNumberValue( "NodePoint 1 x", CentroidX( oResult ), 100 )
+	lResult = lResult And TestNumberValue( "NodePoint 1 y", CentroidY( oResult ), 20 )
+	oResult = NodePoint( oLine, 2, 3 )
+	lResult = lResult And TestNumberValue( "NodePoint 1 x", CentroidX( oResult ), 200 )
+	lResult = lResult And TestNumberValue( "NodePoint 1 y", CentroidY( oResult ), 50 )
+	oResult = NodePoint( oLine, 3, 1 )
+	lResult = lResult And TestNumberValue( "NodePoint 1 x", CentroidX( oResult ), 100 )
+	lResult = lResult And TestNumberValue( "NodePoint 1 y", CentroidY( oResult ), 100 )
+	oResult = NodePoint( oLine, 3, 2 )
+	lResult = lResult And TestNumberValue( "NodePoint 1 x", CentroidX( oResult ), 1000 )
+	lResult = lResult And TestNumberValue( "NodePoint 1 y", CentroidY( oResult ), 200 )
+	oResult = NodePoint( oLine, 3, 3 )
+	lResult = lResult And TestNumberValue( "NodePoint 1 x", CentroidX( oResult ), 20 )
+	lResult = lResult And TestNumberValue( "NodePoint 1 y", CentroidY( oResult ), 500 )
+	
+	TestNodePoint = lResult
+End Function
+
+Function TestIsSubFolder() As Logical
+	Dim lResult As Logical
+	lResult = TRUE
+	
+	lResult = lResult And TestLogicalValue( "IsSubFolder blank 1", IsSubFolder( "", "C:\" ), FALSE )
+	lResult = lResult And TestLogicalValue( "IsSubFolder blank 2", IsSubFolder( "c:\", "" ), FALSE )
+	lResult = lResult And TestLogicalValue( "IsSubFolder blank both", IsSubFolder( "", "" ), FALSE )
+	lResult = lResult And TestLogicalValue( "IsSubFolder true", IsSubFolder( "c:\windows", "c:\" ), TRUE )
+	lResult = lResult And TestLogicalValue( "IsSubFolder caps true", IsSubFolder( "c:\wInDoWs", "C:\" ), TRUE )
+	lResult = lResult And TestLogicalValue( "IsSubFolder slashes true", IsSubFolder( "c:\windows\", "c:" ), TRUE )
+	lResult = lResult And TestLogicalValue( "IsSubFolder false", IsSubFolder( "c:\", "c:\Windows" ), FALSE )
+	lResult = lResult And TestLogicalValue( "IsSubFolder false", IsSubFolder( "c:\windows", "d:\" ), FALSE )
+	
+	TestIsSubFolder = lResult
+End Function
+
+Function TestIsDate() As Logical
+	Dim lResult As Logical
+	lResult = TRUE
+	
+	lResult = lResult And TestLogicalValue( "IsDate good", IsDate( "1/1/2014" ), TRUE )
+	lResult = lResult And TestLogicalValue( "IsDate bad", IsDate( "x" ), FALSE )
+	lResult = lResult And TestLogicalValue( "IsDate blank", IsDate( "" ), FALSE )
+	lResult = lResult And TestLogicalValue( "IsDate bad date", IsDate( "30/02/2014" ), FALSE )
+	lResult = lResult And TestLogicalValue( "IsDate US date", IsDate( "01/30/2014" ), FALSE )
+	lResult = lResult And TestLogicalValue( "IsDate number", IsDate( "1" ), FALSE )
+	lResult = lResult And TestLogicalValue( "IsDate date time", IsDate( "1/1/2014 10:00" ), FALSE )
+	
+	TestIsDate = lResult
+End Function
+
+Function TestTableIsVector() As Logical
+	Dim lResult As Logical
+	lResult = TRUE
+	
+	Open Table ApplicationDirectory$() + "test_data\rect.tab" As BaseTable
+	Open Table ApplicationDirectory$() + "test_data\raster.tab" As RasterTable
+	Open Table ApplicationDirectory$() + "test_data\wfs.tab" As WfsTable
+	Open Table ApplicationDirectory$() + "test_data\wms.tab" As WmsTable
+	Open Table ApplicationDirectory$() + "test_data\linked.tab" As LinkedTable
+	Open Table ApplicationDirectory$() + "test_data\tileserver.tab" As TileServerTable
+	Select * From BaseTable Where RowId = 1 Into QueryTable NoSelect
+	
+	lResult = lResult And TestLogicalValue( "TableIsVector no table", TableIsVector( "" ), FALSE )
+	lResult = lResult And TestLogicalValue( "TableIsVector bad table", TableIsVector( "bad" ), FALSE )
+	lResult = lResult And TestLogicalValue( "TableIsVector base", TableIsVector( "BaseTable" ), TRUE )
+	lResult = lResult And TestLogicalValue( "TableIsVector query", TableIsVector( "QueryTable" ), TRUE )
+	' Not sure what a "VIEW" table actually is - I can't find any examples of them
+	'lResult = lResult And TestLogicalValue( "TableIsVector view", TableIsVector( "view" ), TRUE )
+	lResult = lResult And TestLogicalValue( "TableIsVector image", TableIsVector( "RasterTable" ), FALSE )
+	lResult = lResult And TestLogicalValue( "TableIsVector linked", TableIsVector( "LinkedTable" ), TRUE )
+	lResult = lResult And TestLogicalValue( "TableIsVector wms", TableIsVector( "WmsTable" ), FALSE )
+	lResult = lResult And TestLogicalValue( "TableIsVector wfs", TableIsVector( "WfsTable" ), TRUE )
+	lResult = lResult And TestLogicalValue( "TableIsVector tileserver", TableIsVector( "TileServerTable" ), FALSE )
+	
+	Close All
+	
+	TestTableIsVector = lResult
+End Function
+
+Function TestGetColumnList() As Logical
+	Dim lResult As Logical
+	lResult = TRUE
+	
+	Dim sColumns() As String
+	
+	Open Table ApplicationDirectory$() + "test_data\rect.tab" As BaseTable
+	
+	lResult = lResult And TestLogicalValue( "GetColumnList no table", GetColumnList( "", sColumns ), FALSE )
+	lResult = lResult And TestNumberValue( "GetColumnList no table 2", UBound( sColumns ) , 0 )
+	
+	ReDim sColumns(1)
+	sColumns(1) = "test"
+	
+	lResult = lResult And TestLogicalValue( "GetColumnList no table clear A", GetColumnList( "", sColumns ), FALSE )
+	lResult = lResult And TestNumberValue( "GetColumnList no table clear A 2 ", UBound( sColumns ) , 0 )
+	
+	lResult = lResult And TestLogicalValue( "GetColumnList bad table", GetColumnList( "bad", sColumns ), FALSE )
+	lResult = lResult And TestNumberValue( "GetColumnList bad table 2", UBound( sColumns ) , 0 )
+	
+	lResult = lResult And TestLogicalValue( "GetColumnList valid table", GetColumnList( "BaseTable", sColumns ), TRUE )
+	lResult = lResult And TestNumberValue( "GetColumnList valid table 2", UBound( sColumns ), 11 )
+	lResult = lResult And TestStringValue( "GetColumnList valid table 2a", sColumns(1), "id" )
+	lResult = lResult And TestStringValue( "GetColumnList valid table 2b", sColumns(2), "string_column" )
+	lResult = lResult And TestStringValue( "GetColumnList valid table 2c", sColumns(3), "another_string_column" )
+	
+	Close All
+	
+	TestGetColumnList = lResult
+End Function
+
+Function TestBitwiseTest() As Logical
+	Dim lResult As Logical
+	lResult = TRUE
+	
+	' Easy tests
+	lResult = lResult And TestLogicalValue( "BitwiseTest 0 0", BitwiseTest( 0, 0 ), FALSE )
+	lResult = lResult And TestLogicalValue( "BitwiseTest 1 1", BitwiseTest( 0, 1 ), FALSE )
+	lResult = lResult And TestLogicalValue( "BitwiseTest 1 1", BitwiseTest( 1, 1 ), TRUE )
+	
+	' Complex tests
+	lResult = lResult And TestLogicalValue( "BitwiseTest 0 2", BitwiseTest( 0, 2 ), FALSE )
+	lResult = lResult And TestLogicalValue( "BitwiseTest 1 2", BitwiseTest( 1, 2 ), FALSE )
+	lResult = lResult And TestLogicalValue( "BitwiseTest 2 2", BitwiseTest( 2, 2 ), TRUE )
+	lResult = lResult And TestLogicalValue( "BitwiseTest 3 2", BitwiseTest( 3, 2 ), TRUE )
+	lResult = lResult And TestLogicalValue( "BitwiseTest 4 2", BitwiseTest( 4, 2 ), FALSE )
+	lResult = lResult And TestLogicalValue( "BitwiseTest 5 2", BitwiseTest( 5, 2 ), FALSE )
+	lResult = lResult And TestLogicalValue( "BitwiseTest 6 2", BitwiseTest( 6, 2 ), TRUE )
+	lResult = lResult And TestLogicalValue( "BitwiseTest 8 2", BitwiseTest( 8, 2 ), FALSE )
+	lResult = lResult And TestLogicalValue( "BitwiseTest 8+2 2", BitwiseTest( 8 + 2, 2 ), TRUE )
+	
+	lResult = lResult And TestLogicalValue( "BitwiseTest 0 4", BitwiseTest( 0, 4 ), FALSE )
+	lResult = lResult And TestLogicalValue( "BitwiseTest 1 4", BitwiseTest( 1, 4 ), FALSE )
+	lResult = lResult And TestLogicalValue( "BitwiseTest 2 4", BitwiseTest( 2, 4 ), FALSE )
+	lResult = lResult And TestLogicalValue( "BitwiseTest 4 4", BitwiseTest( 4, 4 ), TRUE )
+	lResult = lResult And TestLogicalValue( "BitwiseTest 5 4", BitwiseTest( 5, 4 ), TRUE )
+	lResult = lResult And TestLogicalValue( "BitwiseTest 6 4", BitwiseTest( 6, 4 ), TRUE )
+	lResult = lResult And TestLogicalValue( "BitwiseTest 8 4", BitwiseTest( 8, 4 ), FALSE )
+	lResult = lResult And TestLogicalValue( "BitwiseTest 12 4", BitwiseTest( 12, 4 ), TRUE )
+	lResult = lResult And TestLogicalValue( "BitwiseTest 13 4", BitwiseTest( 13, 4 ), TRUE )
+	
+	TestBitwiseTest = lResult
+End Function
+
+Function TestObjectIsPolygon() As Logical
+	
+	Dim lResult As Logical
+	lResult = TRUE
+	
+	Dim oObj As Object
+	
+	' Arc
+	Create Arc Into Variable oObj( 1, 1 ) ( 2, 2 ) 0 100
+	lResult = lResult And TestLogicalValue( "ObjectIsPolygon arc", ObjectIsPolygon( oObj ), FALSE )
+	' Ellipse
+	Create Ellipse Into Variable oObj( 1, 1 ) ( 2, 2 )
+	lResult = lResult And TestLogicalValue( "ObjectIsPolygon ellipse", ObjectIsPolygon( oObj ), TRUE )
+	' Line
+	Create Line Into Variable oObj( 1, 1 ) ( 2, 2 )
+	lResult = lResult And TestLogicalValue( "ObjectIsPolygon line", ObjectIsPolygon( oObj ), FALSE )
+	' PLine
+	Create Pline Into Variable oObj Multiple 2 2 ( 1, 1 ) ( 2, 2 ) 2 ( 3, 3 ) ( 4, 4 )
+	lResult = lResult And TestLogicalValue( "ObjectIsPolygon pline", ObjectIsPolygon( oObj ), FALSE )
+	' Point
+	Create Point Into Variable oObj ( 1, 1 )
+	lResult = lResult And TestLogicalValue( "ObjectIsPolygon point", ObjectIsPolygon( oObj ), FALSE )
+	' Frame
+	Create Frame Into Variable oObj ( 1, 1 ) ( 2, 2 )
+	lResult = lResult And TestLogicalValue( "ObjectIsPolygon frame", ObjectIsPolygon( oObj ), TRUE )
+	' Region
+	Create Region Into Variable oObj 1 3 ( 1, 1 ) ( 2, 2 ) ( 1, 2 )
+	lResult = lResult And TestLogicalValue( "ObjectIsPolygon region", ObjectIsPolygon( oObj ), TRUE )
+	' Rect
+	Create Rect Into Variable oObj ( 1, 1 ) ( 2, 2 )
+	lResult = lResult And TestLogicalValue( "ObjectIsPolygon rect", ObjectIsPolygon( oObj ), TRUE )
+	' RoundRect
+	Create RoundRect Into Variable oObj ( 1, 1 ) ( 2, 2 ) 0.1
+	lResult = lResult And TestLogicalValue( "ObjectIsPolygon roundrect", ObjectIsPolygon( oObj ), TRUE )
+	' Text
+	Create Text Into Variable oObj "test" ( 1, 1 ) ( 2, 2 )
+	lResult = lResult And TestLogicalValue( "ObjectIsPolygon text", ObjectIsPolygon( oObj ), FALSE )
+	' MultiPoint
+	Create MultiPoint Into Variable oObj 2 ( 1, 1 ) ( 2, 2 )
+	lResult = lResult And TestLogicalValue( "ObjectIsPolygon multipoint", ObjectIsPolygon( oObj ), FALSE )
+	' Collection
+	Create Collection Into Variable oObj MultiPoint 2 ( 1, 1 ) ( 2, 2 )
+	lResult = lResult And TestLogicalValue( "ObjectIsPolygon multipoint", ObjectIsPolygon( oObj ), FALSE )
+	
+	TestObjectIsPolygon = lResult
+	
+End Function
+
+Function TestSelectionIsPolygons() As Logical
+	Dim lResult As Logical
+	lResult = TRUE
+	
+	Close All
+	
+	' no table
+	lResult = lResult And TestLogicalValue( "SelectionIsPolygons no table", SelectionIsPolygons( ALLOW_MULTIPLE ), FALSE )
+	
+	Open Table ApplicationDirectory$() + "test_data\mixed.tab" As Mixed
+	
+	' no selection
+	lResult = lResult And TestLogicalValue( "SelectionIsPolygons no selection", SelectionIsPolygons( ALLOW_MULTIPLE ), FALSE )
+	
+	Select * From Mixed
+	lResult = lResult And TestLogicalValue( "SelectionIsPolygons mixed", SelectionIsPolygons( ALLOW_MULTIPLE ), FALSE )
+	
+	Select * From Mixed Where Type = "Region" Or Type = "Rectangle" Or Type = "Rounded Rectangle"
+	lResult = lResult And TestLogicalValue( "SelectionIsPolygons regions", SelectionIsPolygons( ALLOW_MULTIPLE ), TRUE )
+	lResult = lResult And TestLogicalValue( "SelectionIsPolygons regions single", SelectionIsPolygons( ALLOW_SINGLE_ONLY ), FALSE )
+	
+	Select * From Mixed Where RowId = 2
+	lResult = lResult And TestLogicalValue( "SelectionIsPolygons regions single true", SelectionIsPolygons( ALLOW_SINGLE_ONLY ), TRUE )
+	
+	Select * From Mixed Where Type = "Region" Or Type = "No Object"
+	lResult = lResult And TestLogicalValue( "SelectionIsPolygons no object row", SelectionIsPolygons( ALLOW_MULTIPLE ), FALSE )
+	
+	Map From Mixed
+	' Cosmetic
+	Dim oRect, oRect2 As Object
+	Create Rect Into Variable oRect ( 1, 1 ) ( 2, 2 )
+	Create Rect Into Variable oRect2 ( 3, 3 ) ( 4, 4 )
+	
+	Call DrawInCosmetic( oRect, FrontWindow())
+	Call DrawInCosmetic( oRect2, FrontWindow())
+	
+	Select * From WindowInfo( FrontWindow(), WIN_INFO_TABLE )
+	lResult = lResult And TestLogicalValue( "SelectionIsPolygons cosmetic", SelectionIsPolygons( ALLOW_MULTIPLE ), TRUE )
+	
+	Create Point Into Variable oRect ( 3, 3 )
+	Call DrawInCosmetic( oRect, FrontWindow())
+	Select * From WindowInfo( FrontWindow(), WIN_INFO_TABLE )
+	lResult = lResult And TestLogicalValue( "SelectionIsPolygons cosmetic mixed", SelectionIsPolygons( ALLOW_MULTIPLE ), FALSE )
+	
+	Open Table ApplicationDirectory$() + "test_data\non_mappable.tab" As NonMappable
+	Select * From NonMappable
+	lResult = lResult And TestLogicalValue( "SelectionIsPolygons non mappable", SelectionIsPolygons( ALLOW_MULTIPLE ), FALSE )
+	
+	Close All
+	TestSelectionIsPolygons = lResult
+End Function
+
+Function TestConcatWithSeperator() As Logical
+	Dim lResult As Logical
+	lResult = TRUE
+	
+	lResult = lResult And TestStringValue( "ConcatWithSeperator no strings", ConcatWithSeperator( "", "", "" ), "" )
+	lResult = lResult And TestStringValue( "ConcatWithSeperator no strings 2", ConcatWithSeperator( "", "-", "" ), "" )
+	lResult = lResult And TestStringValue( "ConcatWithSeperator no string 1", ConcatWithSeperator( "a", "-", "" ), "a" )
+	lResult = lResult And TestStringValue( "ConcatWithSeperator no string 2", ConcatWithSeperator( "", "-", "b" ), "b" )
+	lResult = lResult And TestStringValue( "ConcatWithSeperator joined", ConcatWithSeperator( "a", "-", "b" ), "a-b" )
+	lResult = lResult And TestStringValue( "ConcatWithSeperator no seperator", ConcatWithSeperator( "a", "", "b" ), "ab" )
+	
+	TestConcatWithSeperator = lResult
+	
+End Function
+
+Function TestPrettyStringArray() As Logical
+	Dim sArray() As String
+	Dim lResult As Logical
+	lResult = TRUE
+	
+	lResult = lResult And TestStringValue( "PrettyStringArray no strings", PrettyStringArray( sArray, "and" ), "" )
+	lResult = lResult And TestStringValue( "PrettyStringArray no sep", PrettyStringArray( sArray, "" ), "" )
+	ReDim sArray(1)
+	sArray(1) = "string1"
+	lResult = lResult And TestStringValue( "PrettyStringArray one string", PrettyStringArray( sArray, "" ), "string1" )
+	ReDim sArray(2)
+	sArray(2) = "string2"
+	lResult = lResult And TestStringValue( "PrettyStringArray two strings, no sep", PrettyStringArray( sArray, "" ), "string1  string2" )
+	lResult = lResult And TestStringValue( "PrettyStringArray two strings, and", PrettyStringArray( sArray, "and" ), "string1 and string2" )
+	lResult = lResult And TestStringValue( "PrettyStringArray two strings, or", PrettyStringArray( sArray, "or" ), "string1 or string2" )
+	ReDim sArray(3)
+	sArray(3) = "string3"
+	lResult = lResult And TestStringValue( "PrettyStringArray three strings", PrettyStringArray( sArray, "and" ), "string1, string2 and string3" )
+	ReDim sArray(4)
+	sArray(4) = "string4"
+	lResult = lResult And TestStringValue( "PrettyStringArray four strings", PrettyStringArray( sArray, "and" ), "string1, string2, string3 and string4" )
+	
+	TestPrettyStringArray = lResult
+End Function
+
+Function TestConvertDate() As Logical
+	Dim lResult As Logical
+	Dim lConvertOk As Logical
+	lResult = TRUE
+	Dim dDate As Date
+	dDate = StringToDate( "1/1/00" )
+	lResult = lResult And TestLogicalValue( "ConvertDate empty", ConvertDate( "", dDate ), FALSE )
+	lResult = lResult And TestDateValue( "ConvertDate empty date", dDate, StringToDate( "1/1/00" ) )
+	lResult = lResult And TestLogicalValue( "ConvertDate bad date", ConvertDate( "not a date", dDate ), FALSE )
+	lResult = lResult And TestDateValue( "ConvertDate bad date result", dDate, StringToDate( "1/1/00" ) )
+	lResult = lResult And TestLogicalValue( "ConvertDate bad date 2", ConvertDate( "30/15/00", dDate ), FALSE )
+	lResult = lResult And TestDateValue( "ConvertDate bad date 2 result", dDate, StringToDate( "1/1/00" ) )
+	lResult = lResult And TestLogicalValue( "ConvertDate bad date 3", ConvertDate( "29/02/01", dDate ), FALSE )
+	lResult = lResult And TestDateValue( "ConvertDate bad date 3 result", dDate, StringToDate( "1/1/00" ) )
+	lResult = lResult And TestLogicalValue( "ConvertDate bad date 4", ConvertDate( "05/30/10", dDate ), FALSE )
+	lResult = lResult And TestDateValue( "ConvertDate bad date 4 result", dDate, StringToDate( "1/1/00" ) )
+	lResult = lResult And TestLogicalValue( "ConvertDate too short", ConvertDate( "10213", dDate ), FALSE )
+	lResult = lResult And TestDateValue( "ConvertDate too short result", dDate, StringToDate( "1/1/00" ) )
+	lResult = lResult And TestLogicalValue( "ConvertDate bad name", ConvertDate( "10FEV13", dDate ), FALSE )
+	lResult = lResult And TestDateValue( "ConvertDate bad name result", dDate, StringToDate( "1/1/00" ) )
+	lResult = lResult And TestLogicalValue( "ConvertDate bad name 2", ConvertDate( "10FEB013", dDate ), FALSE )
+	lResult = lResult And TestDateValue( "ConvertDate bad name result 2", dDate, StringToDate( "1/1/00" ) )
+	
+	lResult = lResult And TestLogicalValue( "ConvertDate simple", ConvertDate( "01/01/11", dDate ), TRUE )
+	lResult = lResult And TestDateValue( "ConvertDate simple result", dDate, StringToDate( "1/1/11" ) )
+	dDate = StringToDate( "1/1/00" )
+	lResult = lResult And TestLogicalValue( "ConvertDate simple 2", ConvertDate( "10/01/70", dDate ), TRUE )
+	lResult = lResult And TestDateValue( "ConvertDate simple 2 result", dDate, StringToDate( "10/1/70" ) )
+	dDate = StringToDate( "1/1/00" )
+	lResult = lResult And TestLogicalValue( "ConvertDate dashes", ConvertDate( "30-05-10", dDate ), TRUE )
+	lResult = lResult And TestDateValue( "ConvertDate dashes result", dDate, StringToDate( "30/5/10" ) )
+	dDate = StringToDate( "1/1/00" )
+	lResult = lResult And TestLogicalValue( "ConvertDate dashes reversed", ConvertDate( "2010-05-30", dDate ), TRUE )
+	lResult = lResult And TestDateValue( "ConvertDate dashes reversed result", dDate, StringToDate( "30/5/10" ) )
+	dDate = StringToDate( "1/1/00" )
+	lResult = lResult And TestLogicalValue( "ConvertDate no sep", ConvertDate( "100313", dDate ), TRUE )
+	lResult = lResult And TestDateValue( "ConvertDate no sep result", dDate, StringToDate( "10/3/13" ) )
+	dDate = StringToDate( "1/1/00" )
+	lResult = lResult And TestLogicalValue( "ConvertDate no sep 2", ConvertDate( "10MAR13", dDate ), TRUE )
+	lResult = lResult And TestDateValue( "ConvertDate no sep result 2", dDate, StringToDate( "10/3/13" ) )
+	dDate = StringToDate( "1/1/00" )
+	lResult = lResult And TestLogicalValue( "ConvertDate no sep 3", ConvertDate( "10Mar2013", dDate ), TRUE )
+	lResult = lResult And TestDateValue( "ConvertDate no sep result 3", dDate, StringToDate( "10/3/13" ) )
+	dDate = StringToDate( "1/1/00" )
+	
+	TestConvertDate = lResult
+End Function
+
+Function TestConvertTime() As Logical
+	Dim lResult As Logical
+	Dim lConvertOk As Logical
+	lResult = TRUE
+	Dim tTime As Time
+	tTime = StringToTime( "0:00" )
+	lResult = lResult And TestLogicalValue( "ConvertTime empty", ConvertTime( "", tTime ), FALSE )
+	lResult = lResult And TestTimeValue( "ConvertTime empty time", tTime, StringToTime( "0:00" ) )
+	lResult = lResult And TestLogicalValue( "ConvertTime bad time", ConvertTime( "not a time", tTime ), FALSE )
+	lResult = lResult And TestTimeValue( "ConvertTime bad time result", tTime, StringToTime( "0:00" ) )
+	lResult = lResult And TestLogicalValue( "ConvertTime bad time 2", ConvertTime( "25:30", tTime ), FALSE )
+	lResult = lResult And TestTimeValue( "ConvertTime bad time 2 result", tTime, StringToTime( "0:00" ) )
+	lResult = lResult And TestLogicalValue( "ConvertTime bad time 3", ConvertTime( "12:90", tTime ), FALSE )
+	lResult = lResult And TestTimeValue( "ConvertTime bad time 3 result", tTime, StringToTime( "0:00" ) )
+	lResult = lResult And TestLogicalValue( "ConvertTime bad time decimal", ConvertTime( "1.60", tTime ), FALSE )
+	lResult = lResult And TestTimeValue( "ConvertTime bad time decimal result", tTime, StringToTime( "0:00" ) )
+	lResult = lResult And TestLogicalValue( "ConvertTime bad time decimal 2", ConvertTime( "24.10", tTime ), FALSE )
+	lResult = lResult And TestTimeValue( "ConvertTime bad time decimal result 2", tTime, StringToTime( "0:00" ) )
+	lResult = lResult And TestLogicalValue( "ConvertTime bad time decimal 3", ConvertTime( "31.10", tTime ), FALSE )
+	lResult = lResult And TestTimeValue( "ConvertTime bad time decimal result 3", tTime, StringToTime( "0:00" ) )
+	
+	lResult = lResult And TestLogicalValue( "ConvertTime overflow", ConvertTime( "20197310000", tTime ), FALSE )
+	
+	lResult = lResult And TestLogicalValue( "ConvertTime decimal good", ConvertTime( "1.10", tTime ), TRUE )
+	lResult = lResult And TestTimeValue( "ConvertTime simple result", tTime, StringToTime( "1:10" ) )
+	tTime = StringToTime( "0:00" )
+	lResult = lResult And TestLogicalValue( "ConvertTime decimal good 2", ConvertTime( "12.59", tTime ), TRUE )
+	lResult = lResult And TestTimeValue( "ConvertTime simple result 2", tTime, StringToTime( "12:59" ) )
+	tTime = StringToTime( "0:00" )
+	lResult = lResult And TestLogicalValue( "ConvertTime decimal good 3", ConvertTime( "23.59", tTime ), TRUE )
+	lResult = lResult And TestTimeValue( "ConvertTime simple result 3", tTime, StringToTime( "23:59" ) )
+	tTime = StringToTime( "0:00" )
+	lResult = lResult And TestLogicalValue( "ConvertTime decimal good 4", ConvertTime( "3.1", tTime ), TRUE )
+	lResult = lResult And TestTimeValue( "ConvertTime simple result 4", tTime, StringToTime( "3:10" ) )
+	tTime = StringToTime( "0:00" )
+	lResult = lResult And TestLogicalValue( "ConvertTime fraction 1", ConvertTime( "0.5", tTime ), TRUE )
+	lResult = lResult And TestTimeValue( "ConvertTime fraction result 1", tTime, StringToTime( "12:00" ) )
+	tTime = StringToTime( "0:00" )
+	lResult = lResult And TestLogicalValue( "ConvertTime fraction 2", ConvertTime( "0.04166667", tTime ), TRUE )
+	lResult = lResult And TestTimeValue( "ConvertTime fraction result 2", tTime, StringToTime( "1:00" ) )
+	tTime = StringToTime( "0:00" )
+	lResult = lResult And TestLogicalValue( "ConvertTime string 1", ConvertTime( "23:59", tTime ), TRUE )
+	lResult = lResult And TestTimeValue( "ConvertTime string result 1", tTime, StringToTime( "23:59" ) )
+	tTime = StringToTime( "0:00" )
+	lResult = lResult And TestLogicalValue( "ConvertTime string 2", ConvertTime( "03:01", tTime ), TRUE )
+	lResult = lResult And TestTimeValue( "ConvertTime string result 2", tTime, StringToTime( "3:01" ) )
+	tTime = StringToTime( "0:00" )
+	lResult = lResult And TestLogicalValue( "ConvertTime string 3", ConvertTime( "03:01:03", tTime ), TRUE )
+	lResult = lResult And TestTimeValue( "ConvertTime string result 3", tTime, StringToTime( "3:01:03" ) )
+	tTime = StringToTime( "0:00" )
+	lResult = lResult And TestLogicalValue( "ConvertTime string 4", ConvertTime( "03.01.03", tTime ), TRUE )
+	lResult = lResult And TestTimeValue( "ConvertTime string result 4", tTime, StringToTime( "3:01:03" ) )
+	tTime = StringToTime( "0:00" )
+	lResult = lResult And TestLogicalValue( "ConvertTime string 5", ConvertTime( "03:01:03:908", tTime ), TRUE )
+	lResult = lResult And TestTimeValue( "ConvertTime string result 5", tTime, StringToTime( "3:01:03.908" ) )
+	tTime = StringToTime( "0:00" )
+	
+	TestConvertTime = lResult
+End Function
+
+
+Function TestGetWindowsVersion() As Logical
+	Dim lResult As Logical
+	
+	lResult = TRUE
+	' Will need to update this value if Windows version changes
+	lResult = lResult And TestStringValue( "GetWindowsVersion", GetWindowsVersion(), "6.1" )
+	
+	TestGetWindowsVersion = lResult
+End Function
+
+Function TestGetWorkstationName() As Logical
+	Dim lResult As Logical
+	
+	lResult = TRUE
+	' Will need to update this value if workstation changes
+	lResult = lResult And TestStringValue( "GetWorkstationName", GetWorkstationName(), "GAU-PC1" )
+	
+	TestGetWorkstationName = lResult
+End Function
+
+Function TestWordWrap() As Logical
+	Dim lResult As Logical
+	
+	lResult = TRUE
+	
+	lResult = lResult And TestStringValue( "WordWrap short", WordWrap( "test", 10 ), "test" )
+	lResult = lResult And TestStringValue( "WordWrap bad length", WordWrap( "test", 0 ), "test" )
+	lResult = lResult And TestStringValue( "WordWrap good", WordWrap( "test some sentence which needs wrapping", 20 ), "test some sentence" + Chr$(13) + "which needs wrapping" )
+	lResult = lResult And TestStringValue( "WordWrap no space", WordWrap( "testsomesentencewhichneedswrapping", 20 ), "testsomesentencewhic" + Chr$(13) + "hneedswrapping" )
+	
+	TestWordWrap = lResult
+End Function
+
+Function TestIsLeapYear() As Logical
+	Dim lResult As Logical
+	
+	lResult = TRUE
+	
+	lResult = lResult And TestLogicalValue( "IsLeapYear 1999", IsLeapYear(1999), FALSE )
+	lResult = lResult And TestLogicalValue( "IsLeapYear 2000", IsLeapYear(2000), TRUE )
+	lResult = lResult And TestLogicalValue( "IsLeapYear 2004", IsLeapYear(2004), TRUE )
+	lResult = lResult And TestLogicalValue( "IsLeapYear 2300", IsLeapYear(2300), FALSE )
+	lResult = lResult And TestLogicalValue( "IsLeapYear 2001", IsLeapYear(2001), FALSE )
+	
+	TestIsLeapYear = lResult
+End Function
+
+Function TestDaysInMonth() As Logical
+	Dim lResult As Logical
+	
+	lResult = TRUE
+	
+	lResult = lResult And TestNumberValue( "DaysInMonth Jan", DaysInMonth( 1, 1999 ), 31 )
+	lResult = lResult And TestNumberValue( "DaysInMonth Mar", DaysInMonth( 3, 1999 ), 31 )
+	lResult = lResult And TestNumberValue( "DaysInMonth Apr", DaysInMonth( 4, 1999 ), 30 )
+	lResult = lResult And TestNumberValue( "DaysInMonth May", DaysInMonth( 5, 1999 ), 31 )
+	lResult = lResult And TestNumberValue( "DaysInMonth Jun", DaysInMonth( 6, 1999 ), 30 )
+	lResult = lResult And TestNumberValue( "DaysInMonth Jul", DaysInMonth( 7, 1999 ), 31 )
+	lResult = lResult And TestNumberValue( "DaysInMonth Aug", DaysInMonth( 8, 1999 ), 31 )
+	lResult = lResult And TestNumberValue( "DaysInMonth Sep", DaysInMonth( 9, 1999 ), 30 )
+	lResult = lResult And TestNumberValue( "DaysInMonth Oct", DaysInMonth( 10, 1999 ), 31 )
+	lResult = lResult And TestNumberValue( "DaysInMonth Nov", DaysInMonth( 11, 1999 ), 30 )
+	lResult = lResult And TestNumberValue( "DaysInMonth Dec", DaysInMonth( 12, 1999 ), 31 )
+	lResult = lResult And TestNumberValue( "DaysInMonth Feb no leap", DaysInMonth( 2, 1999 ), 28 )
+	lResult = lResult And TestNumberValue( "DaysInMonth Feb leap", DaysInMonth( 2, 2000 ), 29 )
+	
+	TestDaysInMonth = lResult
+End Function
+
+
+Function TestTrimColumnListToExisting() As Logical
+	Dim lResult As Logical
+	
+	lResult = TRUE
+	Open Table ApplicationDirectory$() + "test_data\rect.tab" As BaseTable
+	
+	lResult = lResult And TestStringValue( "TrimColumnListToExisting no table", TrimColumnListToExisting( "", "" ), "" )
+	lResult = lResult And TestStringValue( "TrimColumnListToExisting no table 2", TrimColumnListToExisting( "bob,jo,philip", "" ), "" )
+	lResult = lResult And TestStringValue( "TrimColumnListToExisting bad table", TrimColumnListToExisting( "bad", "bob,jo" ), "" )
+	
+	lResult = lResult And TestStringValue( "TrimColumnListToExisting valid table", TrimColumnListToExisting( "BaseTable", "" ), "" )
+	lResult = lResult And TestStringValue( "TrimColumnListToExisting valid table 2", TrimColumnListToExisting( "BaseTable", "id" ), "id" )
+	lResult = lResult And TestStringValue( "TrimColumnListToExisting valid table 3", TrimColumnListToExisting( "BaseTable", "string_column" ), "string_column" )
+	lResult = lResult And TestStringValue( "TrimColumnListToExisting valid table 4", TrimColumnListToExisting( "BaseTable", "another_string_column" ), "another_string_column" )
+	lResult = lResult And TestStringValue( "TrimColumnListToExisting valid table 5", TrimColumnListToExisting( "BaseTable", "string_column,another_string_column" ), "string_column,another_string_column" )
+	lResult = lResult And TestStringValue( "TrimColumnListToExisting valid table 6", TrimColumnListToExisting( "BaseTable", "another_string_column,string_column" ), "another_string_column,string_column" )
+	lResult = lResult And TestStringValue( "TrimColumnListToExisting valid table 7", TrimColumnListToExisting( "BaseTable", "another_string_column,badcol" ), "another_string_column" )
+	lResult = lResult And TestStringValue( "TrimColumnListToExisting valid table 8", TrimColumnListToExisting( "BaseTable", "allbadcols,badcol" ), "" )
+	
+	Close All
+	
+	TestTrimColumnListToExisting = lResult
+	
+End Function

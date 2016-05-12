@@ -1,0 +1,9 @@
+!table
+!version 1050
+!charset WindowsLatin1
+
+Definition Table
+  File "tileserver.xml"
+  Type "TILESERVER"
+  CoordSys Earth Projection 10, 157, "m", 0 Bounds (-20037508.342789244, -20037508.343038857) (20037508.342789244, 20037508.343038857)
+ReadOnly

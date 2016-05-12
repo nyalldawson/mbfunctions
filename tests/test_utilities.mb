@@ -1,0 +1,118 @@
+Include "test.def"
+
+Define ALMOST_ZERO 5e-009
+
+Function TestStringValue( ByVal sTestName As String, ByVal sResult As String, ByVal sExpected As String ) As Logical
+	If sResult <> sExpected Then
+		Call AppendToLog( "FAIL!", sTestName, "expected: """ + sExpected + """, actual: """ + sResult + """", 1 )
+		TestStringValue = FALSE
+	Else
+		Call AppendToLog( "pass", sTestName, "expected: """ + sExpected + """, actual: """ + sResult + """", 2 )
+		TestStringValue = TRUE
+	End If
+End Function
+
+Function TestNumberValue( ByVal sTestName As String, ByVal fResult As Float, ByVal fExpected As Float ) As Logical
+	If Abs( fResult - fExpected ) > ALMOST_ZERO Then
+		Call AppendToLog( "FAIL!", sTestName, "expected: """ + fExpected + """, actual: """ + fResult + """", 1 )
+		TestNumberValue = FALSE
+	Else
+		Call AppendToLog( "pass", sTestName, "expected: """ + fExpected + """, actual: """ + fResult + """", 2 )
+		TestNumberValue = TRUE
+	End If
+End Function
+
+Function TestLogicalValue( ByVal sTestName As String, ByVal lResult As Logical, ByVal lExpected As Logical ) As Logical
+	If lResult <> lExpected Then
+		Call AppendToLog( "FAIL!", sTestName, "expected: """ + lExpected + """, actual: """ + lResult + """", 1 )
+		TestLogicalValue = FALSE
+	Else
+		Call AppendToLog( "pass", sTestName, "expected: """ + lExpected + """, actual: """ + lResult + """", 2 )
+		TestLogicalValue = TRUE
+	End If
+End Function
+
+Function TestDateTimeValue( ByVal sTestName As String, ByVal dtResult As DateTime, ByVal dtExpected As DateTime ) As Logical
+	If dtResult <> dtExpected Then
+		Call AppendToLog( "FAIL!", sTestName, "expected: """ + dtExpected + """, actual: """ + dtResult + """", 1 )
+		TestDateTimeValue = FALSE
+	Else
+		Call AppendToLog( "pass", sTestName, "expected: """ + dtExpected + """, actual: """ + dtResult + """", 2 )
+		TestDateTimeValue = TRUE
+	End If
+End Function
+
+Function TestDateValue( ByVal sTestName As String, ByVal dResult As Date, ByVal dExpected As Date ) As Logical
+	If dResult <> dExpected Then
+		Call AppendToLog( "FAIL!", sTestName, "expected: """ + dExpected + """, actual: """ + dResult + """", 1 )
+		TestDateValue = FALSE
+	Else
+		Call AppendToLog( "pass", sTestName, "expected: """ + dExpected + """, actual: """ + dResult + """", 2 )
+		TestDateValue = TRUE
+	End If
+End Function
+
+Function TestTimeValue( ByVal sTestName As String, ByVal tResult As Time, ByVal tExpected As Time ) As Logical
+	If tResult <> tExpected Then
+		Call AppendToLog( "FAIL!", sTestName, "expected: """ + tExpected + """, actual: """ + tResult + """", 1 )
+		TestTimeValue = FALSE
+	Else
+		Call AppendToLog( "pass", sTestName, "expected: """ + tExpected + """, actual: """ + tResult + """", 2 )
+		TestTimeValue = TRUE
+	End If
+End Function
+
+Function CompareImages( ByVal sTestName As String, ByVal sImageName As String ) As Logical
+	Dim sFilePathRendered, sFilePathExpected, sDiff As String
+	sFilePathRendered = "C:\Temp\" + sImageName + "_rendered.png"
+	sFilePathExpected = ApplicationDirectory$() + "test_data\control_images\" + sImageName + "_expected.png"
+	sDiff = "C:\Temp\" + sImageName + "_diff.png"
+	
+	Dim sCmd As String
+	sCmd = """C:\Program Files\ImageMagick-6.8.8-Q8\compare"" -metric AE """ + sFilePathExpected + """ """ + sFilePathRendered + """ """ + sDiff + """ 2> ""c:\temp\compare.log"""
+	Open File "C:\Temp\comparecmd.bat" For Output As 1
+	Print #1, sCmd
+	Close File #1
+	
+	If FileExists( "c:\temp\compare.log" ) Then
+		Kill "c:\temp\compare.log"
+	End If
+	
+	Run Program "C:\Temp\comparecmd.bat"
+	
+	Dim i As Integer
+	i = Timer()
+	Do Until FileExists( "c:\temp\compare.log" ) Or Timer() - i > 3
+	Loop
+	
+	If Not FileExists( "c:\temp\compare.log" ) Then
+		CompareImages = FALSE
+	End If
+	
+	' Wait a sec
+	i = Timer()
+	Do Until Timer() - i > 1
+	Loop
+	
+	Open File "c:\temp\compare.log" For Input As #1
+	Dim sLine As String
+	Input #1, sLine
+	Close File #1
+	
+	If sLine = "0" Then
+		Call AppendToLog( "pass", sTestName, "pixel difference " + sLine, 2 )
+		CompareImages = TRUE
+	Else
+		Call AppendToLog( "FAIL!", sTestName, "pixel difference " + sLine, 1 )
+		CompareImages = FALSE
+	End If
+	
+End Function
+
+
+Sub AppendToLog( ByVal sPrefix As String, ByVal sTest As String, ByVal sMessage As String, ByVal iLevel As Integer )
+	If iLevel <= LOG_MAX_LEVEL Then
+		TEST_LOG = TEST_LOG + sPrefix + " " + sTest + ": " + sMessage + Chr$(13)
+	End If
+End Sub
+

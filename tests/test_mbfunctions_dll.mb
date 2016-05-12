@@ -1,0 +1,347 @@
+Include "test.def"
+
+Declare Function TestRegExTest() As Logical
+Declare Function RandomString() As String
+Declare Function TestRegExMatch() As Logical
+Declare Function TestRegExMatchAll() As Logical
+Declare Function TestRegExMatchMultiple() As Logical
+Declare Function TestRegExReplace() As Logical
+Declare Function TestBetterRnd() As Logical
+
+Function TestMbFunctionsDll() As Logical
+	Dim lResult As Logical
+	lResult = TRUE
+	
+	' Test RegExTest function
+	lResult = lResult And TestRegExTest()
+	' Test RegExMatch function
+	lResult = lResult And TestRegExMatch()
+	' Test RegExMatchAll function
+	lResult = lResult And TestRegExMatchAll()
+	' Test RegExMatchMultiple function
+	lResult = lResult And TestRegExMatchMultiple()
+	' Test RegExReplacee function
+	lResult = lResult And TestRegExReplace()
+	' Test BetterRnd function
+	lResult = lResult And TestBetterRnd()
+	
+	TestMbFunctionsDll = lResult
+End Function
+
+'Create a random junk string for testing
+Function RandomString() As String
+	Dim i, j, length As Integer
+	
+	length = Fix( Rnd(1) * 255 ) + 1
+	Dim sTemp As String
+	
+	For j = 1 to length
+		'sTemp = sTemp + Chr$(Fix(Rnd(1) * 26) +97)
+		Dim sChar As String
+		sChar = Chr$( Fix( Rnd(1) * 255 ) + 0 )
+		If sChar = Chr$(12) Then sChar = " " End If
+		
+		sTemp = sTemp + sChar
+		
+		If Rnd(1) < 0.05 Then
+			sTemp = sTemp + " "
+		End If
+	Next
+	
+	RandomString = sTemp
+	
+End Function
+
+Function TestBetterRnd() As Logical
+	Dim lResult As Logical
+	lResult = TRUE
+	
+	' Test multiple iterations (simple)
+	Dim i As Integer
+	Dim fVal As Float
+	For i = 1 to 1000000
+		fVal = BetterRnd()
+		If fVal < 0 Or fVal > 1 Then
+			TestBetterRnd = FALSE
+			Exit Function
+		End If
+	Next
+	
+	lResult = lResult And TestLogicalValue( "BetterRnd 1000000 random iterations", True, TRUE )
+	
+	TestBetterRnd = lResult
+End Function
+
+Function TestRegExTest() As Logical
+	Dim lResult As Logical
+	lResult = TRUE
+	
+	lResult = lResult And TestLogicalValue( "RegExTest", RegExTest( "pig face", "pig" ), TRUE )
+	lResult = lResult And TestLogicalValue( "RegExTest no exp", RegExTest( "pig face", "" ), FALSE )
+	lResult = lResult And TestLogicalValue( "RegExTest no string", RegExTest( "", "pig" ), FALSE )
+	lResult = lResult And TestLogicalValue( "RegExTest no either", RegExTest( "", "" ), FALSE )
+	lResult = lResult And TestLogicalValue( "RegExTest .", RegExTest( "testing 123", "." ), TRUE )
+	lResult = lResult And TestLogicalValue( "RegExTest whitespace", RegExTest( "testing 123", "\s" ), TRUE )
+	lResult = lResult And TestLogicalValue( "RegExTest no whitespace", RegExTest( "testing123", "\s" ), FALSE )
+	lResult = lResult And TestLogicalValue( "RegExTest word boundary", RegExTest( "testing123", "\btest" ), TRUE )
+	lResult = lResult And TestLogicalValue( "RegExTest case sensitivity", RegExTest( "testing123", "TEST" ), FALSE )
+	lResult = lResult And TestLogicalValue( "RegExTest whole string", RegExTest( "testing123", "^test$" ), FALSE )
+	lResult = lResult And TestLogicalValue( "RegExTest non capturing group", RegExTest( "testing 123", "ing\s(?:\d{3})" ), TRUE )
+	lResult = lResult And TestLogicalValue( "RegExTest dot all", RegExTest( "testing" + Chr$(13) + "123", "testing.123" ), TRUE )
+	lResult = lResult And TestLogicalValue( "RegExTest bad expression", RegExTest( "testing" + Chr$(13) + "123", "+?123" ), FALSE )
+	
+	' Test multiple iterations (simple)
+	Dim i As Integer
+	For i = 1 to 100000
+		If Not RegExTest( "testing 123", ".{1,}" ) Then
+			TestRegExTest = FALSE
+			Exit Function
+		End If
+	Next
+	lResult = lResult And TestLogicalValue( "RegExTest 100000 iterations", True, TRUE )
+	For i = 1 to 10000
+		If Not RegExTest( RandomString(), ".{1,}" ) Then
+			TestRegExTest = FALSE
+			Exit Function
+		End If
+	Next
+	lResult = lResult And TestLogicalValue( "RegExTest 10000 random iterations", True, TRUE )
+	
+	TestRegExTest = lResult
+End Function
+
+Function TestRegExMatch() As Logical
+	Dim lResult As Logical
+	lResult = TRUE
+	
+	lResult = lResult And TestStringValue( "RegExMatch", RegExMatch( "pig face", "(pig)" ), "pig" )
+	lResult = lResult And TestStringValue( "RegExMatch no exp", RegExMatch( "pig face", "" ), "" )
+	lResult = lResult And TestStringValue( "RegExMatch no string", RegExMatch( "", "pig" ), "" )
+	lResult = lResult And TestStringValue( "RegExMatch .", RegExMatch( "testing 123", "(.)" ), "t" )
+	lResult = lResult And TestStringValue( "RegExMatch .*", RegExMatch( "testing 123", "(.*)" ), "testing 123" )
+	lResult = lResult And TestStringValue( "RegExMatch non greedy", RegExMatch( "testing 123", "(.+?)\b" ), "testing" )
+	lResult = lResult And TestStringValue( "RegExMatch greedy", RegExMatch( "testing 123", "(.+)\b" ), "testing 123" )
+	lResult = lResult And TestStringValue( "RegExMatch no whitespace", RegExMatch( "testing123", "(\s)" ), "" )
+	lResult = lResult And TestStringValue( "RegExMatch word boundary", RegExMatch( "testing123", "\b(test)" ), "test" )
+	lResult = lResult And TestStringValue( "RegExMatch case sensitivity", RegExMatch( "testing123", "(TEST)" ), "" )
+	lResult = lResult And TestStringValue( "RegExMatch whole string", RegExMatch( "testing123", "^(test)$" ), "" )
+	lResult = lResult And TestStringValue( "RegExMatch non capturing group", RegExMatch( "testing 123", "(?:test)ing\s(\d{3})" ), "123" )
+	lResult = lResult And TestStringValue( "RegExMatch dot all", RegExMatch( "testing" + Chr$(13) + "123", ".(123)" ), "123" )
+	lResult = lResult And TestStringValue( "RegExMatch multi group", RegExMatch( "testing123", "(test)ing(123)" ), "test" )
+	lResult = lResult And TestStringValue( "RegExMatch bad expression", RegExMatch( "testing123", "(+?)abc" ), "" )
+	
+	' Test multiple iterations (simple)
+	Dim i As Integer
+	For i = 1 to 100000
+		If Not RegExMatch( "testing 123", "(\d+)" ) = "123" Then
+			TestRegExMatch = FALSE
+			Exit Function
+		End If
+	Next
+	lResult = lResult And TestStringValue( "RegExMatch 100000 iterations", True, TRUE )
+	For i = 1 to 1000
+		If Not RegExMatch( RandomString(), "(.)" ) Then
+			TestRegExMatch = FALSE
+			Exit Function
+		End If
+	Next
+	lResult = lResult And TestStringValue( "RegExMatch 1000 random iterations", True, TRUE )
+	
+	TestRegExMatch = lResult
+End Function
+
+Function TestRegExMatchAll() As Logical
+	Dim lResult As Logical
+	lResult = TRUE
+	
+	Dim sArray(50) As String
+	Dim sTest As String
+	sTest = "abc"
+	Call PrepareArray( sArray, 10 )
+	
+	lResult = lResult And TestNumberValue( "RegExMatchAll simple number results", RegExMatchAll( sTest, "(.)", sArray ), 3 )
+	lResult = lResult And TestStringValue( "RegExMatchAll simple  1", sArray(1), "a" )
+	lResult = lResult And TestStringValue( "RegExMatchAll simple  2", sArray(2), "b" )
+	lResult = lResult And TestStringValue( "RegExMatchAll simple  3", sArray(3), "c" )
+	
+	sTest = ""
+	Call PrepareArray( sArray, 10 )
+	lResult = lResult And TestNumberValue( "RegExMatchAll blank number results", RegExMatchAll( sTest, "(.)", sArray ), 0 )
+	lResult = lResult And TestStringValue( "RegExMatchAll blank 1", sArray(1), "          " )
+	lResult = lResult And TestStringValue( "RegExMatchAll blank 2", sArray(2), "          " )
+	lResult = lResult And TestStringValue( "RegExMatchAll blank 3", sArray(3), "          " )
+	
+	sTest = "heres a longish string to be split to words"
+	Call PrepareArray( sArray, 30 )
+	lResult = lResult And TestNumberValue( "RegExMatchAll words number results", RegExMatchAll( sTest, "\b(\w+)\b", sArray ), 9 )
+	lResult = lResult And TestStringValue( "RegExMatchAll words 1", sArray(1), "heres" )
+	lResult = lResult And TestStringValue( "RegExMatchAll words 2", sArray(2), "a" )
+	lResult = lResult And TestStringValue( "RegExMatchAll words 3", sArray(3), "longish" )
+	
+	sTest = "heres a longish string to be split to words"
+	Call PrepareArray( sArray, 30 )
+	lResult = lResult And TestNumberValue( "RegExMatchAll non capture group number results", RegExMatchAll( sTest, "\b(?:s)(\w+)\b", sArray ), 2 )
+	lResult = lResult And TestStringValue( "RegExMatchAll non capture group 1", sArray(1), "tring" )
+	lResult = lResult And TestStringValue( "RegExMatchAll non capture group 2", sArray(2), "plit" )
+	
+	sTest = "digits 1.5.8 testing 123"
+	Call PrepareArray( sArray, 30 )
+	lResult = lResult And TestNumberValue( "RegExMatchAll digits number results", RegExMatchAll( sTest, "(\d)", sArray ), 6 )
+	lResult = lResult And TestStringValue( "RegExMatchAll digits group 1", sArray(1), "1" )
+	lResult = lResult And TestStringValue( "RegExMatchAll digits group 2", sArray(2), "5" )
+	
+	sTest = ""
+	Call PrepareArray( sArray, 10 )
+	lResult = lResult And TestNumberValue( "RegExMatchAll blank test results", RegExMatchAll( sTest, "", sArray ), - 1 )
+	
+	sTest = "bad expression"
+	Call PrepareArray( sArray, 10 )
+	lResult = lResult And TestNumberValue( "RegExMatchAll bad expression", RegExMatchAll( sTest, "(.+?)\s(+?)", sArray ), - 1 )
+	
+	' Test multiple iterations (simple)
+	Dim i As Integer
+	For i = 1 to 100000
+		If Not RegExMatchAll( "testing 123", "(\d+)", sArray ) = 1 Then
+			TestRegExMatchAll = FALSE
+			Exit Function
+		End If
+	Next
+	lResult = lResult And TestStringValue( "RegExMatchAll 100000 iterations", True, TRUE )
+	Call PrepareArray( sArray, 300 )
+	For i = 1 to 1000
+		If Not RegExMatchAll( RandomString(), "(.*)", sArray ) >= 1 Then
+			TestRegExMatchAll = FALSE
+			Exit Function
+		End If
+	Next
+	lResult = lResult And TestStringValue( "RegExMatchAll 1000 random iterations", True, TRUE )
+	
+	TestRegExMatchAll = lResult
+End Function
+
+Function TestRegExMatchMultiple() As Logical
+	Dim lResult As Logical
+	lResult = TRUE
+	
+	Dim sArray(50) As String
+	Dim sTest As String
+	sTest = "abc"
+	Call PrepareArray( sArray, 10 )
+	
+	lResult = lResult And TestNumberValue( "RegExMatchMultiple simple number results", RegExMatchMultiple( sTest, "(.)(.)(.)", sArray ), 3 )
+	lResult = lResult And TestStringValue( "RegExMatchMultiple simple  1", sArray(1), "a" )
+	lResult = lResult And TestStringValue( "RegExMatchMultiple simple  2", sArray(2), "b" )
+	lResult = lResult And TestStringValue( "RegExMatchMultiple simple  3", sArray(3), "c" )
+	
+	sTest = ""
+	Call PrepareArray( sArray, 10 )
+	lResult = lResult And TestNumberValue( "RegExMatchMultiple blank number results", RegExMatchMultiple( sTest, "(.)", sArray ), 0 )
+	lResult = lResult And TestStringValue( "RegExMatchMultiple blank 1", sArray(1), "          " )
+	lResult = lResult And TestStringValue( "RegExMatchMultiple blank 2", sArray(2), "          " )
+	lResult = lResult And TestStringValue( "RegExMatchMultiple blank 3", sArray(3), "          " )
+	
+	sTest = "heres a longish string to be split to words"
+	Call PrepareArray( sArray, 30 )
+	lResult = lResult And TestNumberValue( "RegExMatchMultiple words number results", RegExMatchMultiple( sTest, "(\w+)\s(\w+)\s(\w+)", sArray ), 3 )
+	lResult = lResult And TestStringValue( "RegExMatchMultiple words 1", sArray(1), "heres" )
+	lResult = lResult And TestStringValue( "RegExMatchMultiple words 2", sArray(2), "a" )
+	lResult = lResult And TestStringValue( "RegExMatchMultiple words 3", sArray(3), "longish" )
+	
+	sTest = "heres a longish string to be split to words"
+	Call PrepareArray( sArray, 30 )
+	lResult = lResult And TestNumberValue( "RegExMatchMultiple non capture group number results", RegExMatchMultiple( sTest, "(?:\w+)\s(\w+)\s(\w+)", sArray ), 2 )
+	lResult = lResult And TestStringValue( "RegExMatchMultiple non capture group 1", sArray(1), "a" )
+	lResult = lResult And TestStringValue( "RegExMatchMultiple non capture group 2", sArray(2), "longish" )
+	
+	sTest = "digits 1.5.8 testing 123"
+	Call PrepareArray( sArray, 30 )
+	lResult = lResult And TestNumberValue( "RegExMatchMultiple digits number results", RegExMatchMultiple( sTest, "(\d)\.(\d)\.(\d)", sArray ), 3 )
+	lResult = lResult And TestStringValue( "RegExMatchMultiple digits group 1", sArray(1), "1" )
+	lResult = lResult And TestStringValue( "RegExMatchMultiple digits group 2", sArray(2), "5" )
+	lResult = lResult And TestStringValue( "RegExMatchMultiple digits group 2", sArray(3), "8" )
+	
+	sTest = ""
+	Call PrepareArray( sArray, 10 )
+	lResult = lResult And TestNumberValue( "RegExMatchMultiple blank test results", RegExMatchMultiple( sTest, "", sArray ), - 1 )
+	
+	sTest = "bad expression"
+	Call PrepareArray( sArray, 10 )
+	lResult = lResult And TestNumberValue( "RegExMatchMultiple bad expression", RegExMatchMultiple( sTest, "(.+?)\s(+?)", sArray ), - 1 )
+	
+	' Test multiple iterations (simple)
+	Dim i As Integer
+	For i = 1 to 100000
+		If Not RegExMatchMultiple( "testing 123", "(.+?)\s(.+?)", sArray ) = 2 Then
+			TestRegExMatchMultiple = FALSE
+			Exit Function
+		End If
+	Next
+	lResult = lResult And TestStringValue( "RegExMatchMultiple 100000 iterations", True, TRUE )
+	Call PrepareArray( sArray, 300 )
+	For i = 1 to 1000
+		If Not RegExMatchMultiple( RandomString(), "(.*)", sArray ) >= 1 Then
+			TestRegExMatchMultiple = FALSE
+			Exit Function
+		End If
+	Next
+	lResult = lResult And TestStringValue( "RegExMatchMultiple 1000 random iterations", True, TRUE )
+	
+	TestRegExMatchMultiple = lResult
+End Function
+
+Function TestRegExReplace() As Logical
+	Dim lResult As Logical
+	lResult = TRUE
+	
+	Dim lReplaceResult As Logical
+	Dim sDest As String
+	sDest = Space$(255)
+	lReplaceResult = RegExReplace( "add ape hat", "^(.)|(?<=\s)(.)", "\u$1$2", sDest )
+	lResult = lResult And TestLogicalValue( "RegExReplace complex result", lReplaceResult, TRUE )
+	lResult = lResult And TestStringValue( "RegExReplace complex", sDest, "Add Ape Hat" )
+	
+	sDest = Space$(255)
+	lReplaceResult = RegExReplace( "add ape hat", "[^a-z]", "_", sDest )
+	lResult = lResult And TestLogicalValue( "RegExReplace simple result", lReplaceResult, TRUE )
+	lResult = lResult And TestStringValue( "RegExReplace simple", sDest, "add_ape_hat" )
+	
+	sDest = Space$(255)
+	lReplaceResult = RegExReplace( "add ape hat", "^+a-z", "_", sDest )
+	lResult = lResult And TestLogicalValue( "RegExReplace bad expression result", lReplaceResult, FALSE )
+	
+	sDest = Space$(255)
+	lReplaceResult = RegExReplace( "", "a", "b", sDest )
+	lResult = lResult And TestLogicalValue( "RegExReplace no string result", lReplaceResult, FALSE )
+	
+	sDest = Space$(255)
+	lReplaceResult = RegExReplace( "add ape hat", " ", "", sDest )
+	lResult = lResult And TestLogicalValue( "RegExReplace remove string result", lReplaceResult, TRUE )
+	lResult = lResult And TestStringValue( "RegExReplace remove string", sDest, "addapehat" )
+	
+	' Test multiple iterations (simple)
+	Dim i As Integer
+	For i = 1 to 100000
+		sDest = Space$(255)
+		If Not RegExReplace( "testing 123", " ", "_", sDest ) Then
+			TestRegExReplace = FALSE
+			Exit Function
+		End If
+		If sDest <> "testing_123" Then
+			TestRegExReplace = FALSE
+			Exit Function
+		End If
+	Next
+	lResult = lResult And TestStringValue( "RegExReplace 100000 iterations", True, TRUE )
+	For i = 1 to 1000
+		sDest = Space$(300)
+		If Not RegExReplace( " " + RandomString(), " ", "_", sDest ) Then
+			TestRegExReplace = FALSE
+			Exit Function
+		End If
+	Next
+	lResult = lResult And TestStringValue( "RegExReplace 1000 random iterations", True, TRUE )
+	
+	TestRegExReplace = lResult
+End Function
+
+

@@ -1,0 +1,736 @@
+Include "test.def"
+
+Declare Function TestInputBox() As Logical
+Declare Function TestMessageBox() As Logical
+Declare Function TestMsgBox() As Logical
+Declare Function TestChooseTable() As Logical
+Declare Function TestChooseTableAdvanced() As Logical
+Declare Function TestChooseWindow() As Logical
+Declare Function TestChooseWindowAdvanced() As Logical
+Declare Function TestChooseMapWindow() As Logical
+Declare Function TestChooseLegendWindow() As Logical
+Declare Function TestChooseLayer() As Logical
+Declare Function TestChooseLayerAdvanced() As Logical
+Declare Function TestChooseColumn() As Logical
+Declare Function TestChooseColumnAdvanced() As Logical
+Declare Function TestChooseMultipleColumns() As Logical
+Declare Function TestChooseStringArray() As Logical
+Declare Function TestChooseStringArrayAdvanced() As Logical
+Declare Function TestChooseMultiColumnDialog() As Logical
+
+Function TestMbFunctionsGui() As Logical
+	TestMbFunctionsGui = FALSE
+	
+	' Test InputBox function
+	If Not TestInputBox() Then
+		Exit Function
+	End If
+	' Test MessageBox sub
+	If Not TestMessageBox() Then
+		Exit Function
+	End If
+	' Test MsgBox sub
+	If Not TestMsgBox() Then
+		Exit Function
+	End If
+	' Test ChooseWindow Function
+	If Not TestChooseWindow() Then
+		Exit Function
+	End If
+	' Test ChooseWindowAdvanced Function
+	If Not TestChooseWindowAdvanced() Then
+		Exit Function
+	End If
+	' Test ChooseMapWindow Function
+	If Not TestChooseMapWindow() Then
+		Exit Function
+	End If
+	' Test ChooseLegendWindow  Function
+	If Not TestChooseLegendWindow() Then
+		Exit Function
+	End If
+	' Test ChooseLayer Function
+	If Not TestChooseLayer() Then
+		Exit Function
+	End If
+	' Test ChooseLayerAdvanced Function
+	If Not TestChooseLayerAdvanced() Then
+		Exit Function
+	End If
+	' Test ChooseColumn Function
+	If Not TestChooseColumn() Then
+		Exit Function
+	End If
+	' Test ChooseColumnAdvanced Function
+	If Not TestChooseColumnAdvanced() Then
+		Exit Function
+	End If
+	' Test ChooseMultipleColumns Function
+	If Not TestChooseMultipleColumns() Then
+		Exit Function
+	End If
+	' Test ChooseStringArray function
+	If Not TestChooseStringArray() Then
+		Exit Function
+	End If
+	' Test ChooseStringArrayAdvanced function
+	If Not TestChooseStringArrayAdvanced() Then
+		Exit Function
+	End If
+	' Test ChooseMultiColumnDialog function
+	If Not TestChooseMultiColumnDialog() Then
+		Exit Function
+	End If
+	' Test ChooseTable Function
+	If Not TestChooseTable() Then
+		Exit Function
+	End If
+	' Test ChooseTableAdvanced Function
+	If Not TestChooseTableAdvanced() Then
+		Exit Function
+	End If
+	
+	TestMbFunctionsGui = TRUE
+End Function
+
+Function TestInputBox() As Logical
+	Dim lResult As Logical
+	lResult = TRUE
+	
+	Dim sVal As String
+	sVal = InputBox( "Please press cancel", "", "" )
+	lResult = lResult And TestLogicalValue( "Inputbox cancel", sVal = "-999", TRUE )
+	
+	Note "Press ok on dialog"
+	sVal = InputBox( "Please press ok", "", "" )
+	lResult = lResult And TestLogicalValue( "Inputbox cancel", sVal = "", TRUE )
+	
+	Note "Prompt should be: test prompt. Press cancel if not"
+	sVal = InputBox( "test prompt", "", "" )
+	lResult = lResult And TestLogicalValue( "Inputbox prompt", sVal <> "-999", TRUE )
+	
+	Note "Title should be: test prompt. Press cancel if not"
+	sVal = InputBox( "", "test prompt", "" )
+	lResult = lResult And TestLogicalValue( "Inputbox title", sVal <> "-999", TRUE )
+	
+	Note "Default value should be: test prompt. Press cancel if not"
+	sVal = InputBox( "Value below should be test prompt:", "test prompt", "test prompt" )
+	lResult = lResult And TestLogicalValue( "Inputbox default", sVal = "test prompt", TRUE )
+	
+	Note "Enter ""test"" as value"
+	sVal = InputBox( "Enter ""test"" below:", "test prompt", "" )
+	lResult = lResult And TestStringValue( "Inputbox value", sVal, "test" )
+	
+	TestInputBox = lResult
+End Function
+
+Function TestMessageBox() As Logical
+	Dim lResult As Logical
+	lResult = TRUE
+	
+	Call MessageBox( "Should be no icon, OK button", "Default settings", 0 )
+	Call MessageBox( "vbOKCancel", "MessageBox", vbOKCancel )
+	Call MessageBox( "vbAbortRetryIgnore", "MessageBox", vbAbortRetryIgnore )
+	Call MessageBox( "vbYesNoCancel", "MessageBox", vbYesNoCancel )
+	Call MessageBox( "vbYesNo", "MessageBox", vbYesNo )
+	Call MessageBox( "vbRetryCancel", "MessageBox", vbRetryCancel )
+	Call MessageBox( "vbCritical", "MessageBox", vbCritical )
+	Call MessageBox( "vbQuestion", "MessageBox", vbQuestion )
+	Call MessageBox( "vbExclamation", "MessageBox", vbExclamation )
+	Call MessageBox( "vbInformation", "MessageBox", vbInformation )
+	Call MessageBox( "vbDefaultButton1", "MessageBox", vbAbortRetryIgnore + vbDefaultButton1 )
+	Call MessageBox( "vbDefaultButton2", "MessageBox", vbAbortRetryIgnore + vbDefaultButton2 )
+	Call MessageBox( "vbDefaultButton3", "MessageBox", vbAbortRetryIgnore + vbDefaultButton3 )
+	
+	
+	TestMessageBox = lResult
+End Function
+
+Function TestMsgBox() As Logical
+	Dim lResult As Logical
+	lResult = TRUE
+	
+	lResult = lResult And TestNumberValue( "MsgBox Ok", MsgBox( "Click OK", "MsgBox", 0 ), vbOk )
+	lResult = lResult And TestNumberValue( "MsgBox Cancel", MsgBox( "Click Cancel", "MsgBox", vbOKCancel + vbDefaultButton2 ), vbCancel )
+	lResult = lResult And TestNumberValue( "MsgBox Abort", MsgBox( "Click Abort", "MsgBox", vbAbortRetryIgnore + vbDefaultButton1 ), vbAbort )
+	lResult = lResult And TestNumberValue( "MsgBox Retry", MsgBox( "Click Retry", "MsgBox", vbAbortRetryIgnore + vbDefaultButton2 ), vbRetry )
+	lResult = lResult And TestNumberValue( "MsgBox Ignore", MsgBox( "Click Ignore", "MsgBox", vbAbortRetryIgnore + vbDefaultButton3 ), vbIgnore )
+	lResult = lResult And TestNumberValue( "MsgBox Yes", MsgBox( "Click Yes", "MsgBox", vbYesNo + vbDefaultButton1 ), vbYes )
+	lResult = lResult And TestNumberValue( "MsgBox No", MsgBox( "Click No", "MsgBox", vbYesNo + vbDefaultButton2 ), vbNo )
+	
+	TestMsgBox = lResult
+End Function
+
+Function TestChooseTable() As Logical
+	Dim lResult As Logical
+	lResult = TRUE
+	
+	Open Table ApplicationDirectory$() + "test_data\rect.tab" As XTable
+	Open Table ApplicationDirectory$() + "test_data\rect2.tab" As ZTable
+	Open Table ApplicationDirectory$() + "test_data\rect3.tab" As ATable
+	Open Table ApplicationDirectory$() + "test_data\rect4.tab" As cTable
+	
+	Note "Should now see a ChooseTable dialog with 4 sorted tables. Choose the cTable table."
+	lResult = lResult And TestStringValue( "ChooseTable 1", ChooseTable( "Title", "Choose the cTable table" ), "cTable" )
+	
+	Note "Choose the XTable table."
+	lResult = lResult And TestStringValue( "ChooseTable 2", ChooseTable( "Title", "Choose the XTable table" ), "XTable" )
+	
+	Note "Click cancel"
+	lResult = lResult And TestStringValue( "ChooseTable Cancel", ChooseTable( "Title", "Press Cancel" ), "" )
+	
+	Select * From cTable Into "Query" NoSelect
+	Note "Choose ""Query"""
+	lResult = lResult And TestStringValue( "ChooseTable query", ChooseTable( "Title", "Choose the ""Query"" table" ), "Query" )
+	
+	Select * From cTable Into "Query2"
+	Note "Choose ""Selection"""
+	lResult = lResult And TestStringValue( "ChooseTable selection", ChooseTable( "Title", "Choose the ""Selection"" table" ), "Query2" )
+	
+	lResult = lResult And TestLogicalValue( "ChooseTable selection first", Ask( "Was selection the first table listed?", "yes", "no" ), TRUE )
+	Close All
+	
+	lResult = lResult And TestStringValue( "ChooseTable no good", ChooseTable( "Title", "No tables" ), "__no_good_tables!__" )
+	
+	lResult = lResult And TestStringValue( "ChooseTable no title", ChooseTable( "", "No tables" ), "__no_good_tables!__" )
+	lResult = lResult And TestStringValue( "ChooseTable no prompt", ChooseTable( "Title", "" ), "__no_good_tables!__" )
+	
+	TestChooseTable = lResult
+End Function
+
+Function TestChooseTableAdvanced() As Logical
+	Dim lResult As Logical
+	lResult = TRUE
+	
+	Open Table ApplicationDirectory$() + "test_data\rect.tab" As XTable
+	Open Table ApplicationDirectory$() + "test_data\rect2.tab" As ZTable ReadOnly
+	Open Table ApplicationDirectory$() + "test_data\rect3.tab" As ATable ReadOnly
+	Open Table ApplicationDirectory$() + "test_data\rect4.tab" As cTable
+	
+	Note "Should now see a ChooseTable dialog with 4 sorted tables. Choose the cTable table, which should be the default."
+	lResult = lResult And TestStringValue( "ChooseTableAdvanced 1", ChooseTableAdvanced( "Title", "Choose the cTable table", "cT", "", 0 ), "cTable" )
+	
+	Note "Should now see a ChooseTable dialog with 4 sorted tables. Choose the zTable table, which should be the default."
+	lResult = lResult And TestStringValue( "ChooseTableAdvanced 2", ChooseTableAdvanced( "Title", "Choose the zTable table", "z", "", 0 ), "ZTable" )
+	
+	Note "Should now see a ChooseTable dialog with only 3 sorted tables. cTable should not be listed."
+	lResult = lResult And TestLogicalValue( "ChooseTableAdvanced 2", ChooseTableAdvanced( "Title", "Choose any table. Click cancel if ""cTable"" is listed.", "ATable", "c", 0 ) = "" , FALSE )
+	
+	Note "Should now see a ChooseTable dialog with 4 sorted tables."
+	lResult = lResult And TestLogicalValue( "ChooseTableAdvanced 2", ChooseTableAdvanced( "Title", "Choose any table. Click cancel if 4 tables are not listed.", "ATable", "aasdasdasdasd", 0 ) = "" , FALSE )
+	
+	Note "Should now see a ChooseTable dialog with 2 sorted tables."
+	lResult = lResult And TestLogicalValue( "ChooseTableAdvanced 2", ChooseTableAdvanced( "Title", "Choose any table. Click cancel if 2 tables are not listed.", "", "", CHOOSETABLE_HIDEREADONLY ) = "" , FALSE )
+	
+	lResult = lResult And TestStringValue( "ChooseTableAdvanced no good 1", ChooseTableAdvanced( "Title", "No tables", "", "a", 0 ) , "__no_good_tables!__" )
+	
+	' Test vector/nonvector flags
+	Open Table ApplicationDirectory$() + "test_data\raster.tab"
+	Open Table ApplicationDirectory$() + "test_data\tileserver.tab"
+	Open Table ApplicationDirectory$() + "test_data\wfs.tab"
+	Open Table ApplicationDirectory$() + "test_data\wms.tab"
+	
+	Note "Should now see a ChooseTable dialog with 8 tables. Choose the raster table, which should be the default."
+	lResult = lResult And TestStringValue( "ChooseTableAdvanced raster", ChooseTableAdvanced( "Title", "Choose the raster table", "raster", "", 0 ), "raster" )
+	
+	Note "Should now see a ChooseTable dialog with 5 tables. Choose the wfs table, which should be the default."
+	lResult = lResult And TestStringValue( "ChooseTableAdvanced noraster", ChooseTableAdvanced( "Title", "Should be 5 tables listed. Choose the default table", "wfs", "", CHOOSETABLE_VECTORONLY ) , "wfs" )
+	
+	Close Table raster
+	Close Table tileserver
+	Close Table WFS
+	Close Table wms
+	
+	Close Table cTable
+	Close Table XTable
+	
+	lResult = lResult And TestStringValue( "ChooseTableAdvanced no good 2", ChooseTableAdvanced( "Title", "No tables", "", "", CHOOSETABLE_HIDEREADONLY ) , "__no_good_tables!__" )
+	
+	Close All
+	
+	lResult = lResult And TestStringValue( "ChooseTableAdvanced no good 3", ChooseTableAdvanced( "Title", "No tables", "", "", CHOOSETABLE_HIDEREADONLY ) , "__no_good_tables!__" )
+	
+	TestChooseTableAdvanced = lResult
+End Function
+
+Function TestChooseWindow() As Logical
+	Dim lResult As Logical
+	lResult = TRUE
+	
+	Open Table ApplicationDirectory$() + "test_data\rect.tab" As Rect1
+	Open Table ApplicationDirectory$() + "test_data\rect2.tab"
+	Open Table ApplicationDirectory$() + "test_data\rect3.tab"
+	Open Table ApplicationDirectory$() + "test_data\rect4.tab"
+	
+	Dim iWindowId(4) As Integer
+	Map From Rect1
+	Set Window FrontWindow() Title "a map window"
+	iWindowId(1) = FrontWindow()
+	Map From Rect2
+	Set Window FrontWindow() Title "x map window"
+	iWindowId(2) = FrontWindow()
+	Map From Rect3
+	Set Window FrontWindow() Title "c map window"
+	iWindowId(3) = FrontWindow()
+	Map From Rect4
+	Set Window FrontWindow() Title "L map window"
+	iWindowId(4) = FrontWindow()
+	
+	Note "Should now see a ChooseWindow dialog with 4 sorted windows. Choose the ""c map window"" window."
+	lResult = lResult And TestNumberValue( "ChooseWindow 1", ChooseWindow( "Title", "Choose the ""c map window"" window", 0 ), iWindowId(3) )
+	
+	Note "Should now see a ChooseWindow dialog with 4 sorted windows. Click Cancel"
+	lResult = lResult And TestNumberValue( "ChooseWindow Cancel", ChooseWindow( "Title", "Click Cancel", 0 ), 0 )
+	
+	Browse * From rect4
+	Note "Should now see a ChooseWindow dialog with 5 sorted windows. Click Cancel"
+	lResult = lResult And TestNumberValue( "ChooseWindow All with browsers", ChooseWindow( "Title", "Click Cancel", 0 ), 0 )
+	
+	Note "Should now see a ChooseWindow dialog with 4 sorted windows. Click Cancel"
+	lResult = lResult And TestNumberValue( "ChooseWindow mappers", ChooseWindow( "Title", "Click Cancel", WIN_MAPPER ), 0 )
+	
+	
+	lResult = lResult And TestNumberValue( "ChooseWindow no Matching", ChooseWindow( "Title", "No matching", WIN_LEGEND ), 0 )
+	
+	Close All
+	
+	lResult = lResult And TestNumberValue( "ChooseWindow no windows", ChooseWindow( "Title", "No matching", 0 ), 0 )
+	
+	TestChooseWindow = lResult
+End Function
+
+Function TestChooseWindowAdvanced() As Logical
+	Dim lResult As Logical
+	lResult = TRUE
+	
+	Open Table ApplicationDirectory$() + "test_data\rect.tab" As Rect1
+	Open Table ApplicationDirectory$() + "test_data\rect2.tab"
+	Open Table ApplicationDirectory$() + "test_data\rect3.tab"
+	Open Table ApplicationDirectory$() + "test_data\rect4.tab"
+	
+	Dim iWindowId(4) As Integer
+	Map From Rect1
+	Set Window FrontWindow() Title "a map window"
+	iWindowId(1) = FrontWindow()
+	Map From Rect2
+	Set Window FrontWindow() Title "x map window"
+	iWindowId(2) = FrontWindow()
+	Map From Rect3
+	Set Window FrontWindow() Title "c map window"
+	iWindowId(3) = FrontWindow()
+	Map From Rect4
+	Set Window FrontWindow() Title "L map window"
+	iWindowId(4) = FrontWindow()
+	
+	Note "Should now see a ChooseWindow dialog with 3 sorted windows. Choose the ""c map window"" window."
+	lResult = lResult And TestNumberValue( "ChooseWindowAdvanced 1", ChooseWindowAdvanced( "Title", "Choose the ""c map window"" window", 0, iWindowId(2) ), iWindowId(3) )
+	
+	lResult = lResult And TestNumberValue( "ChooseWindowAdvanced no Matching", ChooseWindowAdvanced( "Title", "No matching", WIN_LEGEND, iWindowId(2) ), 0 )
+	
+	Close Table Rect1
+	Close Table Rect3
+	Close Table Rect4
+	
+	lResult = lResult And TestNumberValue( "ChooseWindowAdvanced no windows", ChooseWindowAdvanced( "Title", "No matching", 0, iWindowId(2) ), 0 )
+	Close All
+	
+	TestChooseWindowAdvanced = lResult
+End Function
+
+Function TestChooseMapWindow() As Logical
+	Dim lResult As Logical
+	lResult = TRUE
+	
+	Open Table ApplicationDirectory$() + "test_data\rect.tab" As Rect1
+	Open Table ApplicationDirectory$() + "test_data\rect2.tab"
+	Open Table ApplicationDirectory$() + "test_data\rect3.tab"
+	Open Table ApplicationDirectory$() + "test_data\rect4.tab"
+	
+	Dim iWindowId(4) As Integer
+	Map From Rect1
+	Set Window FrontWindow() Title "a map window"
+	iWindowId(1) = FrontWindow()
+	Browse * From Rect1
+	Map From Rect2
+	Set Window FrontWindow() Title "x map window"
+	iWindowId(2) = FrontWindow()
+	Browse * From Rect2
+	Map From Rect3
+	Set Window FrontWindow() Title "c map window"
+	iWindowId(3) = FrontWindow()
+	Browse * From Rect3
+	Map From Rect4
+	Set Window FrontWindow() Title "L map window"
+	iWindowId(4) = FrontWindow()
+	Browse * From Rect4
+	
+	Note "Should now see a ChooseWindow dialog with 4 sorted map windows. Choose the ""c map window"" window."
+	lResult = lResult And TestNumberValue( "ChooseMapWindow 1", ChooseMapWindow( "Title", "Choose the ""c map window"" window" ), iWindowId(3) )
+	
+	Close Window iWindowId(1)
+	Close Window iWindowId(2)
+	Close Window iWindowId(3)
+	Close Window iWindowId(4)
+	lResult = lResult And TestNumberValue( "ChooseMapWindow no matching", ChooseMapWindow( "Title", "No matching" ), 0 )
+	
+	Close All
+	
+	TestChooseMapWindow = lResult
+End Function
+
+Function TestChooseLegendWindow() As Logical
+	Dim lResult As Logical
+	lResult = TRUE
+	
+	Open Table ApplicationDirectory$() + "test_data\rect.tab" As Rect1
+	Open Table ApplicationDirectory$() + "test_data\rect2.tab"
+	Open Table ApplicationDirectory$() + "test_data\rect3.tab"
+	Open Table ApplicationDirectory$() + "test_data\rect4.tab"
+	
+	
+	Dim iWindowId(4), iLegendWindowId(4) As Integer
+	Map From Rect1
+	Set Window FrontWindow() Title "a map window"
+	iWindowId(1) = FrontWindow()
+	Create Cartographic Legend From Window FrontWindow() Frame From Layer 1
+	iLegendWindowId(1) = FrontWindow()
+	Browse * From Rect1
+	Map From Rect2
+	Set Window FrontWindow() Title "x map window"
+	iWindowId(2) = FrontWindow()
+	Create Cartographic Legend From Window FrontWindow() Frame From Layer 1
+	iLegendWindowId(2) = FrontWindow()
+	Browse * From Rect2
+	Map From Rect3
+	Set Window FrontWindow() Title "c map window"
+	iWindowId(3) = FrontWindow()
+	Create Cartographic Legend From Window FrontWindow() Frame From Layer 1
+	iLegendWindowId(3) = FrontWindow()
+	Browse * From Rect3
+	Map From Rect4
+	Set Window FrontWindow() Title "L map window"
+	iWindowId(4) = FrontWindow()
+	Create Cartographic Legend From Window FrontWindow() Frame From Layer 1
+	iLegendWindowId(4) = FrontWindow()
+	Browse * From Rect4
+	
+	Note "Should now see a ChooseWindow dialog with 4 sorted legend windows. Choose the ""c map window"" window."
+	lResult = lResult And TestNumberValue( "ChooseLegendWindow 1", ChooseLegendWindow( "Title", "Choose the ""c map window"" window" ), iLegendWindowId(3) )
+	
+	Close Window iWindowId(1)
+	Close Window iWindowId(2)
+	Close Window iWindowId(3)
+	Close Window iWindowId(4)
+	lResult = lResult And TestNumberValue( "ChooseLegendWindow no matching", ChooseLegendWindow( "Title", "No matching" ), 0 )
+	
+	Close All
+	
+	TestChooseLegendWindow = lResult
+End Function
+
+Function TestChooseLayer() As Logical
+	Dim lResult As Logical
+	lResult = TRUE
+	Dim iLayerNo As Integer
+	
+	lResult = lResult And TestStringValue( "ChooseLayer none", ChooseLayer( "Title", "None", iLayerNo ), "__no_good_layers" )
+	
+	Open Table ApplicationDirectory$() + "test_data\rect.tab" As Rect1
+	Open Table ApplicationDirectory$() + "test_data\rect2.tab"
+	Open Table ApplicationDirectory$() + "test_data\rect3.tab"
+	Open Table ApplicationDirectory$() + "test_data\rect4.tab"
+	
+	Map From Rect3, Rect2, Rect1, Rect4
+	
+	Note "Should now see a ChooseLayer dialog with 4 layers. Choose the ""Rect2"" Layer."
+	
+	lResult = lResult And TestStringValue( "ChooseLayer 1", ChooseLayer( "Title", "Choose the ""Rect2"" layer", iLayerNo ), "Rect2" )
+	lResult = lResult And TestNumberValue( "ChooseLayer 1 layerno", iLayerNo, 2 )
+	
+	lResult = lResult And TestStringValue( "ChooseLayer cancel", ChooseLayer( "Title", "Click cancel", iLayerNo ), "" )
+	lResult = lResult And TestNumberValue( "ChooseLayer cancel layerno", iLayerNo, 0 )
+	
+	Close All
+	
+	TestChooseLayer = lResult
+End Function
+
+Function TestChooseLayerAdvanced() As Logical
+	Dim lResult As Logical
+	lResult = TRUE
+	Dim iLayerNo As Integer
+	
+	lResult = lResult And TestStringValue( "ChooseLayerAdvanced none", ChooseLayer( "Title", "None", iLayerNo ), "__no_good_layers" )
+	
+	Open Table ApplicationDirectory$() + "test_data\rect.tab" As Rect1
+	Open Table ApplicationDirectory$() + "test_data\rect2.tab"
+	Open Table ApplicationDirectory$() + "test_data\rect3.tab"
+	Open Table ApplicationDirectory$() + "test_data\rect4.tab"
+	
+	Map From Rect3, Rect2, Rect1, Rect4
+	
+	Set Map Layer 2 Display Global
+	
+	Note "Should now see a ChooseLayer dialog with 3 layers. Choose the ""Rect4"" Layer."
+	lResult = lResult And TestStringValue( "ChooseLayerAdvanced ignore", ChooseLayerAdvanced( "Title", "Choose the ""Rect4"" layer", iLayerNo, "rect3", "", 0 ), "Rect4" )
+	lResult = lResult And TestNumberValue( "ChooseLayerAdvanced ignore layerno", iLayerNo, 4 )
+	
+	lResult = lResult And TestStringValue( "ChooseLayerAdvanced default", ChooseLayerAdvanced( "Title", "Accept the default layer (rect3)", iLayerNo, "", "Rect3", 0 ), "Rect3" )
+	lResult = lResult And TestNumberValue( "ChooseLayerAdvanced default layerno", iLayerNo, 1 )
+	
+	lResult = lResult And TestStringValue( "ChooseLayerAdvanced override only", ChooseLayerAdvanced( "Title", "Should only see rect2", iLayerNo, "", "", CHOOSELAYER_WITHOVERRIDES ), "Rect2" )
+	lResult = lResult And TestNumberValue( "ChooseLayerAdvanced override only layerno", iLayerNo, 2 )
+	
+	Close All
+	
+	TestChooseLayerAdvanced = lResult
+End Function
+
+Function TestChooseColumn() As Logical
+	Dim lResult As Logical
+	lResult = TRUE
+	Dim iLayerNo As Integer
+	
+	lResult = lResult And TestStringValue( "ChooseColumn none", ChooseColumn( "", "No Table", "Choose column" ), "" )
+	
+	Open Table ApplicationDirectory$() + "test_data\rect.tab" As Rect1
+	
+	lResult = lResult And TestStringValue( "ChooseColumn 1", ChooseColumn( "Rect1", "Test", "Choose first column (another_string_column)" ), "another_string_column" )
+	lResult = lResult And TestStringValue( "ChooseColumn 2", ChooseColumn( "Rect1", "Test", "Choose ""logical_column"" column" ), "logical_column" )
+	lResult = lResult And TestStringValue( "ChooseColumn cancel", ChooseColumn( "Rect1", "Test", "Click cancel" ), "" )
+	
+	Select string_column, date_column From Rect1 Into aquery NoSelect
+	lResult = lResult And TestStringValue( "ChooseColumn query", ChooseColumn( "aquery", "Test", "Choose ""date_column""" ), "date_column" )
+	
+	Close All
+	
+	TestChooseColumn = lResult
+End Function
+
+Function TestChooseColumnAdvanced() As Logical
+	Dim lResult As Logical
+	lResult = TRUE
+	
+	Open Table ApplicationDirectory$() + "test_data\rect.tab" As Rect1
+	
+	lResult = lResult And TestStringValue( "ChooseColumnAdvanced 1", ChooseColumnAdvanced( "Rect1", "Test", "Choose default column (logical_column)", "logical_column", "", "" ), "logical_column" )
+	lResult = lResult And TestStringValue( "ChooseColumnAdvanced default", ChooseColumnAdvanced( "Rect1", "Test", "Choose first column (date_column)", "", "string_column", "" ), "date_column" )
+	lResult = lResult And TestStringValue( "ChooseColumnAdvanced ignore", ChooseColumnAdvanced( "Rect1", "Test", "Choose default column (another_string_column)", "logical_column", "logical_column", "" ), "another_string_column" )
+	lResult = lResult And TestStringValue( "ChooseColumnAdvanced char", ChooseColumnAdvanced( "Rect1", "Test", "Should be two columns listed, click cancel if not", "", "", "char" ), "another_string_column" )
+	lResult = lResult And TestStringValue( "ChooseColumnAdvanced numeric", ChooseColumnAdvanced( "Rect1", "Test", "Should be 5 columns listed, click cancel if not", "", "", "numeric" ), "decimal_column" )
+	lResult = lResult And TestStringValue( "ChooseColumnAdvanced date", ChooseColumnAdvanced( "Rect1", "Test", "Should be 2 columns listed, click cancel if not", "", "", "date" ), "date_column" )
+	lResult = lResult And TestStringValue( "ChooseColumnAdvanced dateonly", ChooseColumnAdvanced( "Rect1", "Test", "Should be 1 column listed, click cancel if not", "", "", "dateonly" ), "date_column" )
+	
+	Open Table ApplicationDirectory$() + "test_data\non_mappable.tab"
+	
+	lResult = lResult And TestStringValue( "ChooseColumnAdvanced bad dateonly", ChooseColumnAdvanced( "non_mappable", "Test", "Should not see this dialog!", "", "", "dateonly" ), "" )
+	lResult = lResult And TestLogicalValue( "ChooseColumnAdvanced bad dateonly dialog", Ask( "Did you receive a warning about no date fields?", "yes", "no" ), TRUE )
+	lResult = lResult And TestStringValue( "ChooseColumnAdvanced bad date", ChooseColumnAdvanced( "non_mappable", "Test", "Should not see this dialog!", "", "", "date" ), "" )
+	lResult = lResult And TestLogicalValue( "ChooseColumnAdvanced bad date dialog", Ask( "Did you receive a warning about no date/datetime fields?", "yes", "no" ), TRUE )
+	lResult = lResult And TestStringValue( "ChooseColumnAdvanced bad numeric", ChooseColumnAdvanced( "non_mappable", "Test", "Should not see this dialog!", "", "", "numeric" ), "" )
+	lResult = lResult And TestLogicalValue( "ChooseColumnAdvanced bad numeric dialog", Ask( "Did you receive a warning about no numeric fields?", "yes", "no" ), TRUE )
+	
+	Open Table ApplicationDirectory$() + "test_data\Rect2.tab"
+	lResult = lResult And TestStringValue( "ChooseColumnAdvanced bad char", ChooseColumnAdvanced( "Rect2", "Test", "Should not see this dialog!", "", "", "char" ), "" )
+	lResult = lResult And TestLogicalValue( "ChooseColumnAdvanced bad char dialog", Ask( "Did you receive a warning about no char fields?", "yes", "no" ), TRUE )
+	
+	' type filter AND hidden column
+	lResult = lResult And TestStringValue( "ChooseColumnAdvanced type and hidden filters", ChooseColumnAdvanced( "Rect2", "Test", "Should not see this dialog!", "", "id", "numeric" ), "" )
+	lResult = lResult And TestLogicalValue( "ChooseColumnAdvanced type and hidden filters dialog", Ask( "Did you receive a warning about no numeric fields?", "yes", "no" ), TRUE )
+	Close All
+	
+	lResult = lResult And TestStringValue( "ChooseColumnAdvanced bad", ChooseColumnAdvanced( "non_mappable", "Test", "Should be 1 column listed, click cancel if not", "", "", "dateonly" ), "" )
+	
+	TestChooseColumnAdvanced = lResult
+End Function
+
+Function TestChooseMultipleColumns() As Logical
+	Dim lResult As Logical
+	lResult = TRUE
+	
+	Dim sCols() As String
+	
+	lResult = lResult And TestLogicalValue( "ChooseMultipleColumns none", ChooseMultipleColumns( "", "No Table", "Choose column", sCols ), FALSE )
+	lResult = lResult And TestNumberValue( "ChooseMultipleColumns none count", UBound( sCols ), 0 )
+	
+	Open Table ApplicationDirectory$() + "test_data\rect.tab" As Rect1
+	
+	lResult = lResult And TestLogicalValue( "ChooseMultipleColumns cancel", ChooseMultipleColumns( "Rect1", "Cancel", "Click Cancel", sCols ), FALSE )
+	lResult = lResult And TestNumberValue( "ChooseMultipleColumns cancel count", UBound( sCols ), 0 )
+	
+	lResult = lResult And TestLogicalValue( "ChooseMultipleColumns 1 column", ChooseMultipleColumns( "Rect1", "Choose one", "Choose just the first column", sCols ), TRUE )
+	lResult = lResult And TestNumberValue( "ChooseMultipleColumns 1 count", UBound( sCols ), 1 )
+	lResult = lResult And TestStringValue( "ChooseMultipleColumns 1", sCols(1), "another_string_column" )
+	
+	lResult = lResult And TestLogicalValue( "ChooseMultipleColumns 2 column", ChooseMultipleColumns( "Rect1", "Choose one", "Choose just the second column", sCols ), TRUE )
+	lResult = lResult And TestNumberValue( "ChooseMultipleColumns 2 count", UBound( sCols ), 1 )
+	lResult = lResult And TestStringValue( "ChooseMultipleColumns 2", sCols(1), "date_column" )
+	
+	lResult = lResult And TestLogicalValue( "ChooseMultipleColumns 3 column", ChooseMultipleColumns( "Rect1", "Choose two", "Choose the first two columns", sCols ), TRUE )
+	lResult = lResult And TestNumberValue( "ChooseMultipleColumns 3 count", UBound( sCols ), 2 )
+	lResult = lResult And TestStringValue( "ChooseMultipleColumns 3a", sCols(1), "another_string_column" )
+	lResult = lResult And TestStringValue( "ChooseMultipleColumns 3b", sCols(2), "date_column" )
+	
+	lResult = lResult And TestLogicalValue( "ChooseMultipleColumns 4 column", ChooseMultipleColumns( "Rect1", "Choose two", "Choose the second and forth columns", sCols ), TRUE )
+	lResult = lResult And TestNumberValue( "ChooseMultipleColumns 4 count", UBound( sCols ), 2 )
+	lResult = lResult And TestStringValue( "ChooseMultipleColumns 4a", sCols(1), "date_column" )
+	lResult = lResult And TestStringValue( "ChooseMultipleColumns 4b", sCols(2), "decimal_column" )
+	
+	Select string_column, date_column From Rect1 Into aquery NoSelect
+	lResult = lResult And TestLogicalValue( "ChooseMultipleColumns query column", ChooseMultipleColumns( "aquery", "Choose one", "Choose just the first column", sCols ), TRUE )
+	lResult = lResult And TestNumberValue( "ChooseMultipleColumns query count", UBound( sCols ), 1 )
+	lResult = lResult And TestStringValue( "ChooseMultipleColumns query", sCols(1), "date_column" )
+	
+	Close All
+	
+	TestChooseMultipleColumns = lResult
+End Function
+
+Function TestChooseStringArray() As Logical
+	Dim lResult As Logical
+	lResult = TRUE
+	
+	'Make a test array
+	Dim sArray(4) As String
+	sArray(1) = "First row"
+	sArray(2) = "Second row"
+	sArray(3) = "Third row"
+	sArray(4) = "Forth row"
+	
+	Note "Should now see a ChooseArray dialog with 4 rows. Choose the first row, which should be the default."
+	lResult = lResult And TestStringValue( "ChooseStringArray 1", ChooseStringArray( "Title", "Choose the first row", sArray, "" ), "First row" )
+	
+	Note "Should now see a ChooseArray dialog with 4 rows. Choose the last row."
+	lResult = lResult And TestStringValue( "ChooseStringArray 2", ChooseStringArray( "Title", "Choose the last row", sArray, "" ), "Forth row" )
+	
+	Note "Click cancel"
+	lResult = lResult And TestStringValue( "ChooseStringArray Cancel", ChooseStringArray( "Title", "Press Cancel", sArray, "" ), "" )
+	
+	Dim sBadArray() As String
+	lResult = lResult And TestStringValue( "ChooseStringArray no contents", ChooseStringArray( "Title", "No tables", sBadArray, "" ), "" )
+	lResult = lResult And TestStringValue( "ChooseStringArray no title", ChooseStringArray( "", "No title", sBadArray, "" ), "" )
+	lResult = lResult And TestStringValue( "ChooseStringArray no prompt", ChooseStringArray( "Title", "", sBadArray, "" ), "" )
+	
+	Note "Should now see a ChooseArray dialog with 4 rows. Choose the default row."
+	lResult = lResult And TestStringValue( "ChooseStringArray default", ChooseStringArray( "Title", "Choose the default row", sArray, "Third row" ), "Third row" )
+	
+	Note "Should now see a ChooseArray dialog with 4 rows. Choose the default row."
+	lResult = lResult And TestStringValue( "ChooseStringArray bad default", ChooseStringArray( "Title", "Choose the default row", sArray, "xxThird row" ), "First row" )
+	
+	TestChooseStringArray = lResult
+End Function
+
+Function TestChooseStringArrayAdvanced() As Logical
+	Dim lResult As Logical
+	lResult = TRUE
+	
+	'Make a test display array
+	Dim sShowArray(4) As String
+	sShowArray(1) = "First row"
+	sShowArray(2) = "Second row"
+	sShowArray(3) = "Third row"
+	sShowArray(4) = "Forth row"
+	'Make a test return array
+	Dim sReturnArray(4) As String
+	sReturnArray(1) = "1"
+	sReturnArray(2) = "2"
+	sReturnArray(3) = "3"
+	sReturnArray(4) = "4"
+	
+	Note "Should now see a ChooseArray dialog with 4 rows. Choose the first row, which should be the ""first row""."
+	lResult = lResult And TestStringValue( "ChooseStringArrayAdvanced 1", ChooseStringArrayAdvanced( "Title", "Choose the first row", sShowArray, sReturnArray, "1" ), "1" )
+	
+	Note "Should now see a ChooseArray dialog with 4 rows. Choose the last row, which should be ""forth row""."
+	lResult = lResult And TestStringValue( "ChooseStringArrayAdvanced 2", ChooseStringArrayAdvanced( "Title", "Choose the last row", sShowArray, sReturnArray, "1" ), "4" )
+	
+	Note "Click cancel"
+	lResult = lResult And TestStringValue( "ChooseStringArrayAdvanced Cancel", ChooseStringArrayAdvanced( "Title", "Press Cancel", sShowArray, sReturnArray, "" ), "" )
+	
+	Dim sBadArray(3) As String
+	Dim sEmptyArray() As String
+	lResult = lResult And TestStringValue( "ChooseStringArrayAdvanced bad array 1", ChooseStringArrayAdvanced( "Title", "Should not see this dialog 1", sShowArray, sBadArray, "" ), "" )
+	lResult = lResult And TestStringValue( "ChooseStringArrayAdvanced bad array 2", ChooseStringArrayAdvanced( "Title", "Should not see this dialog 2", sBadArray, sReturnArray, "" ), "" )
+	lResult = lResult And TestStringValue( "ChooseStringArrayAdvanced bad array 3", ChooseStringArrayAdvanced( "Title", "Should not see this dialog 3", sEmptyArray, sEmptyArray, "" ), "" )
+	
+	Note "Should now see a ChooseArray dialog with 4 rows. Choose the default row."
+	lResult = lResult And TestStringValue( "ChooseStringArrayAdvanced default", ChooseStringArrayAdvanced( "Title", "Choose the default row", sShowArray, sReturnArray, "3" ), "3" )
+	
+	Note "Should now see a ChooseArray dialog with 4 rows. Choose the default row."
+	lResult = lResult And TestStringValue( "ChooseStringArrayAdvanced bad default", ChooseStringArrayAdvanced( "Title", "Choose the default row", sShowArray, sReturnArray, "Third row" ), "1" )
+	
+	TestChooseStringArrayAdvanced = lResult
+End Function
+
+
+Function TestChooseMultiColumnDialog() As Logical
+	Dim lResult As Logical
+	lResult = TRUE
+	
+	Dim sColumns() As String
+	
+	Open Table ApplicationDirectory$() + "test_data\rect.tab" As Rect1
+	
+	lResult = lResult And TestLogicalValue( "ChooseMultiColumnDialog bad table", MultiChooseColumns( "a", sColumns, FALSE ), FALSE )
+	Note "Click cancel"
+	lResult = lResult And TestLogicalValue( "ChooseMultiColumnDialog cancel", MultiChooseColumns( "Rect1", sColumns, FALSE ), FALSE )
+	Note "Select NO columns and click OK"
+	lResult = lResult And TestLogicalValue( "ChooseMultiColumnDialog no selection 1", MultiChooseColumns( "Rect1", sColumns, FALSE ), TRUE )
+	lResult = lResult And TestNumberValue( "ChooseMultiColumnDialog no selection 2", UBound( sColumns ), 0 )
+	
+	Note "Select just the first column and click OK"
+	lResult = lResult And TestLogicalValue( "ChooseMultiColumnDialog one selection 1", MultiChooseColumns( "Rect1", sColumns, FALSE ), TRUE )
+	lResult = lResult And TestNumberValue( "ChooseMultiColumnDialog one selection 2", UBound( sColumns ), 1 )
+	lResult = lResult And TestStringValue( "ChooseMultiColumnDialog one selection 3", sColumns(1), "id" )
+	
+	ReDim sColumns(0)
+	
+	Note "Select the first two columns and click OK"
+	lResult = lResult And TestLogicalValue( "ChooseMultiColumnDialog two selection 1", MultiChooseColumns( "Rect1", sColumns, FALSE ), TRUE )
+	lResult = lResult And TestNumberValue( "ChooseMultiColumnDialog two selection 2", UBound( sColumns ), 2 )
+	lResult = lResult And TestStringValue( "ChooseMultiColumnDialog two selection 3", sColumns(1), "id" )
+	lResult = lResult And TestStringValue( "ChooseMultiColumnDialog two selection 4", sColumns(2), "string_column" )
+	
+	ReDim sColumns(0)
+	
+	Note "Add all columns and click OK"
+	lResult = lResult And TestLogicalValue( "ChooseMultiColumnDialog all 1", MultiChooseColumns( "Rect1", sColumns, FALSE ), TRUE )
+	lResult = lResult And TestNumberValue( "ChooseMultiColumnDialog all 2", UBound( sColumns ), 11 )
+	
+	ReDim sColumns(0)
+	
+	Note "Add all columns then remove the first and click OK"
+	lResult = lResult And TestLogicalValue( "ChooseMultiColumnDialog remove one 1", MultiChooseColumns( "Rect1", sColumns, FALSE ), TRUE )
+	lResult = lResult And TestNumberValue( "ChooseMultiColumnDialog remove one 2", UBound( sColumns ), 10 )
+	lResult = lResult And TestStringValue( "ChooseMultiColumnDialog remove one 3", sColumns(1), "string_column" )
+	
+	Note "Click OK"
+	ReDim sColumns(1)
+	sColumns(1) = "string_column"
+	lResult = lResult And TestLogicalValue( "ChooseMultiColumnDialog preselected 1", MultiChooseColumns( "Rect1", sColumns, FALSE ), TRUE )
+	lResult = lResult And TestNumberValue( "ChooseMultiColumnDialog preselected 2", UBound( sColumns ), 1 )
+	lResult = lResult And TestStringValue( "ChooseMultiColumnDialog preselected 3", sColumns(1), "string_column" )
+	
+	Note "Click OK"
+	ReDim sColumns(11)
+	Dim i As Integer
+	For i = 1 to 11
+		sColumns(i) = ColumnInfo( "Rect1", "COL" + i, COL_INFO_NAME )
+	Next
+	lResult = lResult And TestLogicalValue( "ChooseMultiColumnDialog preselected all 1", MultiChooseColumns( "Rect1", sColumns, FALSE ), TRUE )
+	lResult = lResult And TestNumberValue( "ChooseMultiColumnDialog preselected all 2", UBound( sColumns ), 11 )
+	lResult = lResult And TestStringValue( "ChooseMultiColumnDialog preselected all 3", sColumns(1), "id" )
+	
+	Note "OK should be disabled - click CANCEL"
+	ReDim sColumns(0)
+	lResult = lResult And TestLogicalValue( "ChooseMultiColumnDialog force select 1", MultiChooseColumns( "Rect1", sColumns, TRUE ), FALSE )
+	
+	Note "OK should be disabled. Select any combination of columns and click OK"
+	ReDim sColumns(0)
+	lResult = lResult And TestLogicalValue( "ChooseMultiColumnDialog force select 2", MultiChooseColumns( "Rect1", sColumns, TRUE ), TRUE )
+	lResult = lResult And TestLogicalValue( "ChooseMultiColumnDialog force select 2a", UBound( sColumns ) > 0, TRUE )
+	
+	Close All
+	
+	TestChooseMultiColumnDialog = lResult
+	
+End Function
