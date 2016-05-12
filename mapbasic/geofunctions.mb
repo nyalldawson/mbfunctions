@@ -225,3 +225,140 @@ Function OrthagonalizeRing( ByVal oObj As Object, ByVal iPoly As Integer ) As Ob
 	
 	OrthagonalizeRing = oResult
 End Function
+
+
+Function ThreePointsToCircle( ByVal oPoint1 As Object, ByVal oPoint2 As Object, ByVal oPoint3 As Object ) As Object
+	Dim fMa, fMb As Float
+	Dim fX, fY As Float
+	Dim fY1, fY2, fY3, fX1, fX2, fX3 As Float
+	
+	fY1 = CentroidY( oPoint1 )
+	fY2 = CentroidY( oPoint2 )
+	fY3 = CentroidY( oPoint3 )
+	fX1 = CentroidX( oPoint1 )
+	fX2 = CentroidX( oPoint2 )
+	fX3 = CentroidX( oPoint3 )
+	
+	fMa = ( fY2 - fY1 ) / ( fX2 - fX1 )
+	fMb = ( fY3 - fY2 ) / ( fX3 - fX2 )
+	
+	fX = ( fMa * fMb * ( fY1 - fY3 ) + fMb * ( fX1 + fX2 ) - fMa * ( fX2 + fX3 )) / ( 2 * ( fMb - fMa ))
+	fY = ( - 1 / fMa ) * ( fX - ( fX1 + fX2 ) / 2 ) + ( fY1 + fY2 ) / 2
+	
+	Dim oCenter As Object
+	oCenter = CreatePoint( fX, fY )
+	
+	Dim fRadius As Float
+	fRadius = SphericalObjectDistance( oCenter, oPoint1, "m" )
+	
+	ThreePointsToCircle = Buffer( oCenter, 60, fRadius, "m" )
+End Function
+
+
+' see "Applet’s Algorithm": http://www.personal.kent.edu/~rmuhamma/Compgeometry/MyCG/CG-Applets/Center/centercli.htm
+Function MinimumEnclosingCircle( ByVal sPointTable As String ) As Object
+	Dim oHull, oMBR, oSmallCircle As Object
+	Create Object As ConvexHull From sPointTable Into Variable oHull
+	
+	Dim iNoSides, iSideS1, iSideS2, iVertices As Integer
+	iNoSides = ObjectInfo( oHull, OBJ_INFO_NPNTS ) - 1
+	iVertices = iNoSides
+	
+	' pick any side, say S, of the convex hull
+	iSideS1 = 1
+	iSideS2 = 2
+	
+	Dim i As Integer
+	Dim fAngleSubtended As Float
+	Dim flenS1S2, fLenS1V, fLenS2V As Float
+	Dim oS1, oS2, oV As Object
+	Dim fAlpha As Float
+	Dim fBeta, fGamma As Float
+	Dim iV As Integer
+	
+	Dim n As Integer
+	n = 1
+	
+	' For each vertex of H other than those of S, we compute the angle subtended by S.
+	' The minimum such angle occurs at vertex v, and the value of the minimum angle is a (alpha).
+	again:
+	
+	oS1 = CreatePoint( ObjectNodeX( oHull, 1, iSideS1 ), ObjectNodeY( oHull, 1, iSideS1 ))
+	oS2 = CreatePoint( ObjectNodeX( oHull, 1, iSideS2 ), ObjectNodeY( oHull, 1, iSideS2 ))
+	
+	fAlpha = 360
+	
+	' "For each vertex of oHull:"
+	For i = n to iVertices
+		' "(other than those of S:)"
+		If Not ( i = iSideS1 Or i = iSideS2 ) Then
+			oV = CreatePoint( ObjectNodeX( oHull, 1, i ), ObjectNodeY( oHull, 1, i ))
+			
+			' "Compute angle subtended by S"
+			flenS1S2 = SphericalObjectDistance( oS1, oS2, "m" )
+			fLenS1V = SphericalObjectDistance( oS1, oV, "m" )
+			fLenS2V = SphericalObjectDistance( oS2, oV, "m" )
+			' (cosine rule)
+			fAngleSubtended = Acos(( flenS1V^2 + fLenS2V^2 - fLenS1S2^2 ) / ( 2 * flenS1V * flenS2V )) * RAD_2_DEG
+			
+			' " The minimum such angle occurs at vertex v, and the value of the minimum angle is a (alpha)."
+			If fAngleSubtended < fAlpha Then
+				iV = i
+				fAlpha = fAngleSubtended
+			End If
+		End If
+	Next
+	
+	If fAlpha < 90 Then
+		'"Goto step2"
+		
+		oV = CreatePoint( ObjectNodeX( oHull, 1, iV ), ObjectNodeY( oHull, 1, iV ))
+		' "Compute angle subtended by S"
+		flenS1S2 = SphericalObjectDistance( oS1, oS2, "m" )
+		fLenS1V = SphericalObjectDistance( oS1, oV, "m" )
+		fLenS2V = SphericalObjectDistance( oS2, oV, "m" )
+		
+		'"Since a < 90 degrees, check the remaining vertices of the triangle formed by S and v."
+		fBeta = Acos(( flenS1S2^2 + fLenS2V^2 - fLenS1V^2 ) / ( 2 * flenS1S2 * flenS2V )) * RAD_2_DEG
+		fGamma = Acos(( flenS1S2^2 + fLenS1V^2 - fLenS2V^2 ) / ( 2 * flenS1S2 * flenS1V )) * RAD_2_DEG
+		
+		' "IF no vertices are obtuse THEN We are done!"
+		If ( fBeta >= 90 And fBeta < 180 ) Or ( fGamma >= 90 And fGamma < 180 ) Then
+			' "If one of the other angles of the triangle formed by S and v is obtuse"
+			
+			' "then set S to be the side opposite the obtuse angle and repeat the main loop of the algorithm (i.e., Goto step 1 above)."
+			If ( fBeta >= 90 And fBeta < 180 ) Then
+				' S = s1->v
+				iSideS1 = iSideS1
+				iSideS2 = iV
+			Else
+				' S = s2 -> v
+				iSideS1 = iV
+				iSideS2 = iSideS2
+			End If
+			
+			' "repeat the main loop of the algorithm (i.e., Goto step 1 above)."
+			n = n + 1
+			Goto again
+		Else
+			' done
+			'  The MEC is determined by the vertices of S and the vertex v
+			MinimumEnclosingCircle = ThreePointsToCircle( oS1, oS2, oV )
+		End If
+	Else
+		' "The minimal enclosing circle is determined by the diametric circle of S"
+		
+		Dim fRad As Float
+		fRad = SphericalObjectDistance( oS1, oS2, "m" ) / 2
+		
+		Dim fX, fY As Float
+		fX = ( CentroidX( oS1 ) + CentroidX( oS2 )) / 2
+		fY = ( CentroidY( oS1 ) + CentroidY( oS2 )) / 2
+		
+		Dim oCenter As Object
+		oCenter = CreatePoint ( fX, fY )
+		
+		MinimumEnclosingCircle = Buffer( oCenter, 60, fRad, "m" )
+	End If
+	
+End Function

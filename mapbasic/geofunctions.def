@@ -74,3 +74,19 @@ Declare Function RingCentroid( ByVal oObj As Object, ByVal iPoly As Integer ) As
 '   Object with orthagonalized ring
 Declare Function OrthagonalizeRing( ByVal oObj As Object, ByVal iPoly As Integer ) As Object
 
+' Creates a circle through three given points
+' Parameters:
+'   oPoint1: point 1
+'   oPoint2: point 2
+'   oPoint3: point 3
+' Returns:
+'   Circle passing through the three given points
+Declare Function ThreePointsToCircle( ByVal oPoint1 As Object, ByVal oPoint2 As Object, ByVal oPoint3 As Object ) As Object
+
+' Returns the minimum enclosing circle (circle with smallest area) which contains all points from a table
+' Parameters:
+'   sPointTable: name of table containing points to enclose
+' Returns:
+'   Minimum area circle enclosing all points
+Declare Function MinimumEnclosingCircle( ByVal sPointTable As String ) As Object
+

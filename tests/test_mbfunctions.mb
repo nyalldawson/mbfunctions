@@ -786,9 +786,9 @@ Function TestSafeClose() As Logical
 	' Test closing hidden tables
 	Open Table ApplicationDirectory$() + "test_data\rect2.tab" As Hidden Hide
 	Select * From Hidden Into "test" NoSelect
-	lResult = lResult And TestLogicalValue( "Test safeclose hidden", TableExists("test"), TRUE )
-	Call SafeClose("Hidden")
-	lResult = lResult And TestLogicalValue( "Test safeclose hidden", TableExists("test"), FALSE )
+	lResult = lResult And TestLogicalValue( "Test safeclose hidden", TableExists( "test" ), TRUE )
+	Call SafeClose( "Hidden" )
+	lResult = lResult And TestLogicalValue( "Test safeclose hidden", TableExists( "test" ), FALSE )
 	
 	TestSafeClose = lResult
 End Function
